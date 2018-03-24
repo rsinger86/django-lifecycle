@@ -1,0 +1,7 @@
+*.pyc
+build/
+local-development.txt
+local-dev.txt
+dist/
+MANIFEST
+db.sqlite3
