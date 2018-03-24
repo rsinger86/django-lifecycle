@@ -1,6 +1,6 @@
 ## Intro
 
-This project provides a `@hook` decorator as well as a base model or mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is [Signals](https://docs.djangoproject.com/en/2.0/topics/signals/), however in the projects I've worked on, my teams often find that *Signals introduce unnesseary indirection and are at odds with Django's "fat models" approach to including related logic in the model class itself. 
+This project provides a `@hook` decorator as well as a base model or mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is [Signals](https://docs.djangoproject.com/en/2.0/topics/signals/), however in the projects I've worked on, my teams often find that Signals introduce unnesseary indirection and are at odds with Django's "fat models" approach to including related logic in the model class itself*. 
 
 In short, you can write model code that looks like this:
 
@@ -54,7 +54,7 @@ Or add the mixin to your Django model definition:
 
 ```
 from django.db import models
-from django_lifecycle import LifecycleModel, hook
+from django_lifecycle import LifecycleModelMixin, hook
 
 
 class YourModel(LifecycleModelMixin, models.Model):
@@ -107,7 +107,7 @@ The `was` and `is_now` keyword arguments allow you to compare the model's state 
 
 ## Example - Hook with State Transition Conditions: Part II
 
-You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trials because they should expire:
+You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should always expire:
 
 ```
     @hook('before_delete', when='has_trial', is_now=True)
@@ -116,3 +116,29 @@ You can also enforce certain dissallowed transitions. For example, maybe you don
 ```
 
 We've ommitted the `was` keyword meaning that the initial state of the `has_trial` field can be any value ("*").
+
+## Example - Hook with Simple Change Condition
+
+As we saw in the very first example, you can also pass the keyword argument `changed=True` to run the hooked method if a field has changed, regardless of previous or current value.
+
+```
+    @hook('before_update', when='address', has_changed=True)
+    def timestamp_address_change(self):
+        self.address_updated_at = timezone.now()
+```
+
+## Example - Custom Transition Condition
+
+If you need to hook into events with more complex conditions, you can take advantage of `has_changed` and `initial_value` methods:
+
+ ```
+    @hook('after_update')
+    def on_update(self):
+        if self.has_changed('username') and not self.has_changed('password'):
+            # do the thing here
+            if self.initial_value('login_attempts') == 2:
+                do_thing()
+            else:
+                do_other_thing()
+
+```
