@@ -53,7 +53,8 @@ Table of Contents:
 - * [Lifecycle Hooks - Documented](#lifecycle-hooks-doc)
 - * [Condition Arguments - Documented](#condition-args-doc)
 - * [Utility Methods - Documented](#utility-method-doc)
-
+- [Testing](#testing)
+- [License](#license)
 
 # Installation
 
@@ -213,3 +214,12 @@ These are available on your model when you use the mixin or extend the base mode
 |:-------------:|:-------------:|
 | `has_changed(field_name: str) -> bool` | Return a boolean indicating whether the field's value has changed since the model was initialized |
 | `initial_value(field_name: str) -> bool` | Return the value of the field when the model was first initialized |
+
+
+# Testing
+
+Tests are found in a simplified Django project in the ```/tests``` folder. Install the project requirements and do ```./manage.py test``` to run them.
+
+# License
+
+See [License](LICENSE.md).
