@@ -1,11 +1,12 @@
-## Intro
+# Overview
 
-This project provides a `@hook` decorator as well as a base model or mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is [Signals](https://docs.djangoproject.com/en/2.0/topics/signals/), however in the projects I've worked on, my teams often find that Signals introduce unnesseary indirection and are at odds with Django's "fat models" approach to including related logic in the model class itself*. 
+This project provides a `@hook` decorator as well as a base model or mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is [Signals](https://docs.djangoproject.com/en/2.0/topics/signals/). However, in the projects I've worked on, my team often finds that Signals introduce unnesseary indirection and are at odds with Django's "fat models" approach of including related logic in the model class itself*. 
 
 In short, you can write model code that looks like this:
 
 ```
 from django_lifecycle import LifecycleModel, hook
+
 
 class UserAccount(LifecycleModel):
     username = models.CharField(max_length=100)
@@ -20,7 +21,7 @@ class UserAccount(LifecycleModel):
 Instead of overriding `save` and `__init___` in a clunky way that hurts readability:
 
 ```
-    ### ... previous class and field declaration ...
+    # same class and field declarations as above ...
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,7 +37,36 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 
 *This is not to say Signals are never useful; my team prefers to use them for incidental concerns not related to the business domain, like cache invalidation.
 
-## Usage 
+
+Table of Contents:
+
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [Usage](#usage)
+- [Examples](#examples)
+  * [Simple Hook - No Conditions](#ex-simple-hook)
+  * [Hook with Transition Conditions: Part I](#ex-condition-hook-1")
+  * [Hook with Transition Conditions: Part II](#ex-condition-hook-2")
+  * [Hook with Simple Change Condition](#ex-simple-change)
+  * [Custom Condition](#ex-custom-condition)
+- [Documentation](#docs)
+- * [Lifecycle Hooks - Documented](#lifecycle-hooks-doc)
+- * [Condition Arguments - Documented](#condition-args-doc)
+- * [Utility Methods - Documented](#utility-method-doc)
+
+
+# Installation
+
+```
+pip install django-lifecycle
+```
+
+# Requirements
+
+* Python (3.3, 3.4, 3.5)
+* Django (1.8, 1.9, 1.10)
+
+# Usage 
 
 Either extend the provided abstract base model class:
 
@@ -64,7 +94,9 @@ class YourModel(LifecycleModelMixin, models.Model):
 
 Great, now we can start adding lifecycle hooks! Let's do a few examples that illustrate the ability to not only hook into certain events, but to add basic conditions that can replace the need for boilerplate conditional code. 
 
-## Example - Simple Hook - No conditions
+# Examples
+
+## Simple Hook - No conditions <a id="ex-simple-hook"></a>
 
 Say you want to process a thumbnail image in the background and send the user an email when they first sign up:
 
@@ -90,7 +122,7 @@ Or say you want to email a user when their account is deleted. You could add the
         )
 ```
 
-## Example - Hook with State Transition Conditions: Part I
+## Hook with Transition Conditions: Part I <a id="ex-condition-hook-1"></a>
 
 Maybe you only want the hooked method to run only under certain circumstances related to the state of your model. Say if updating a model instance changes a "status" field's value from "active" to "banned", you want to send them an email:
 
@@ -105,7 +137,7 @@ Maybe you only want the hooked method to run only under certain circumstances re
 
 The `was` and `is_now` keyword arguments allow you to compare the model's state from when it was first instantiated to the current moment. You can also pass an `*` to indicate any value - these are the defaults, meaning that by default the hooked method will fire. The `when` keyword specifies which field to check against. 
 
-## Example - Hook with State Transition Conditions: Part II
+## Hook with Transition Conditions: Part II <a id="ex-condition-hook-2"></a>
 
 You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should always expire:
 
@@ -117,7 +149,7 @@ You can also enforce certain dissallowed transitions. For example, maybe you don
 
 We've ommitted the `was` keyword meaning that the initial state of the `has_trial` field can be any value ("*").
 
-## Example - Hook with Simple Change Condition
+## Hook with Simple Change Condition <a id="ex-simple-change"></a>
 
 As we saw in the very first example, you can also pass the keyword argument `changed=True` to run the hooked method if a field has changed, regardless of previous or current value.
 
@@ -127,7 +159,7 @@ As we saw in the very first example, you can also pass the keyword argument `cha
         self.address_updated_at = timezone.now()
 ```
 
-## Example - Custom Transition Condition
+## Custom Condition <a id="ex-custom-condition"></a>
 
 If you need to hook into events with more complex conditions, you can take advantage of `has_changed` and `initial_value` methods:
 
@@ -142,7 +174,9 @@ If you need to hook into events with more complex conditions, you can take advan
                 do_other_thing()
 ```
 
-## Lifecycle Hooks - Detailed
+# Documentation <a id="docs"></a>
+
+## Lifecycle Hooks <a id="lifecycle-hooks-doc"></a>
 
 The hook name is passed as the first positional argument to the @hook decorator, e.g. `@hook('before_create)`.
 
@@ -159,7 +193,7 @@ The hook name is passed as the first positional argument to the @hook decorator,
 | after_delete | Immediately after `delete` is called |
 
 
-## Hook Condition Arguments - Detailed
+## Condition Arguments <a id="condition-args-doc"></a>
 
 `@hook(hook_name, when: str, was: any: is_now: any: changed: bool)`
 
@@ -171,7 +205,7 @@ The hook name is passed as the first positional argument to the @hook decorator,
 | changed | bool | Only fire the hooked method if the value of the `when` field has changed since the model was initialized  |
 
 
-## Other Utility Methods
+## Other Utility Methods <a id="utility-method-doc"></a>
 
 These are available on your model when you use the mixin or extend the base model.
 
