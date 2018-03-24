@@ -140,5 +140,42 @@ If you need to hook into events with more complex conditions, you can take advan
                 do_thing()
             else:
                 do_other_thing()
-
 ```
+
+## Lifecycle Hooks - Detailed
+
+The hook name is passed as the first positional argument to the @hook decorator, e.g. `@hook('before_create)`.
+
+`@hook(hook_name, **kwargs)`
+
+
+| Hook name       | When it fires   |
+|:-------------:|:-------------:|
+| before_create | Immediately before `save` is called, if `pk` is `None` |
+| after_create | Immediately after `save` is called, if `pk` was initially `None` |
+| before_update | Immediately before `save` is called, if `pk` is NOT `None` |
+| after_update | Immediately after `save` is called, if `pk` was NOT `None` |
+| before_delete | Immediately before `delete` is called |
+| after_delete | Immediately after `delete` is called |
+
+
+## Hook Condition Arguments - Detailed
+
+`@hook(hook_name, when: str, was: any: is_now: any: changed: bool)`
+
+| Keywarg arg       | Type   | Details |
+|:-------------:|:-------------:|:-------------:|
+| when | str | The name of the field that you want to check against; required for the conditions below to be checked |
+| was | any | Only fire the hooked method if the value of the `when` field was equal to this value when first initialized; defaults to `*`.  |
+| is_now | any | Only fire the hooked method if the value of the `when` field is currently equal to this value; defaults to `*`.  |
+| changed | bool | Only fire the hooked method if the value of the `when` field has changed since the model was initialized  |
+
+
+## Other Utility Methods
+
+These are available on your model when you use the mixin or extend the base model.
+
+| Method       | Details |
+|:-------------:|:-------------:|
+| `has_changed(field_name: str) -> bool` | Return a boolean indicating whether the field's value has changed since the model was initialized |
+| `initial_value(field_name: str) -> bool` | Return the value of the field when the model was first initialized |
