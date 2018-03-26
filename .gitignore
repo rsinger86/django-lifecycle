@@ -5,3 +5,4 @@ local-dev.txt
 dist/
 MANIFEST
 db.sqlite3
+__pycache__/ 
