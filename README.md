@@ -50,9 +50,9 @@ Table of Contents:
   * [Hook with Simple Change Condition](#ex-simple-change)
   * [Custom Condition](#ex-custom-condition)
 - [Documentation](#docs)
-- * [Lifecycle Hooks - Documented](#lifecycle-hooks-doc)
-- * [Condition Arguments - Documented](#condition-args-doc)
-- * [Utility Methods - Documented](#utility-method-doc)
+- * [Lifecycle Hook](#lifecycle-hooks-doc)
+- * [Condition Arguments](#condition-args-doc)
+- * [Utility Methods](#utility-method-doc)
 - [Testing](#testing)
 - [License](#license)
 
@@ -71,7 +71,7 @@ pip install django-lifecycle
 
 Either extend the provided abstract base model class:
 
-```
+```python
 from django_lifecycle import LifecycleModel, hook
 
 
@@ -83,7 +83,7 @@ class YourModel(LifecycleModel):
 Or add the mixin to your Django model definition:
 
 
-```
+```python
 from django.db import models
 from django_lifecycle import LifecycleModelMixin, hook
 
@@ -101,7 +101,7 @@ Great, now we can start adding lifecycle hooks! Let's do a few examples that ill
 
 Say you want to process a thumbnail image in the background and send the user an email when they first sign up:
 
-```
+```python
     @hook('after_create')
     def do_after_create_jobs(self):
         enqueue_job(process_thumbnail, self.picture_url)
@@ -114,7 +114,7 @@ Say you want to process a thumbnail image in the background and send the user an
 
 Or say you want to email a user when their account is deleted. You could add the decorated method below:
 
-```
+```python
     @hook('after_delete')
     def email_deleted_user(self):
         mail.send_mail(
@@ -127,7 +127,7 @@ Or say you want to email a user when their account is deleted. You could add the
 
 Maybe you only want the hooked method to run only under certain circumstances related to the state of your model. Say if updating a model instance changes a "status" field's value from "active" to "banned", you want to send them an email:
 
-```
+```python
     @hook('after_update', when='status', was='active', is_now='banned')
     def email_banned_user(self):
         mail.send_mail(
@@ -142,7 +142,7 @@ The `was` and `is_now` keyword arguments allow you to compare the model's state 
 
 You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should always expire:
 
-```
+```python
     @hook('before_delete', when='has_trial', is_now=True)
     def ensure_trial_not_active(self):
         raise CannotDeleteActiveTrial('Cannot delete trial user!')
@@ -154,7 +154,7 @@ We've ommitted the `was` keyword meaning that the initial state of the `has_tria
 
 As we saw in the very first example, you can also pass the keyword argument `changed=True` to run the hooked method if a field has changed, regardless of previous or current value.
 
-```
+```python
     @hook('before_update', when='address', has_changed=True)
     def timestamp_address_change(self):
         self.address_updated_at = timezone.now()
@@ -164,7 +164,7 @@ As we saw in the very first example, you can also pass the keyword argument `cha
 
 If you need to hook into events with more complex conditions, you can take advantage of `has_changed` and `initial_value` methods:
 
- ```
+ ```python
     @hook('after_update')
     def on_update(self):
         if self.has_changed('username') and not self.has_changed('password'):
