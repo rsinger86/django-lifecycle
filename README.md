@@ -196,7 +196,7 @@ The hook name is passed as the first positional argument to the @hook decorator,
 
 ## Condition Arguments <a id="condition-args-doc"></a>
 
-`@hook(hook_name, when: str, was: any: is_now: any: changed: bool)`
+`hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = None):`
 
 | Keywarg arg       | Type   | Details |
 |:-------------:|:-------------:|:-------------:|
