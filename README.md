@@ -38,7 +38,7 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 *This is not to say Signals are never useful; my team prefers to use them for incidental concerns not related to the business domain, like cache invalidation.
 
 
-#Table of Contents:
+# Table of Contents:
 
 - [Installation](#installation)
 - [Requirements](#requirements)
