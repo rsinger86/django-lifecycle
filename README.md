@@ -4,7 +4,7 @@ This project provides a `@hook` decorator as well as a base model or mixin to ad
 
 In short, you can write model code that looks like this:
 
-```
+```python
 from django_lifecycle import LifecycleModel, hook
 
 
@@ -20,7 +20,7 @@ class UserAccount(LifecycleModel):
 
 Instead of overriding `save` and `__init___` in a clunky way that hurts readability:
 
-```
+```python
     # same class and field declarations as above ...
     
     def __init__(self, *args, **kwargs):
