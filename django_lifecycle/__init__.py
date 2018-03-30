@@ -1,5 +1,6 @@
 from functools import reduce
 from django.db import models
+from django.utils.functional import cached_property
 
 
 
@@ -119,12 +120,17 @@ class LifecycleModelMixin(object):
         self._run_hooked_methods('after_delete')
 
     
+    @cached_property
+    def _field_names(self):
+        return [field.name for field in self._meta.get_fields()]
+            
+        
     def _get_potentially_hooked_methods(self):
         collected = []
         skip = ('_get_potential_methods', '_run_hooked_methods')
         
         for name in dir(self):
-            if name in skip:
+            if name in skip or name in self._field_names:
                 continue
                 
             try:
