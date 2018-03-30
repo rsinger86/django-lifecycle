@@ -196,14 +196,14 @@ The hook name is passed as the first positional argument to the @hook decorator,
 
 ## Condition Arguments <a id="condition-args-doc"></a>
 
-`hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = None):`
+`@hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = None):`
 
 | Keywarg arg       | Type   | Details |
 |:-------------:|:-------------:|:-------------:|
 | when | str | The name of the field that you want to check against; required for the conditions below to be checked |
 | was | any | Only fire the hooked method if the value of the `when` field was equal to this value when first initialized; defaults to `*`.  |
 | is_now | any | Only fire the hooked method if the value of the `when` field is currently equal to this value; defaults to `*`.  |
-| changed | bool | Only fire the hooked method if the value of the `when` field has changed since the model was initialized  |
+| has_changed | bool | Only fire the hooked method if the value of the `when` field has changed since the model was initialized  |
 
 
 ## Other Utility Methods <a id="utility-method-doc"></a>
