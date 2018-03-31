@@ -48,6 +48,7 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
   * [Hook with Transition Conditions: Part I](#ex-condition-hook-1")
   * [Hook with Transition Conditions: Part II](#ex-condition-hook-2")
   * [Hook with Simple Change Condition](#ex-simple-change)
+  * [Hook with "Is Not" Condition](#ex-is-not)
   * [Custom Condition](#ex-custom-condition)
 - [Documentation](#docs)
 - * [Lifecycle Hook](#lifecycle-hooks-doc)
@@ -158,6 +159,16 @@ As we saw in the very first example, you can also pass the keyword argument `cha
     @hook('before_update', when='address', has_changed=True)
     def timestamp_address_change(self):
         self.address_updated_at = timezone.now()
+```
+
+## Hook with "Is Not" Condition <a id="ex-is-not"></a>
+
+As we saw in the very first example, you can also pass the keyword argument `changed=True` to run the hooked method if a field has changed, regardless of previous or current value.
+
+```python
+    @hook('before_save', when='email', is_not=None)
+    def lowercase_email(self):
+        self.email = self.email.lower()
 ```
 
 ## Custom Condition <a id="ex-custom-condition"></a>
