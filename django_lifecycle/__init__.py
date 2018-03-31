@@ -4,8 +4,14 @@ from django.utils.functional import cached_property
 
 
 
-def hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = None):
+class NullType(object):
+    pass
+
+
+def hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = None, is_not = NullType):
     assert hook in (
+        'before_save',
+        'after_save',
         'before_create',
         'after_create',
         'before_update',
@@ -26,7 +32,8 @@ def hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = N
             'when': when,
             'was': was,
             'is_now': is_now,
-            'has_changed': has_changed
+            'has_changed': has_changed,
+            'is_not': is_not
         })
 
         return wrapper
@@ -93,8 +100,12 @@ class LifecycleModelMixin(object):
             self._run_hooked_methods('before_create')
         else:
             self._run_hooked_methods('before_update')
-            
+        
+        self._run_hooked_methods('before_save')
+
         super().save(*args, **kwargs)
+
+        self._run_hooked_methods('after_save')
 
         if is_new:
             self._run_hooked_methods('after_create')
@@ -127,7 +138,7 @@ class LifecycleModelMixin(object):
         
     def _get_potentially_hooked_methods(self):
         collected = []
-        skip = ('_get_potential_methods', '_run_hooked_methods')
+        skip = ('_get_potentially_hooked_methods', '_run_hooked_methods')
         
         for name in dir(self):
             if name in skip or name in self._field_names:
@@ -169,7 +180,10 @@ class LifecycleModelMixin(object):
         
         if not self._check_value_transition(specs):
             return False 
-        
+
+        if not self._check_is_not_condition(specs):
+            return False 
+
         return True
 
 
@@ -194,6 +208,16 @@ class LifecycleModelMixin(object):
             specs_match += 1
 
         return specs_match == 2
+
+
+    def _check_is_not_condition(self, specs: dict):
+        field_name = specs['when']
+        is_not = specs['is_not']
+ 
+        if is_not is NullType:
+            return True 
+        
+        return getattr(self, field_name) != is_not
 
 
 

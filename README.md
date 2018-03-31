@@ -186,6 +186,8 @@ The hook name is passed as the first positional argument to the @hook decorator,
 
 | Hook name       | When it fires   |
 |:-------------:|:-------------:|
+| before_save | Immediately before `save` is called |
+| after_save | Immediately after `save` is called
 | before_create | Immediately before `save` is called, if `pk` is `None` |
 | after_create | Immediately after `save` is called, if `pk` was initially `None` |
 | before_update | Immediately before `save` is called, if `pk` is NOT `None` |
@@ -204,6 +206,7 @@ The hook name is passed as the first positional argument to the @hook decorator,
 | was | any | Only fire the hooked method if the value of the `when` field was equal to this value when first initialized; defaults to `*`.  |
 | is_now | any | Only fire the hooked method if the value of the `when` field is currently equal to this value; defaults to `*`.  |
 | has_changed | bool | Only fire the hooked method if the value of the `when` field has changed since the model was initialized  |
+| is_not | any | Only fire the hooked method if the value of the `when` field is NOT equal to this value  |
 
 
 ## Other Utility Methods <a id="utility-method-doc"></a>

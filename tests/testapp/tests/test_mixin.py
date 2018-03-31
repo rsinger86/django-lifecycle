@@ -90,3 +90,29 @@ class LifecycleMixinTests(TestCase):
         self.assertFalse(useraccount._check_value_transition(specs))
         useraccount.first_name = 'Ned'
         self.assertTrue(useraccount._check_value_transition(specs))
+
+
+    def test_is_not_condition_should_pass(self):
+        specs =  {
+            'when': 'first_name',
+            'is_not': 'Ned'
+        }
+
+        data = self.stub_data
+        data['first_name'] = 'Homer'
+        UserAccount.objects.create(**data)
+        useraccount = UserAccount.objects.get()
+        self.assertTrue(useraccount._check_is_not_condition(specs))
+
+
+    def test_is_not_condition_should_not_pass(self):
+        specs =  {
+            'when': 'first_name',
+            'is_not': 'Ned'
+        }
+
+        data = self.stub_data
+        data['first_name'] = 'Ned'
+        UserAccount.objects.create(**data)
+        useraccount = UserAccount.objects.get()
+        self.assertFalse(useraccount._check_is_not_condition(specs))

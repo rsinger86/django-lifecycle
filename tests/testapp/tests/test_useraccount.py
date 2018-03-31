@@ -62,3 +62,10 @@ class UserAccountTestCase(TestCase):
         account.delete()
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'We have deleted your account')
+
+
+    def test_lowercase_email(self):
+        data = self.stub_data
+        data['email'] = 'Homer.Simpson@SpringfieldNuclear.com'
+        account = UserAccount.objects.create(**data)
+        self.assertEqual(account.email, 'homer.simpson@springfieldnuclear.com')
