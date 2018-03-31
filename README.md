@@ -163,7 +163,7 @@ As we saw in the very first example, you can also pass the keyword argument `cha
 
 ## Hook with "Is Not" Condition <a id="ex-is-not"></a>
 
-As we saw in the very first example, you can also pass the keyword argument `changed=True` to run the hooked method if a field has changed, regardless of previous or current value.
+You can also have a hooked method fire when a field's value IS NOT equal to a certain value. See a common example below involving lowercasing a user's email. 
 
 ```python
     @hook('before_save', when='email', is_not=None)
