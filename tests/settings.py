@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from distutils.version import StrictVersion
+
+import django
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,10 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
     'tests.testapp'
 ]
+
+# Django 1.8 requires that abstract model app is in INSTALLED_APPS
+if StrictVersion('1.8') <= StrictVersion(django.__version__) < StrictVersion('1.9'):
+    INSTALLED_APPS.append('django_lifecycle')
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
