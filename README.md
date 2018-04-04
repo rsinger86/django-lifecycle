@@ -96,6 +96,9 @@ class YourModel(LifecycleModelMixin, models.Model):
 
 ```
 
+:exclamation: If you are using **Django 1.8 or below** and want to extend the base model, you also have to add `django_lifecycle` to installed apps.
+
+
 Great, now we can start adding lifecycle hooks! Let's do a few examples that illustrate the ability to not only hook into certain events, but to add basic conditions that can replace the need for boilerplate conditional code. 
 
 # Examples
