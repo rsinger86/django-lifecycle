@@ -1,8 +1,8 @@
 from django.utils import timezone
 from django.core import mail
 from django.db import models
-from django_lifecycle import LifecycleModel, hook
-
+from django_lifecycle import hook
+from django_lifecycle.models import LifecycleModel
 
 
 class CannotDeleteActiveTrial(Exception):

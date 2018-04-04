@@ -1,7 +1,8 @@
-from functools import reduce
+from distutils.version import StrictVersion
+
+import django
 from django.db import models
 from django.utils.functional import cached_property
-
 
 
 class NullType(object):
@@ -219,9 +220,8 @@ class LifecycleModelMixin(object):
         
         return getattr(self, field_name) != is_not
 
-
-
-class LifecycleModel(LifecycleModelMixin, models.Model):
-    
-    class Meta:
-        abstract = True
+# For backwards compatibility and Django 1.8
+if StrictVersion(django.__version__) >= StrictVersion('1.9'):
+    class LifecycleModel(LifecycleModelMixin, models.Model):
+        class Meta:
+            abstract = True
