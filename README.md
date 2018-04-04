@@ -66,7 +66,7 @@ pip install django-lifecycle
 # Requirements
 
 * Python (3.3, 3.4, 3.5)
-* Django (1.8, 1.9, 1.10)
+* Django (1.8, 1.9, 1.10, 1.11, 2.0)
 
 # Usage 
 
@@ -229,6 +229,12 @@ These are available on your model when you use the mixin or extend the base mode
 | `has_changed(field_name: str) -> bool` | Return a boolean indicating whether the field's value has changed since the model was initialized |
 | `initial_value(field_name: str) -> bool` | Return the value of the field when the model was first initialized |
 
+
+# Changelog
+
+## 0.2.0
+* Added Django 1.8 support. Thanks @jtiai!
+* Tox testintg added for Python 3.4, 3.5, 3.6 and Django 1.8, 1.11 and 2.0. Thanks @jtiai!
 
 # Testing
 

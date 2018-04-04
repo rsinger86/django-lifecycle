@@ -9,3 +9,4 @@ __pycache__/
 .mypy_cache
 .vscode
 README.txt
+.tox
