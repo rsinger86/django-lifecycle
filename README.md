@@ -54,6 +54,8 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 - * [Lifecycle Hook](#lifecycle-hooks-doc)
 - * [Condition Arguments](#condition-args-doc)
 - * [Utility Methods](#utility-method-doc)
+- * [Limitations](#limitations)
+- [Changelog](#changelog)
 - [Testing](#testing)
 - [License](#license)
 
@@ -192,7 +194,7 @@ If you need to hook into events with more complex conditions, you can take advan
 
 The hook name is passed as the first positional argument to the @hook decorator, e.g. `@hook('before_create)`.
 
-`@hook(hook_name, **kwargs)`
+`@hook(hook_name: str, **kwargs)`
 
 
 | Hook name       | When it fires   |
@@ -209,7 +211,7 @@ The hook name is passed as the first positional argument to the @hook decorator,
 
 ## Condition Arguments <a id="condition-args-doc"></a>
 
-`@hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = None):`
+`@hook(hook_name: str, when: str = None, was='*', is_now='*', has_changed: bool = None, is_not = None):`
 
 | Keywarg arg       | Type   | Details |
 |:-------------:|:-------------:|:-------------:|
@@ -229,12 +231,15 @@ These are available on your model when you use the mixin or extend the base mode
 | `has_changed(field_name: str) -> bool` | Return a boolean indicating whether the field's value has changed since the model was initialized |
 | `initial_value(field_name: str) -> bool` | Return the value of the field when the model was first initialized |
 
+## Limitations <a id="limitations"></a>
 
-# Changelog
+Foreign key fields on a lifecycle model can only be checked with the `has_changed` argument. That is, this library only checks to see if the value of the foreign key has changed. If you need more advanced conditions, consider omiting the run conditions and accessing the related model's fields in the hooked method. 
 
-## 0.2.0
+# Changelog <a id="changelog"></a>
+
+## 0.2.0 (April 2018)
 * Added Django 1.8 support. Thanks @jtiai!
-* Tox testintg added for Python 3.4, 3.5, 3.6 and Django 1.8, 1.11 and 2.0. Thanks @jtiai!
+* Tox testing added for Python 3.4, 3.5, 3.6 and Django 1.8, 1.11 and 2.0. Thanks @jtiai!
 
 # Testing
 
