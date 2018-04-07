@@ -95,6 +95,13 @@ class LifecycleModelMixin(object):
 
         
     def save(self, *args, **kwargs):
+        skip_hooks = kwargs.pop('skip_hooks', False)
+        save = super().save
+
+        if skip_hooks:
+            save(*args, **kwargs)
+            return
+
         is_new = self.pk is None
 
         if is_new:
@@ -103,9 +110,7 @@ class LifecycleModelMixin(object):
             self._run_hooked_methods('before_update')
         
         self._run_hooked_methods('before_save')
-
-        super().save(*args, **kwargs)
-
+        save(*args, **kwargs)
         self._run_hooked_methods('after_save')
 
         if is_new:

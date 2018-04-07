@@ -56,7 +56,7 @@ class UserAccountTestCase(TestCase):
         self.assertRaises(CannotDeleteActiveTrial, account.delete)
 
         
-    def test_log_after_delete(self):
+    def test_email_after_delete(self):
         account = UserAccount.objects.create(**self.stub_data)
         mail.outbox = []
         account.delete()
@@ -69,3 +69,13 @@ class UserAccountTestCase(TestCase):
         data['email'] = 'Homer.Simpson@SpringfieldNuclear.com'
         account = UserAccount.objects.create(**data)
         self.assertEqual(account.email, 'homer.simpson@springfieldnuclear.com')
+
+
+    def test_skip_hooks(self):
+        """
+            Hooked method that auto-lowercases email should be skipped.
+        """
+        account = UserAccount.objects.create(**self.stub_data)
+        account.email = 'Homer.Simpson@springfieldnuclear'
+        account.save(skip_hooks=True)
+        self.assertEqual(account.email, 'Homer.Simpson@springfieldnuclear')

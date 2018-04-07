@@ -234,11 +234,21 @@ These are available on your model when you use the mixin or extend the base mode
 | `has_changed(field_name: str) -> bool` | Return a boolean indicating whether the field's value has changed since the model was initialized |
 | `initial_value(field_name: str) -> bool` | Return the value of the field when the model was first initialized |
 
+## Suppressing Hooked Methods
+
+To prevent the hooked methods from being called, pass `skip_hooks=True` when calling save:
+
+```python
+   account.save(skip_hooks=True)
+```
 ## Limitations <a id="limitations"></a>
 
 Foreign key fields on a lifecycle model can only be checked with the `has_changed` argument. That is, this library only checks to see if the value of the foreign key has changed. If you need more advanced conditions, consider omiting the run conditions and accessing the related model's fields in the hooked method. 
 
 # Changelog <a id="changelog"></a>
+
+## 0.2.2 (April 2018)
+* Save method now accepts `skip_hooks`, an optional boolean keyword argument that controls whether hooked methods are called.
 
 ## 0.2.1 (April 2018)
 * Fixed bug in `_potentially_hooked_methods` that caused unwanted side effects by accessing model instance methods decorated with `@cache_property` or `@property`. 
