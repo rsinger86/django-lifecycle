@@ -54,6 +54,7 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 - * [Lifecycle Hook](#lifecycle-hooks-doc)
 - * [Condition Arguments](#condition-args-doc)
 - * [Utility Methods](#utility-method-doc)
+- * [Suppressing Hooked Methods](#suppressing)
 - * [Limitations](#limitations)
 - [Changelog](#changelog)
 - [Testing](#testing)
@@ -234,7 +235,7 @@ These are available on your model when you use the mixin or extend the base mode
 | `has_changed(field_name: str) -> bool` | Return a boolean indicating whether the field's value has changed since the model was initialized |
 | `initial_value(field_name: str) -> bool` | Return the value of the field when the model was first initialized |
 
-## Suppressing Hooked Methods
+## Suppressing Hooked Methods <a id="suppressing"></a>
 
 To prevent the hooked methods from being called, pass `skip_hooks=True` when calling save:
 
