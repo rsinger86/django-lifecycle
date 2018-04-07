@@ -240,6 +240,9 @@ Foreign key fields on a lifecycle model can only be checked with the `has_change
 
 # Changelog <a id="changelog"></a>
 
+## 0.2.1 (April 2018)
+* Fixed bug in `_potentially_hooked_methods` that caused unwanted side effects by accessing model instance methods decorated with `@cache_property` or `@property`. 
+
 ## 0.2.0 (April 2018)
 * Added Django 1.8 support. Thanks @jtiai!
 * Tox testing added for Python 3.4, 3.5, 3.6 and Django 1.8, 1.11 and 2.0. Thanks @jtiai!

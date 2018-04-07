@@ -1,6 +1,7 @@
 from django.utils import timezone
 from django.core import mail
 from django.db import models
+from django.utils.functional import cached_property
 from django_lifecycle import hook
 from django_lifecycle.models import LifecycleModel
 
@@ -73,3 +74,8 @@ class UserAccount(LifecycleModel):
             'You have been banned', 'You may or may not deserve it.',
             'from@example.com', ['to@example.com'],
         )
+
+
+    @cached_property
+    def full_name(self):
+        return self.first_name + ' ' + self.last_name

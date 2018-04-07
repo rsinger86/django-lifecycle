@@ -136,18 +136,42 @@ class LifecycleModelMixin(object):
     def _field_names(self):
         return [field.name for field in self._meta.get_fields()]
             
-        
-    def _get_potentially_hooked_methods(self):
-        collected = []
-        skip = ('_get_potentially_hooked_methods', '_run_hooked_methods')
-        
+
+    @cached_property
+    def _property_names(self):
+        """
+            Gather up properties and cached_properties which may be methods
+            that were decorated. Need to inspect class versions b/c doing 
+            getattr on them could cause unwanted side effects.
+        """
+        property_names = []
+
         for name in dir(self):
-            if name in skip or name in self._field_names:
+            try:
+                attr = getattr(type(self), name)
+
+                if isinstance(attr, property) or isinstance(attr, cached_property):
+                    property_names.append(name)
+
+            except AttributeError:
+                pass
+
+        return property_names
+
+
+    @cached_property
+    def _potentially_hooked_methods(self):
+        skip = ['_potentially_hooked_methods', '_run_hooked_methods']
+        collected = []
+
+        for name in dir(self):
+            if name in skip + self._field_names + self._property_names:
                 continue
-                
+            
             try:
                 attr = getattr(self, name)
-                if callable(attr) and hasattr(attr, '_hooked'):
+                
+                if hasattr(attr, '_hooked'):
                     collected.append(attr)
             except AttributeError:
                 pass
@@ -161,7 +185,7 @@ class LifecycleModelMixin(object):
             triggered by the current hook. If conditions exist, check them before
             running otherwise go ahead and run.
         """
-        for method in self._get_potentially_hooked_methods():
+        for method in self._potentially_hooked_methods:
             for callback_specs in method._hooked:
                 if callback_specs['hook'] != hook:
                     continue

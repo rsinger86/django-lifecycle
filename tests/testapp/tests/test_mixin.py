@@ -116,3 +116,18 @@ class LifecycleMixinTests(TestCase):
         UserAccount.objects.create(**data)
         useraccount = UserAccount.objects.get()
         self.assertFalse(useraccount._check_is_not_condition(specs))
+
+
+    def test_should_not_call_cached_property(self):
+        """
+            full_name is cached_property. Accessing _potentially_hooked_methods
+            should not call it incidentally.
+        """
+        data = self.stub_data
+        data['first_name'] = 'Bart'
+        data['last_name'] = 'Simpson'
+        account = UserAccount.objects.create(**data)
+        account._potentially_hooked_methods
+        account.first_name = 'Bartholomew'
+        # Should be first time this property is accessed...
+        self.assertEqual(account.full_name, 'Bartholomew Simpson')
