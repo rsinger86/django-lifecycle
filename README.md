@@ -248,6 +248,9 @@ Foreign key fields on a lifecycle model can only be checked with the `has_change
 
 # Changelog <a id="changelog"></a>
 
+## 0.2.3 (April 2018)
+* Removes residual mixin methods from earlier implementation.
+
 ## 0.2.2 (April 2018)
 * Save method now accepts `skip_hooks`, an optional boolean keyword argument that controls whether hooked methods are called.
 
