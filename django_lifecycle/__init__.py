@@ -9,7 +9,8 @@ class NullType(object):
     pass
 
 
-def hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = None, is_not = NullType):
+def hook(hook: str, when: str = None, was='*', is_now='*', 
+                    has_changed: bool = None, is_not = NullType):
     assert hook in (
         'before_save',
         'after_save',
@@ -22,13 +23,15 @@ def hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = N
     )
 
     def decorator(hooked_method):
-        def wrapper(*args, **kwargs):
-            hooked_method(*args, **kwargs)
-        
-        if not hasattr(wrapper, '_hooked'):
-            wrapper._hooked = []
+        if not hasattr(hooked_method, '_hooked'):
+            def func(*args, **kwargs):
+                hooked_method(*args, **kwargs)
+
+            func._hooked = []
+        else:
+            func = hooked_method
             
-        wrapper._hooked.append({
+        func._hooked.append({
             'hook': hook,
             'when': when,
             'was': was,
@@ -37,7 +40,8 @@ def hook(hook: str, when: str = None, was='*', is_now='*', has_changed: bool = N
             'is_not': is_not
         })
 
-        return wrapper
+        return func
+        
     return decorator
     
 
