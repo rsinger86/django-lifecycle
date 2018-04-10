@@ -248,6 +248,9 @@ Foreign key fields on a lifecycle model can only be checked with the `has_change
 
 # Changelog <a id="changelog"></a>
 
+## 0.2.4 (April 2018)
+* Fixed support for adding multiple `@hook` decorators to same method.
+
 ## 0.2.3 (April 2018)
 * Removes residual mixin methods from earlier implementation.
 
