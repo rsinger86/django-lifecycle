@@ -74,7 +74,7 @@ pip install django-lifecycle
 
 # Requirements
 
-* Python (3.3, 3.4, 3.5)
+* Python (3.3, 3.4, 3.5, 3.6)
 * Django (1.8, 1.9, 1.10, 1.11, 2.0)
 
 # Usage 

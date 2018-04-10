@@ -13,8 +13,10 @@ classifiers=[
     # Pick your license as you wish (should match "license" above)
     'Development Status :: 4 - Beta',
     'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5'
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6'
 ]
 setup(name='django-lifecycle',
       version='0.2.5',
