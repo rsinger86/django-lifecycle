@@ -35,14 +35,16 @@ class UserAccountTestCase(TestCase):
         account = UserAccount.objects.create(status='active', **self.stub_data)
         account.refresh_from_db()
         mail.outbox = []
-        account.update(status='banned')
+        account.status = 'banned'
+        account.save()
         self.assertEqual(mail.outbox[0].subject, 'You have been banned')
         
               
     def test_update_password_updated_at_during_update(self):
         account = UserAccount.objects.create(**self.stub_data)
         account.refresh_from_db()
-        account.update(password='maggie')
+        account.password='maggie'
+        account.save()
         account.refresh_from_db()
         
         self.assertTrue( 
@@ -52,7 +54,8 @@ class UserAccountTestCase(TestCase):
 
     def test_ensure_trial_not_active_before_delete(self):
         account = UserAccount.objects.create(**self.stub_data)
-        account.update(has_trial=True)
+        account.has_trial = True 
+        account.save()
         self.assertRaises(CannotDeleteActiveTrial, account.delete)
 
         

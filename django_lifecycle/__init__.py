@@ -121,18 +121,6 @@ class LifecycleModelMixin(object):
             self._run_hooked_methods('after_create')
         else:
             self._run_hooked_methods('after_update')
-            
-            
-    def update(self, **validated_data: dict):
-        for attr, value in validated_data.items():
-            setattr(self, attr, value)
-
-        self.save()
-        
-
-    def update_field(self, field_name: str, value):
-        setattr(self, field_name, value)
-        self.save(update_fields=[field_name])
 
 
     def delete(self, *args, **kwargs):
