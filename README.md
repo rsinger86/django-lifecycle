@@ -50,6 +50,7 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
   * [Hook with Simple Change Condition](#ex-simple-change)
   * [Hook with "Is Not" Condition](#ex-is-not)
   * [Custom Condition](#ex-custom-condition)
+  * [Multiple decorators, same method](#ex-multiple-decorators)
 - [Documentation](#docs)
 - * [Lifecycle Hook](#lifecycle-hooks-doc)
 - * [Condition Arguments](#condition-args-doc)
@@ -190,6 +191,17 @@ If you need to hook into events with more complex conditions, you can take advan
                 do_thing()
             else:
                 do_other_thing()
+```
+
+## Multiple decorators, same method <a id="ex-multiple-decorators"></a>
+
+You can decorate the same method multiple times if you want. 
+
+```python
+    @hook('after_create')
+    @hook('after_delete')
+    def db_rows_changed(self):
+        do_something()
 ```
 
 # Documentation <a id="docs"></a>
