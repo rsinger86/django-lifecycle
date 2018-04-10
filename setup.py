@@ -11,12 +11,13 @@ def readme():
 
 classifiers=[
     # Pick your license as you wish (should match "license" above)
+    'Development Status :: 4 - Beta',
     'License :: OSI Approved :: MIT License',
     'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: 3.5'
 ]
 setup(name='django-lifecycle',
-      version='0.2.4',
+      version='0.2.5',
       description='Declarative model lifecycle hooks, inspired by Rails callbacks.',
       author='Robert Singer',
       author_email='robertgsinger@gmail.com',
