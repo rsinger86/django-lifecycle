@@ -131,3 +131,14 @@ class LifecycleMixinTests(TestCase):
         account.first_name = 'Bartholomew'
         # Should be first time this property is accessed...
         self.assertEqual(account.full_name, 'Bartholomew Simpson')
+
+
+    def test_comparison_state_should_reset_after_save(self):
+        data = self.stub_data
+        data['first_name'] = 'Marge'
+        data['last_name'] = 'Simpson'
+        account = UserAccount.objects.create(**data)
+        account.first_name = 'Maggie'
+        self.assertTrue(account.has_changed('first_name'))
+        account.save()
+        self.assertFalse(account.has_changed('first_name'))

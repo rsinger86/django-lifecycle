@@ -50,12 +50,12 @@ class LifecycleModelMixin(object):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._initial = self.__dict__.copy()
+        self._initial_state = self.__dict__.copy()
 
 
     @property
     def _diff_with_initial(self):
-        d1 = self._initial
+        d1 = self._initial_state
         d2 = self.__dict__
         diffs = []
 
@@ -122,6 +122,8 @@ class LifecycleModelMixin(object):
         else:
             self._run_hooked_methods('after_update')
 
+        self._initial_state = self.__dict__.copy()
+        
 
     def delete(self, *args, **kwargs):
         self._run_hooked_methods('before_delete')
