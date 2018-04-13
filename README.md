@@ -265,6 +265,9 @@ Foreign key fields on a lifecycle model can only be checked with the `has_change
 
 # Changelog <a id="changelog"></a>
 
+## 0.3.0 (April 2018)
+* Resets model's comparison state for hook conditions after `save` called.
+
 ## 0.2.4 (April 2018)
 * Fixed support for adding multiple `@hook` decorators to same method.
 
