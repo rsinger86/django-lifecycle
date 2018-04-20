@@ -165,7 +165,7 @@ We've ommitted the `was` keyword meaning that the initial state of the `has_tria
 
 ## Hook with Simple Change Condition <a id="ex-simple-change"></a>
 
-As we saw in the very first example, you can also pass the keyword argument `changed=True` to run the hooked method if a field has changed, regardless of previous or current value.
+As we saw in the very first example, you can also pass the keyword argument `has_changed=True` to run the hooked method if a field has changed, regardless of previous or current value.
 
 ```python
     @hook('before_update', when='address', has_changed=True)
