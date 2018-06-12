@@ -34,7 +34,7 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
         
         
     def save(self, *args, **kwargs):
-        if self.pk is not None and self.password != self.__orginal_password:
+        if self.pk is not None and self.password != self.__original_password:
             self.password_updated_at = timezone.now()
         super().save(*args, **kwargs)
 
