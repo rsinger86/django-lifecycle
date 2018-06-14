@@ -189,17 +189,19 @@ class LifecycleModelMixin(object):
                 when_any_field = callback_specs.get("when_any")
 
                 if when_field:
-                    if self._check_callback_conditions(when_field, callback_specs):
-                        fired.append(method.__name__)
-                        method()
+                    if not self._check_callback_conditions(when_field, callback_specs):
+                        continue
                 elif when_any_field:
-                    for field_name in when_any_field:
-                        if self._check_callback_conditions(field_name, callback_specs):
-                            fired.append(method.__name__)
-                            method()
-                else:
-                    fired.append(method.__name__)
-                    method()
+                    if not any([
+                        self._check_callback_conditions(field_name, callback_specs)
+                        for field_name in when_any_field
+                    ]):
+                        continue
+
+                # Only call the method once per hook
+                fired.append(method.__name__)
+                method()
+                break
 
         return fired
 

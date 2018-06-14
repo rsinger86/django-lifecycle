@@ -56,6 +56,13 @@ class UserAccountTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "We have deleted your account")
 
+    def test_only_call_hook_once(self):
+        account = UserAccount.objects.create(**self.stub_data)
+        account.first_name = "Waylon"
+        account.last_name = "Smithers"
+        account.save()
+        self.assertEqual(account.name_changes, 1)
+
     def test_lowercase_email(self):
         data = self.stub_data
         data["email"] = "Homer.Simpson@SpringfieldNuclear.com"

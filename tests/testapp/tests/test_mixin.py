@@ -42,6 +42,7 @@ class LifecycleMixinTests(TestCase):
                 "organization_id": org.id,
                 "status": "active",
                 "organization.name": "Dunder Mifflin",
+                "name_changes": 0,
             },
         )
 
