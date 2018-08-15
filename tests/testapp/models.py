@@ -71,3 +71,9 @@ class UserAccount(LifecycleModel):
     @cached_property
     def full_name(self):
         return self.first_name + ' ' + self.last_name
+
+
+class Locale(models.Model):
+    code = models.CharField(max_length=20)
+
+    users = models.ManyToManyField(UserAccount)
