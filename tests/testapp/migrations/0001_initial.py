@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('first_name', models.CharField(max_length=100)),
                 ('last_name', models.CharField(max_length=100)),
                 ('password', models.CharField(max_length=200)),
-                ('email', models.FileField(null=True, upload_to='')),
+                ('email', models.EmailField(max_length=254, null=True)),
                 ('password_updated_at', models.DateTimeField(null=True)),
                 ('joined_at', models.DateTimeField(null=True)),
                 ('has_trial', models.BooleanField(default=False)),
