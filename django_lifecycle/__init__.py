@@ -209,11 +209,17 @@ class LifecycleModelMixin(object):
 
     @cached_property
     def _potentially_hooked_methods(self):
-        skip = ['_potentially_hooked_methods', '_run_hooked_methods']
+        skip = set(
+            ['_potentially_hooked_methods', '_run_hooked_methods'] +
+            self._field_names +
+            self._property_names +
+            self._descriptor_names
+        )
+
         collected = []
 
         for name in dir(self):
-            if name in skip + self._field_names + self._property_names + self._descriptor_names:
+            if name in skip:
                 continue
             
             try:
