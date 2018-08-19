@@ -45,6 +45,33 @@ def hook(hook: str, when: str = None, was='*', is_now='*',
     return decorator
     
 
+DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = []
+if StrictVersion(django.__version__) < StrictVersion('1.9'):
+    from django.db.models.fields.related import SingleRelatedObjectDescriptor, ReverseSingleRelatedObjectDescriptor, \
+        ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor
+    DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES.extend([
+        SingleRelatedObjectDescriptor,
+        ReverseSingleRelatedObjectDescriptor,
+        ForeignRelatedObjectsDescriptor,
+        ManyRelatedObjectsDescriptor,
+        ReverseManyRelatedObjectsDescriptor,
+    ])
+if StrictVersion(django.__version__) >= StrictVersion('1.9'):
+    from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor, \
+        ReverseOneToOneDescriptor, ReverseManyToOneDescriptor, ManyToManyDescriptor
+    DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES.extend([
+        ForwardManyToOneDescriptor,
+        ReverseOneToOneDescriptor,
+        ReverseManyToOneDescriptor,
+        ManyToManyDescriptor,
+    ])
+if StrictVersion(django.__version__) >= StrictVersion('1.11'):
+    from django.db.models.fields.related_descriptors import ForwardOneToOneDescriptor
+    DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES.extend([
+        ForwardOneToOneDescriptor,
+    ])
+DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = tuple(DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES)
+
 
 class LifecycleModelMixin(object):
 
@@ -157,14 +184,42 @@ class LifecycleModelMixin(object):
 
         return property_names
 
+    @cached_property
+    def _descriptor_names(self):
+        """
+        Attributes which are Django descriptors. These represent a field
+        which is a one-to-many or many-to-many relationship that is
+        potentially defined in another model, and doesn't otherwise appear
+        as a field on this model.
+        """
+
+        descriptor_names = []
+
+        for name in dir(self):
+            try:
+                attr = getattr(type(self), name)
+
+                if isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
+                    descriptor_names.append(name)
+
+            except AttributeError:
+                pass
+
+        return descriptor_names
 
     @cached_property
     def _potentially_hooked_methods(self):
-        skip = ['_potentially_hooked_methods', '_run_hooked_methods']
+        skip = set(
+            ['_potentially_hooked_methods', '_run_hooked_methods'] +
+            self._field_names +
+            self._property_names +
+            self._descriptor_names
+        )
+
         collected = []
 
         for name in dir(self):
-            if name in skip + self._field_names + self._property_names:
+            if name in skip:
                 continue
             
             try:

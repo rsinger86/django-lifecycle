@@ -7,9 +7,8 @@ from django_lifecycle.models import LifecycleModel
 
 
 class CannotDeleteActiveTrial(Exception):
-    pass 
+    pass
 
-    
 
 class UserAccount(LifecycleModel):
     username = models.CharField(max_length=100)
@@ -22,11 +21,11 @@ class UserAccount(LifecycleModel):
     has_trial = models.BooleanField(default=False)
 
     status = models.CharField(
-        default='active', 
+        default='active',
         max_length=30,
         choices=(
-            ('active', 'Active'), 
-            ('banned', 'Banned'), 
+            ('active', 'Active'),
+            ('banned', 'Banned'),
             ('inactive', 'Inactive')
         )
     )
@@ -35,12 +34,10 @@ class UserAccount(LifecycleModel):
     def lowercase_email(self):
         self.email = self.email.lower()
 
-
     @hook('before_create')
     def timestamp_joined_at(self):
         self.joined_at = timezone.now()
-        
-    
+
     @hook('after_create')
     def do_after_create_jobs(self):
         ## queue background job to process thumbnail image...
@@ -48,17 +45,14 @@ class UserAccount(LifecycleModel):
             'Welcome!', 'Thank you for joining.',
             'from@example.com', ['to@example.com'],
         )
-        
 
     @hook('before_update', when='password', has_changed=True)
     def timestamp_password_change(self):
         self.password_updated_at = timezone.now()
 
-
     @hook('before_delete', when='has_trial', was='*', is_now=True)
     def ensure_trial_not_active(self):
         raise CannotDeleteActiveTrial('Cannot delete trial user!')
-
 
     @hook('after_delete')
     def email_deleted_user(self):
@@ -67,7 +61,6 @@ class UserAccount(LifecycleModel):
             'from@example.com', ['to@example.com'],
         )
 
-
     @hook('after_update', when='status', was='active', is_now='banned')
     def email_banned_user(self):
         mail.send_mail(
@@ -75,7 +68,12 @@ class UserAccount(LifecycleModel):
             'from@example.com', ['to@example.com'],
         )
 
-
     @cached_property
     def full_name(self):
         return self.first_name + ' ' + self.last_name
+
+
+class Locale(models.Model):
+    code = models.CharField(max_length=20)
+
+    users = models.ManyToManyField(UserAccount)

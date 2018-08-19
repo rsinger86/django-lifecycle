@@ -29,4 +29,14 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
+
+        migrations.CreateModel(
+            name='Locale',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('code', models.CharField(max_length=20)),
+                ('users', models.ManyToManyField(to='UserAccount')),
+            ],
+        ),
+
     ]
