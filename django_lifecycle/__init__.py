@@ -9,8 +9,8 @@ class NullType(object):
     pass
 
 
-def hook(hook: str, when: str = None, was='*', is_now='*', 
-                    has_changed: bool = None, is_not = NullType):
+def hook(hook: str, when: str = None, was='*', is_now='*',
+         has_changed: bool = None, is_not=NullType):
     assert hook in (
         'before_save',
         'after_save',
@@ -30,7 +30,7 @@ def hook(hook: str, when: str = None, was='*', is_now='*',
             func._hooked = []
         else:
             func = hooked_method
-            
+
         func._hooked.append({
             'hook': hook,
             'when': when,
@@ -41,9 +41,9 @@ def hook(hook: str, when: str = None, was='*', is_now='*',
         })
 
         return func
-        
+
     return decorator
-    
+
 
 DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = []
 if StrictVersion(django.__version__) < StrictVersion('1.9'):
@@ -79,7 +79,6 @@ class LifecycleModelMixin(object):
         super().__init__(*args, **kwargs)
         self._initial_state = self.__dict__.copy()
 
-
     @property
     def _diff_with_initial(self):
         d1 = self._initial_state
@@ -88,26 +87,24 @@ class LifecycleModelMixin(object):
 
         for k, v in d1.items():
             if k in d2 and v != d2[k]:
-                diffs.append( (k, (v, d2[k])) )
+                diffs.append((k, (v, d2[k])))
 
         return dict(diffs)
 
- 
     def initial_value(self, field_name: str = None):
         """
         Get initial value of field when model was instantiated.
         """
         if self._meta.get_field(field_name).get_internal_type() == 'ForeignKey':
             if not field_name.endswith('_id'):
-                field_name = field_name+'_id' 
-                
+                field_name = field_name+'_id'
+
         attribute = self._diff_with_initial.get(field_name, None)
 
         if not attribute:
             return None
 
         return attribute[0]
-
 
     def has_changed(self, field_name: str = None) -> bool:
         """
@@ -117,14 +114,13 @@ class LifecycleModelMixin(object):
 
         if self._meta.get_field(field_name).get_internal_type() == 'ForeignKey':
             if not field_name.endswith('_id'):
-                field_name = field_name+'_id' 
+                field_name = field_name+'_id'
 
-        if field_name in changed: 
+        if field_name in changed:
             return True
 
         return False
 
-        
     def save(self, *args, **kwargs):
         skip_hooks = kwargs.pop('skip_hooks', False)
         save = super().save
@@ -139,7 +135,7 @@ class LifecycleModelMixin(object):
             self._run_hooked_methods('before_create')
         else:
             self._run_hooked_methods('before_update')
-        
+
         self._run_hooked_methods('before_save')
         save(*args, **kwargs)
         self._run_hooked_methods('after_save')
@@ -150,24 +146,21 @@ class LifecycleModelMixin(object):
             self._run_hooked_methods('after_update')
 
         self._initial_state = self.__dict__.copy()
-        
 
     def delete(self, *args, **kwargs):
         self._run_hooked_methods('before_delete')
         super().delete(*args, **kwargs)
         self._run_hooked_methods('after_delete')
 
-    
     @cached_property
     def _field_names(self):
         return [field.name for field in self._meta.get_fields()]
-            
 
     @cached_property
     def _property_names(self):
         """
             Gather up properties and cached_properties which may be methods
-            that were decorated. Need to inspect class versions b/c doing 
+            that were decorated. Need to inspect class versions b/c doing
             getattr on them could cause unwanted side effects.
         """
         property_names = []
@@ -221,10 +214,10 @@ class LifecycleModelMixin(object):
         for name in dir(self):
             if name in skip:
                 continue
-            
+
             try:
                 attr = getattr(self, name)
-                
+
                 if hasattr(attr, '_hooked'):
                     collected.append(attr)
             except AttributeError:
@@ -232,10 +225,9 @@ class LifecycleModelMixin(object):
 
         return collected
 
-        
     def _run_hooked_methods(self, hook: str):
         """
-            Iterate through decorated methods to find those that should be 
+            Iterate through decorated methods to find those that should be
             triggered by the current hook. If conditions exist, check them before
             running otherwise go ahead and run.
         """
@@ -244,37 +236,34 @@ class LifecycleModelMixin(object):
                 if callback_specs['hook'] != hook:
                     continue
 
-                when = callback_specs.get('when') 
+                when = callback_specs.get('when')
 
                 if when:
                     if self._check_callback_conditions(callback_specs):
                         method()
                 else:
                     method()
-                
 
     def _check_callback_conditions(self, specs: dict):
         if not self._check_has_changed(specs):
             return False
-        
+
         if not self._check_value_transition(specs):
-            return False 
+            return False
 
         if not self._check_is_not_condition(specs):
-            return False 
+            return False
 
         return True
-
 
     def _check_has_changed(self, specs: dict):
         field_name = specs['when']
         has_changed = specs['has_changed']
 
         if has_changed is None:
-            return True 
-        
-        return has_changed == self.has_changed(field_name)
+            return True
 
+        return has_changed == self.has_changed(field_name)
 
     def _check_value_transition(self, specs: dict):
         field_name = specs['when']
@@ -282,20 +271,19 @@ class LifecycleModelMixin(object):
 
         if specs['was'] in (self.initial_value(field_name), '*'):
             specs_match += 1
-        
+
         if specs['is_now'] in (getattr(self, field_name), '*'):
             specs_match += 1
 
         return specs_match == 2
 
-
     def _check_is_not_condition(self, specs: dict):
         field_name = specs['when']
         is_not = specs['is_not']
- 
+
         if is_not is NullType:
-            return True 
-        
+            return True
+
         return getattr(self, field_name) != is_not
 
 # For backwards compatibility and Django 1.8
