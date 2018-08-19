@@ -265,6 +265,9 @@ Foreign key fields on a lifecycle model can only be checked with the `has_change
 
 # Changelog <a id="changelog"></a>
 
+## 0.3.1 (August 2018)
+* Fixes m2m field bug, in which accessing auto-generated reverse field in `before_create` causes exception b/c PK does not exist yet. Thanks @garyd203!
+
 ## 0.3.0 (April 2018)
 * Resets model's comparison state for hook conditions after `save` called.
 

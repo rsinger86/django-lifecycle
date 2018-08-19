@@ -7,6 +7,7 @@ from django.db import models
 
 from . import LifecycleModelMixin
 
+
 class LifecycleModel(LifecycleModelMixin, models.Model):
     class Meta:
         abstract = True
