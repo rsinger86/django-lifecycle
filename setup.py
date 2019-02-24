@@ -19,7 +19,7 @@ classifiers=[
     'Programming Language :: Python :: 3.6'
 ]
 setup(name='django-lifecycle',
-      version='0.3.1',
+      version='0.3.2',
       description='Declarative model lifecycle hooks, inspired by Rails callbacks.',
       author='Robert Singer',
       author_email='robertgsinger@gmail.com',
