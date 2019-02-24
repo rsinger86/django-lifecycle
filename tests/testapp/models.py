@@ -1,3 +1,5 @@
+import uuid
+
 from django.utils import timezone
 from django.core import mail
 from django.db import models
@@ -77,3 +79,17 @@ class Locale(models.Model):
     code = models.CharField(max_length=20)
 
     users = models.ManyToManyField(UserAccount)
+
+
+class ModelCustomPK(LifecycleModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    created_at = models.DateTimeField(null=True)
+    answer = models.IntegerField(null=True, default=None)
+
+    @hook('before_create')
+    def timestamp_created_at(self):
+        self.created_at = timezone.now()
+
+    @hook('after_create')
+    def answer_to_the_ultimate_question_of_life(self):
+        self.answer = 42

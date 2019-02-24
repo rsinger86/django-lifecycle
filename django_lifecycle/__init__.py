@@ -129,7 +129,7 @@ class LifecycleModelMixin(object):
             save(*args, **kwargs)
             return
 
-        is_new = self.pk is None
+        is_new = self._state.adding
 
         if is_new:
             self._run_hooked_methods('before_create')
