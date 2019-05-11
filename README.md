@@ -265,6 +265,9 @@ Foreign key fields on a lifecycle model can only be checked with the `has_change
 
 # Changelog <a id="changelog"></a>
 
+## 0.4.0 (May 2019)
+* Fixes `initial_value(field_name)` behavior - should return value even if no change. Thanks @adamJLev!
+
 ## 0.3.2 (February 2019)
 * Fixes bug preventing hooks from firing for custom PKs. Thanks @atugushev!
 
