@@ -7,6 +7,8 @@ from django.utils.functional import cached_property
 from django_lifecycle import hook
 from django_lifecycle.models import LifecycleModel
 
+import urlman
+
 
 class CannotDeleteActiveTrial(Exception):
     pass
@@ -23,56 +25,58 @@ class UserAccount(LifecycleModel):
     has_trial = models.BooleanField(default=False)
 
     status = models.CharField(
-        default='active',
+        default="active",
         max_length=30,
-        choices=(
-            ('active', 'Active'),
-            ('banned', 'Banned'),
-            ('inactive', 'Inactive')
-        )
+        choices=(("active", "Active"), ("banned", "Banned"), ("inactive", "Inactive")),
     )
 
-    @hook('before_save', when='email', is_not=None)
+    class urls(urlman.Urls):
+        view = "/books/{self.pk}/"
+
+    @hook("before_save", when="email", is_not=None)
     def lowercase_email(self):
         self.email = self.email.lower()
 
-    @hook('before_create')
+    @hook("before_create")
     def timestamp_joined_at(self):
         self.joined_at = timezone.now()
 
-    @hook('after_create')
+    @hook("after_create")
     def do_after_create_jobs(self):
         ## queue background job to process thumbnail image...
         mail.send_mail(
-            'Welcome!', 'Thank you for joining.',
-            'from@example.com', ['to@example.com'],
+            "Welcome!", "Thank you for joining.", "from@example.com", ["to@example.com"]
         )
 
-    @hook('before_update', when='password', has_changed=True)
+    @hook("before_update", when="password", has_changed=True)
     def timestamp_password_change(self):
         self.password_updated_at = timezone.now()
 
-    @hook('before_delete', when='has_trial', was='*', is_now=True)
+    @hook("before_delete", when="has_trial", was="*", is_now=True)
     def ensure_trial_not_active(self):
-        raise CannotDeleteActiveTrial('Cannot delete trial user!')
+        raise CannotDeleteActiveTrial("Cannot delete trial user!")
 
-    @hook('after_delete')
+    @hook("after_delete")
     def email_deleted_user(self):
         mail.send_mail(
-            'We have deleted your account', 'Thank you for your time.',
-            'from@example.com', ['to@example.com'],
+            "We have deleted your account",
+            "Thank you for your time.",
+            "from@example.com",
+            ["to@example.com"],
         )
 
-    @hook('after_update', when='status', was='active', is_now='banned')
+    @hook("after_update", when="status", was="active", is_now="banned")
     def email_banned_user(self):
         mail.send_mail(
-            'You have been banned', 'You may or may not deserve it.',
-            'from@example.com', ['to@example.com'],
+            "You have been banned",
+            "You may or may not deserve it.",
+            "from@example.com",
+            ["to@example.com"],
         )
 
     @cached_property
     def full_name(self):
-        return self.first_name + ' ' + self.last_name
+        return self.first_name + " " + self.last_name
 
 
 class Locale(models.Model):
@@ -86,10 +90,10 @@ class ModelCustomPK(LifecycleModel):
     created_at = models.DateTimeField(null=True)
     answer = models.IntegerField(null=True, default=None)
 
-    @hook('before_create')
+    @hook("before_create")
     def timestamp_created_at(self):
         self.created_at = timezone.now()
 
-    @hook('after_create')
+    @hook("after_create")
     def answer_to_the_ultimate_question_of_life(self):
         self.answer = 42
