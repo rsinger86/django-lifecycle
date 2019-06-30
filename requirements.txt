@@ -1,2 +1,5 @@
 Django==2.0.3
+djangorestframework==3.9.4
+drf-access-policy==0.4.2
 pytz==2018.3
+urlman==1.2.0

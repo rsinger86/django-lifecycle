@@ -1,4 +1,5 @@
 from distutils.version import StrictVersion
+from inspect import ismethod
 
 import django
 from django.db import models
@@ -238,7 +239,7 @@ class LifecycleModelMixin(object):
             try:
                 attr = getattr(self, name)
 
-                if hasattr(attr, "_hooked"):
+                if ismethod(attr) and hasattr(attr, "_hooked"):
                     collected.append(attr)
             except AttributeError:
                 pass
