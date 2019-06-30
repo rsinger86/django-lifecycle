@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-from distutils.core import setup
+from setuptools import setup
 from codecs import open
-from os import path
 
 
 def readme():
-    with open("README.txt", "r") as infile:
+    with open("README.md", "r") as infile:
         return infile.read()
 
 
@@ -30,4 +29,5 @@ setup(
     keywords="django model lifecycle hooks callbacks",
     long_description=readme(),
     classifiers=classifiers,
+    long_description_content_type="text/markdown",
 )
