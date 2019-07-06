@@ -265,6 +265,9 @@ Foreign key fields on a lifecycle model can only be checked with the `has_change
 
 # Changelog <a id="changelog"></a>
 
+## 0.4.2 (July 2019)
+* Fixes missing README.md issue that broke install.
+
 ## 0.4.1 (June 2019)
 * Fixes [urlman](https://github.com/andrewgodwin/urlman)-compatability.
 
