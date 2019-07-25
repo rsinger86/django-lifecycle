@@ -97,3 +97,16 @@ class ModelCustomPK(LifecycleModel):
     @hook("after_create")
     def answer_to_the_ultimate_question_of_life(self):
         self.answer = 42
+
+
+class ModelWhenAnyPerson(LifecycleModel):
+
+    first_name = models.CharField(max_length=25)
+    middle_name = models.CharField(max_length=25)
+    last_name = models.CharField(max_length=25)
+
+    full_name = models.CharField(max_length=75)
+
+    @hook("before_update", when_any=["first_name", "middle_name", "last_name"])
+    def set_full_name(self):
+        self.full_name = f"{self.first_name} {self.middle_name} {self.last_name}"

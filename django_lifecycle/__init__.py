@@ -13,11 +13,14 @@ class NullType(object):
 def hook(
     hook: str,
     when: str = None,
+    when_any=None,
     was="*",
     is_now="*",
     has_changed: bool = None,
     is_not=NullType,
 ):
+    if when_any is None:
+        when_any = []
     assert hook in (
         "before_save",
         "after_save",
@@ -43,6 +46,7 @@ def hook(
             {
                 "hook": hook,
                 "when": when,
+                "when_any": when_any,
                 "was": was,
                 "is_now": is_now,
                 "has_changed": has_changed,
@@ -258,12 +262,24 @@ class LifecycleModelMixin(object):
                     continue
 
                 when = callback_specs.get("when")
+                when_any = callback_specs.get("when_any")
 
                 if when:
                     if self._check_callback_conditions(callback_specs):
                         method()
+                elif when_any:
+                    if self._check_callback_conditions_any(callback_specs):
+                        method()
                 else:
                     method()
+
+    def _check_callback_conditions_any(self, specs: dict):
+        _dict = specs.copy()
+        for field in specs.get("when_any"):
+            _dict["when"] = field
+            if self._check_callback_conditions(_dict):
+                return True
+        return False
 
     def _check_callback_conditions(self, specs: dict):
         if not self._check_has_changed(specs):
