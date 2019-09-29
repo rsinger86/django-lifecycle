@@ -283,7 +283,7 @@ The hook name is passed as the first positional argument to the @hook decorator,
 
 | Keywarg arg       | Type   | Details |
 |:-------------:|:-------------:|:-------------:|
-| when | str | The name of the field that you want to check against; required for the conditions below to be checked. Use the name of a FK field to watch changes to the related model *reference* or use dot-notation to watch changes to the values of fields on related models, e.g. `"organization.name"`. But [please be aware](#fk-hook-warning) of potential performance drawbacks. |
+| when | str | The name of the field that you want to check against; required for the conditions below to be checked. Use the name of a FK field to watch changes to the related model *reference* or use dot-notation to watch changes to the *values* of fields on related models, e.g. `"organization.name"`. But [please be aware](#fk-hook-warning) of potential performance drawbacks. |
 | has_changed | bool | Only fire the hooked method if the value of the `when` field has changed since the model was initialized  |
 | is_now | any | Only fire the hooked method if the value of the `when` field is currently equal to this value; defaults to `*`.  |
 | is_not | any | Only fire the hooked method if the value of the `when` field is NOT equal to this value  |
