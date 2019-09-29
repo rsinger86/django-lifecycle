@@ -64,7 +64,6 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
   - [Condition Arguments](#condition-args-doc)
   - [Utility Methods](#utility-method-doc)
   - [Suppressing Hooked Methods](#suppressing)
-  - [Limitations](#limitations)
 - [Changelog](#changelog)
 - [Testing](#testing)
 - [License](#license)
