@@ -1,0 +1,10 @@
+LICENSE.md
+MANIFEST.in
+README.md
+setup.py
+django_lifecycle/__init__.py
+django_lifecycle/models.py
+django_lifecycle.egg-info/PKG-INFO
+django_lifecycle.egg-info/SOURCES.txt
+django_lifecycle.egg-info/dependency_links.txt
+django_lifecycle.egg-info/top_level.txt
