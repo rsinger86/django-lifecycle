@@ -14,6 +14,10 @@ class CannotDeleteActiveTrial(Exception):
     pass
 
 
+class Organization(LifecycleModel):
+    name = models.CharField(max_length=100)
+
+
 class UserAccount(LifecycleModel):
     username = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
@@ -23,6 +27,7 @@ class UserAccount(LifecycleModel):
     password_updated_at = models.DateTimeField(null=True)
     joined_at = models.DateTimeField(null=True)
     has_trial = models.BooleanField(default=False)
+    organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL)
 
     status = models.CharField(
         default="active",
@@ -55,6 +60,29 @@ class UserAccount(LifecycleModel):
     @hook("before_delete", when="has_trial", was="*", is_now=True)
     def ensure_trial_not_active(self):
         raise CannotDeleteActiveTrial("Cannot delete trial user!")
+
+    @hook("after_update", when="organization.name", has_changed=True)
+    def notify_org_name_change(self):
+        mail.send_mail(
+            "The name of your organization has changed!",
+            "You organization is now named %s" % self.organization.name,
+            "from@example.com",
+            ["to@example.com"],
+        )
+
+    @hook(
+        "after_update",
+        when="organization.name",
+        was="Hogwarts",
+        is_now="Hogwarts Online",
+    )
+    def notify_user_they_were_moved_to_online_school(self):
+        mail.send_mail(
+            "You were moved to our online school!",
+            "You organization is now named %s" % self.organization.name,
+            "from@example.com",
+            ["to@example.com"],
+        )
 
     @hook("after_delete")
     def email_deleted_user(self):

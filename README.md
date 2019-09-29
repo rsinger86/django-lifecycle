@@ -74,8 +74,8 @@ pip install django-lifecycle
 
 # Requirements
 
-* Python (3.3, 3.4, 3.5, 3.6)
-* Django (1.8, 1.9, 1.10, 1.11, 2.0)
+* Python (3.3+)
+* Django (1.8+)
 
 # Usage 
 
@@ -209,6 +209,50 @@ You can decorate the same method multiple times if you want.
         do_something()
 ```
 
+## Watching Changes to Foreign Key Fields <a id="check-fk-values"></a>
+
+### FK Changes
+
+You can watch whether a foriegn key reference changes by putting the name of the FK field in the `when` parameter:
+
+```python
+class Organization(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class UserAccount(LifecycleModel):
+    username = models.CharField(max_length=100)
+    email = models.CharField(max_length=600)
+    employer = models.ForeignKey(Organization, on_delete=models.SET_NULL)
+
+    @hook("after_update", when="employer", has_changed=True)
+    def notify_user_of_employer_change(self):
+        mail.send_mail("Update", "You now work for someone else!", [self.email])
+```
+
+To be clear: This hook will fire when the value in the database column that stores the foreign key (in this case, `organization_id`) changes. Read on to see how to watch for changes to *fields on the related model*.
+
+### FK Model Field Changes
+You can have a hooked method fire based on the *value of a field* on a foreign key-related model using dot notation:
+
+```python
+class Organization(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class UserAccount(LifecycleModel):
+    username = models.CharField(max_length=100)
+    email = models.CharField(max_length=600)
+    employer = models.ForeignKey(Organization, on_delete=models.SET_NULL)
+
+    @hook("after_update", when="employer.name", has_changed=True, is_now="Google")
+    def notify_user_of_google_buy_out(self):
+        mail.send_mail("Update", "Google bought your employer!", ["to@example.com"],)
+```
+<a id="fk-hook-warning"></a>
+:heavy_exclamation_mark: **If you use dot-notation**.. 
+*Please be aware of the potential performance hit*: When your model is first initialized, the related model will be also be loaded in order to store the "initial" state of the related field. Models set up with these hooks should always be loaded using `.select_related()`, i.e. `UserAccount.objects.select_related("organization")` for the example above. If you don't do this, you will almost certainly experience a major [N+1](https://stackoverflow.com/questions/97197/what-is-the-n1-selects-problem-in-orm-object-relational-mapping) performance problem.
+
 # Documentation <a id="docs"></a>
 
 ## Lifecycle Hooks <a id="lifecycle-hooks-doc"></a>
@@ -232,18 +276,19 @@ The hook name is passed as the first positional argument to the @hook decorator,
 
 ## Condition Arguments <a id="condition-args-doc"></a>
 
-`@hook(hook_name: str, when: str = None, was='*', is_now='*', has_changed: bool = None, is_not = None):`
+`@hook(hook_name: str, when: str = None, was='*', is_now='*', has_changed: bool = None, is_not = None, was_not = None):`
 
 | Keywarg arg       | Type   | Details |
 |:-------------:|:-------------:|:-------------:|
-| when | str | The name of the field that you want to check against; required for the conditions below to be checked |
-| was | any | Only fire the hooked method if the value of the `when` field was equal to this value when first initialized; defaults to `*`.  |
-| is_now | any | Only fire the hooked method if the value of the `when` field is currently equal to this value; defaults to `*`.  |
+| when | str | The name of the field that you want to check against; required for the conditions below to be checked. Use dot-notation to reference fields on related models, e.g. `"organization.name"` -- but be aware of added database queries. |
 | has_changed | bool | Only fire the hooked method if the value of the `when` field has changed since the model was initialized  |
+| is_now | any | Only fire the hooked method if the value of the `when` field is currently equal to this value; defaults to `*`.  |
 | is_not | any | Only fire the hooked method if the value of the `when` field is NOT equal to this value  |
+| was | any | Only fire the hooked method if the value of the `when` field was equal to this value when first initialized; defaults to `*`.  |
+| was_not | any | Only fire the hooked method if the value of the `when` field was NOT equal to this value when first initialized. |
 
 
-## Other Utility Methods <a id="utility-method-doc"></a>
+## Utility Methods <a id="utility-method-doc"></a>
 
 These are available on your model when you use the mixin or extend the base model.
 
@@ -259,9 +304,6 @@ To prevent the hooked methods from being called, pass `skip_hooks=True` when cal
 ```python
    account.save(skip_hooks=True)
 ```
-## Limitations <a id="limitations"></a>
-
-Foreign key fields on a lifecycle model can only be checked with the `has_changed` argument. That is, this library only checks to see if the value of the foreign key has changed. If you need more advanced conditions, consider omiting the run conditions and accessing the related model's fields in the hooked method. 
 
 # Changelog <a id="changelog"></a>
 
