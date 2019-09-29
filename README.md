@@ -49,19 +49,22 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 - [Requirements](#requirements)
 - [Usage](#usage)
 - [Examples](#examples)
-  * [Simple Hook - No Conditions](#ex-simple-hook)
-  * [Hook with Transition Conditions: Part I](#ex-condition-hook-1")
-  * [Hook with Transition Conditions: Part II](#ex-condition-hook-2")
-  * [Hook with Simple Change Condition](#ex-simple-change)
-  * [Hook with "Is Not" Condition](#ex-is-not)
-  * [Custom Condition](#ex-custom-condition)
-  * [Multiple decorators, same method](#ex-multiple-decorators)
+  - [Simple Hook - No Conditions](#ex-simple-hook)
+  - [Hook with Transition Conditions: Part I](#ex-condition-hook-1")
+  - [Hook with Transition Conditions: Part II](#ex-condition-hook-2")
+  - [Hook with Simple Change Condition](#ex-simple-change)
+  - [Hook with "Is Not" Condition](#ex-is-not)
+  - [Custom Condition](#ex-custom-condition)
+  - [Multiple decorators, Same Method](#ex-multiple-decorators)
+  - [Watching Changes to Foreign Key Fields](#watching-changes-to-foreign-key-fields)
+    - [FK Reference Changes](#fk-changes)
+    - [FK Model Field Changes](#fk-model-field-changes)
 - [Documentation](#docs)
-- * [Lifecycle Hook](#lifecycle-hooks-doc)
-- * [Condition Arguments](#condition-args-doc)
-- * [Utility Methods](#utility-method-doc)
-- * [Suppressing Hooked Methods](#suppressing)
-- * [Limitations](#limitations)
+  - [Lifecycle Hook](#lifecycle-hooks-doc)
+  - [Condition Arguments](#condition-args-doc)
+  - [Utility Methods](#utility-method-doc)
+  - [Suppressing Hooked Methods](#suppressing)
+  - [Limitations](#limitations)
 - [Changelog](#changelog)
 - [Testing](#testing)
 - [License](#license)
@@ -308,7 +311,8 @@ To prevent the hooked methods from being called, pass `skip_hooks=True` when cal
 # Changelog <a id="changelog"></a>
 
 ## 0.5.0 (XXX 2019)
-* Fixes missing README.md issue that broke install.
+* Adds `was_not` condition
+* Allow watching changes to FK model field values, not just FK references
 
 ## 0.4.2 (July 2019)
 * Fixes missing README.md issue that broke install.
