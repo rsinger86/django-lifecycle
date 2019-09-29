@@ -310,7 +310,7 @@ To prevent the hooked methods from being called, pass `skip_hooks=True` when cal
 
 # Changelog <a id="changelog"></a>
 
-## 0.5.0 (XXX 2019)
+## 0.5.0 (September 2019)
 * Adds `was_not` condition
 * Allow watching changes to FK model field values, not just FK references
 
