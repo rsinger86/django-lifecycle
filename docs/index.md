@@ -13,14 +13,19 @@ In short, you can write model code that looks like this:
 from django_lifecycle import LifecycleModel, hook
 
 
-class UserAccount(LifecycleModel):
-    username = models.CharField(max_length=100)
-    password = models.CharField(max_length=200)
-    password_updated_at = models.DateTimeField(null=True)
-    
-    @hook('before_update', when='password', has_changed=True)
-    def timestamp_password_change(self):
-        self.password_updated_at = timezone.now()
+class Article(LifecycleModel):
+    contents = models.TextField()
+    updated_at = models.DateTimeField(null=True)
+    status = models.ChoiceField(choices=['draft', 'published'])
+    editor = models.ForeignKey(AuthUser)
+
+    @hook('before_update', when='contents', has_changed=True)
+    def on_content_change(self):
+        self.updated_at = timezone.now()
+
+    @hook('after_update', when="status", was="draft", is_now="published")
+    def on_publish(self):
+        send_email(self.editor.email, "An article has published!")
 ```
 
 Instead of overriding `save` and `__init___` in a clunky way that hurts readability:
@@ -30,14 +35,18 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__original_password = self.password
+        self._orig_contents = self.contents
+        self._orig_status = self.status
         
         
     def save(self, *args, **kwargs):
-        if self.pk is not None and self.password != self.__original_password:
-            self.password_updated_at = timezone.now()
+        if self.pk is not None and self.contents != self._orig_contents):
+            self.updated_at = timezone.now()
+
         super().save(*args, **kwargs)
 
+        if self.status != self._orig_status:
+            send_email(self.editor.email, "An article has published!")
 ```
 
 *This is not to say Signals are never useful; my team prefers to use them for incidental concerns not related to the business domain, like cache invalidation.

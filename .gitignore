@@ -11,3 +11,4 @@ __pycache__/
 README.txt
 .tox
 django_lifecycle.egg-info
+site/
