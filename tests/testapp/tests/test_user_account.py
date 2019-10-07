@@ -101,6 +101,15 @@ class UserAccountTestCase(TestCase):
         )
         self.assertEqual(mail.outbox[1].subject, "You were moved to our online school!")
 
+    def test_email_user_about_name_change(self):
+        account = UserAccount.objects.create(**self.stub_data)
+        mail.outbox = []
+        account.first_name = "Homer the Great"
+        account.save()
+        self.assertEqual(
+            mail.outbox[0].body, "You changed your first name or your last name"
+        )
+
     def test_skip_hooks(self):
         """
             Hooked method that auto-lowercases email should be skipped.
@@ -109,3 +118,4 @@ class UserAccountTestCase(TestCase):
         account.email = "Homer.Simpson@springfieldnuclear"
         account.save(skip_hooks=True)
         self.assertEqual(account.email, "Homer.Simpson@springfieldnuclear")
+

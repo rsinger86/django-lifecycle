@@ -102,6 +102,15 @@ class UserAccount(LifecycleModel):
             ["to@example.com"],
         )
 
+    @hook("after_update", when_any=["first_name", "last_name"], has_changed=True)
+    def email_user_about_name_change(self):
+        mail.send_mail(
+            "Update",
+            "You changed your first name or your last name",
+            "from@example.com",
+            ["to@example.com"],
+        )
+
     @cached_property
     def full_name(self):
         return self.first_name + " " + self.last_name
