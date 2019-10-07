@@ -1,0 +1,32 @@
+site_name: Dango Lifecycle Hooks
+
+theme:
+  name: "material"
+  language: en
+  feature:
+    tabs: false
+  palette:
+    primary: green
+    accent: green
+  font:
+    text: Roboto
+    code: Roboto Mono
+  logo:
+    icon: "cached"
+repo_name: rsinger86/django-lifecycle
+repo_url: https://github.com/rsinger86/django-lifecycle
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+
+nav:
+  - Intro: index.md
+  - Examples: examples.md
+  - Lifecycle Moments & Conditions: hooks_and_conditions.md
+  - Watching ForeignKey Changes: fk_changes.md
+  - Advanced: advanced.md
