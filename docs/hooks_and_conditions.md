@@ -1,6 +1,6 @@
 # Available Hooks & Conditions
 
-You can hook into one or more lifecycle moments by annotating a model method with the `@hook` decorator. The moment name is passed as the first positional argument, `@hook('before_create')`, and optional keyword arguments can be passed to set up conditions for when the method should fire.
+You can hook into one or more lifecycle moments by adding the `@hook` decorator to a model's method. The moment name is passed as the first positional argument, `@hook('before_create')`, and optional keyword arguments can be passed to set up conditions for when the method should fire.
 
 ## Decorator Signature
 
@@ -34,10 +34,11 @@ Below is a full list of hooks, in the same order in which they will get called d
 
 ## Condition Keyward Arguments
 
+If you do not use any conditional parameters, the hook will fire every time the lifecycle moment occurs. You can use the keyword arguments below to conditionally fire the method depending on the initial or current state of a model instance's fields.
 
 | Keywarg arg       | Type   | Details |
 |:-------------:|:-------------:|:-------------:|
-| when | str | The name of the field that you want to check against; required for the conditions below to be checked. Use the name of a FK field to watch changes to the related model *reference* or use dot-notation to watch changes to the *values* of fields on related models, e.g. `"organization.name"`. But [please be aware](#fk-hook-warning) of potential performance drawbacks. |
+| when | str | The name of the field that you want to check against; required for the conditions below to be checked. Use the name of a FK field to watch changes to the related model *reference* or use dot-notation to watch changes to the *values* of fields on related models, e.g. `"organization.name"`. But [please be aware](fk_changes.md#fk-hook-warning) of potential performance drawbacks. |
 | when_any | List[str] | Similar to the `when` parameter, but takes a list of field names. The hooked method will fire if any of the corresponding fields meet the keyword conditions. Useful if you don't like stacking decorators. |
 | has_changed | bool | Only fire the hooked method if the value of the `when` field has changed since the model was initialized  |
 | is_now | any | Only fire the hooked method if the value of the `when` field is currently equal to this value; defaults to `*`.  |

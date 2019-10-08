@@ -25,7 +25,7 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - Intro: index.md
+  - Introduction: index.md
   - Examples: examples.md
   - Lifecycle Moments & Conditions: hooks_and_conditions.md
   - Watching ForeignKey Changes: fk_changes.md

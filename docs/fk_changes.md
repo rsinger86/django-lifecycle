@@ -39,5 +39,4 @@ class UserAccount(LifecycleModel):
         mail.send_mail("Update", "Google bought your employer!", ["to@example.com"],)
 ```
 <a id="fk-hook-warning"></a>
-:heavy_exclamation_mark: **If you use dot-notation**.. 
-*Please be aware of the potential performance hit*: When your model is first initialized, the related model will be also be loaded in order to store the "initial" state of the related field. Models set up with these hooks should always be loaded using `.select_related()`, i.e. `UserAccount.objects.select_related("organization")` for the example above. If you don't do this, you will almost certainly experience a major [N+1](https://stackoverflow.com/questions/97197/what-is-the-n1-selects-problem-in-orm-object-relational-mapping) performance problem.
+**If you use dot-notation**,  *Please be aware of the potential performance hit*: When your model is first initialized, the related model will be also be loaded in order to store the "initial" state of the related field. Models set up with these hooks should always be loaded using `.select_related()`, i.e. `UserAccount.objects.select_related("organization")` for the example above. If you don't do this, you will almost certainly experience a major [N+1](https://stackoverflow.com/questions/97197/what-is-the-n1-selects-problem-in-orm-object-relational-mapping) performance problem.

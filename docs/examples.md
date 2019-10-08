@@ -1,9 +1,10 @@
 # Examples
+Here are some examples to illustrate how you can hook into specific lifecycle moments, optionally based on state transitions.
 
-## A specific lifecycle moment
+## Specific lifecycle moments
 
-For simple cases, you always want something to happen - after saving, before deleting - regardless of the model's previous or current state. 
-For example, you want to process a thumbnail image in the background and send the user an email when they first sign up:
+For simple cases, you might always want something to happen at a certin point, such as after saving or before deleting a model instance.
+When a user is first created, you could process a thumbnail image in the background and send the user an email:
 
 ```python
     @hook('after_create')
@@ -22,16 +23,16 @@ Or you want to email a user when their account is deleted. You could add the dec
     @hook('after_delete')
     def email_deleted_user(self):
         mail.send_mail(
-            'We have deleted your account', 'Thank you for your time.',
+            'We have deleted your account', 'We will miss you!.',
             'customerservice@corporate.com', ['human@gmail.com'],
         )
 ```
 
 Read on to see how to only fire the hooked method if certain conditions about the model's current and previous state are met.
 
-## A transition btwn specific values
+## Transitions btwn specific values
 
-Maybe you only want the hooked method to run only under certain circumstances related to the state of your model. If a model's `status` field change from "active" to "banned", you want to send an email to the user:
+Maybe you only want the hooked method to run under certain circumstances related to the state of your model. If a model's `status` field change from `"active"` to `"banned"`, you may want to send an email to the user:
 
 ```python
     @hook('after_update', when='status', was='active', is_now='banned')
@@ -42,11 +43,11 @@ Maybe you only want the hooked method to run only under certain circumstances re
         )
 ``` 
 
-The `was` and `is_now` keyword arguments allow you to compare the model's state from when it was first instantiated to the current moment. You can also pass an `*` to indicate any value - these are the defaults, meaning that by default the hooked method will fire. The `when` keyword specifies which field to check against. 
+The `was` and `is_now` keyword arguments allow you to compare the model's state from when it was first instantiated to the current moment. You can also pass `"*"` to indicate any value - these are the defaults, meaning that by default the hooked method will fire. The `when` keyword specifies which field to check against. 
 
-## A field's current value is
+## Preventing state transitions
 
-You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should always expire:
+You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should expire instead:
 
 ```python
     @hook('before_delete', when='has_trial', is_now=True)
@@ -56,9 +57,9 @@ You can also enforce certain dissallowed transitions. For example, maybe you don
 
 We've ommitted the `was` keyword meaning that the initial state of the `has_trial` field can be any value ("*").
 
-## A field has changed at all
+## Any change to a field
 
-As we saw in the very first example, you can also pass the keyword argument `has_changed=True` to run the hooked method if a field has changed, regardless of previous or current value.
+You can pass the keyword argument `has_changed=True` to run the hooked method if a field has changed.
 
 ```python
     @hook('before_update', when='address', has_changed=True)
@@ -66,9 +67,9 @@ As we saw in the very first example, you can also pass the keyword argument `has
         self.address_updated_at = timezone.now()
 ```
 
-## A field's current value is NOT
+## When a field's value is NOT
 
-You can also have a hooked method fire when a field's value IS NOT equal to a certain value. See a common example below involving lowercasing a user's email. 
+You can have a hooked method fire when a field's value IS NOT equal to a certain value.
 
 ```python
     @hook('before_save', when='email', is_not=None)
@@ -76,11 +77,42 @@ You can also have a hooked method fire when a field's value IS NOT equal to a ce
         self.email = self.email.lower()
 ```
 
-## Go deeper with utility methods
+## When a field's value was NOT
 
-If you need to hook into events with more complex conditions, you can take advantage of `has_changed` and `initial_value` methods:
+You can have a hooked method fire when a field's initial value was not equal to a specific value.
 
- ```python
+```python
+    @hook('before_save', when='status', was_not="published", is_now="published)
+    def send_publish_alerts(self):
+        send_mass_email()
+```
+
+## Stacking decorators
+
+You can decorate the same method multiple times if you want to hook a method to multiple moments.
+
+```python
+    @hook("after_update", when="published", has_changed=True)
+    @hook("after_create", when="type", has_changed=True)
+    def handle_update(self):
+        # do something
+```
+
+## Watching multiple fields
+
+If you want to hook into the same moment, but base its conditions on multiple fields, you can use the `when_any` parameter.
+
+```python
+    @hook('before_save', when_any=['status', 'type'], has_changed=True)
+    def do_something(self):
+        # do something
+```
+
+## Going deeper with utility methods
+
+If you need to hook into events with more complex conditions, you can take advantage of `has_changed` and `initial_value` [utility methods](advanced.md):
+
+```python
     @hook('after_update')
     def on_update(self):
         if self.has_changed('username') and not self.has_changed('password'):
@@ -91,13 +123,3 @@ If you need to hook into events with more complex conditions, you can take advan
                 do_other_thing()
 ```
 
-## Multiple decorators, Same Method <a id="ex-multiple-decorators"></a>
-
-You can decorate the same method multiple times if you want. 
-
-```python
-    @hook('after_create')
-    @hook('after_delete')
-    def db_rows_changed(self):
-        do_something()
-```
