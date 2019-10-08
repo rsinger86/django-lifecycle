@@ -5,7 +5,7 @@
 
 from django.db import models
 
-from . import LifecycleModelMixin
+from .mixins import LifecycleModelMixin
 
 
 class LifecycleModel(LifecycleModelMixin, models.Model):

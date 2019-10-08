@@ -47,4 +47,4 @@ if StrictVersion(django.__version__) >= StrictVersion("1.11"):
 
 
 DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = tuple(DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES)
-BACKWARDS_COMPATIBILITY = StrictVersion(django.__version__) >= StrictVersion("1.9")
+IS_GTE_1_POINT_9 = StrictVersion(django.__version__) >= StrictVersion("1.9")
