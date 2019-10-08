@@ -49,9 +49,9 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 
 ---
 
-**Documentation**: <a href="https://rsinger86.github.io/drf-access-policy/" target="_blank">https://rsinger86.github.io/drf-access-policy</a>
+**Documentation**: <a href="https://rsinger86.github.io/django-lifecycle/" target="_blank">https://rsinger86.github.io/django-lifecycle</a>
 
-**Source Code**: <a href="https://github.com/rsinger86/drf-access-policy" target="_blank">https://github.com/rsinger86/drf-access-policy</a>
+**Source Code**: <a href="https://github.com/rsinger86/django-lifecycle/" target="_blank">https://github.com/rsinger86/django-lifecycle</a>
 
 ---
 
