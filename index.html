@@ -111,7 +111,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Intro
+                Introduction
               
             </span>
           
@@ -230,9 +230,52 @@
       
     
     
-    <a href="." title="Intro" class="md-nav__link md-nav__link--active">
-      Intro
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Introduction
+      </label>
+    
+    <a href="." title="Introduction" class="md-nav__link md-nav__link--active">
+      Introduction
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    Getting Started
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -302,6 +345,36 @@
     
   
   
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    Getting Started
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -318,9 +391,8 @@
                 <h1 id="django-lifecycle-hooks">Django Lifecycle Hooks<a class="headerlink" href="#django-lifecycle-hooks" title="Permanent link">&para;</a></h1>
 <p><a href="https://pypi.python.org/pypi/django-lifecycle"><img alt="Package version" src="https://badge.fury.io/py/django-lifecycle.svg" /></a>
 <a href="https://img.shields.io/pypi/status/django-lifecycle.svg/"><img alt="Python versions" src="https://img.shields.io/pypi/status/django-lifecycle.svg" /></a></p>
-<h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
-<p>This project provides a <code>@hook</code> decorator as well as a base model or mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is <a href="https://docs.djangoproject.com/en/2.0/topics/signals/">Signals</a>. However, in the projects I've worked on, my team often finds that Signals introduce unnesseary indirection and are at odds with Django's "fat models" approach of including related logic in the model class itself*. </p>
-<p>In short, you can write model code that looks like this:</p>
+<p>This project provides a <code>@hook</code> decorator as well as a base model and mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is <a href="https://docs.djangoproject.com/en/dev/topics/signals/">Signals</a>. However, my team often finds that Signals introduce unnesseary indirection and are at odds with Django's "fat models" approach.</p>
+<p>In short, you can write model code like this:</p>
 <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">django_lifecycle</span> <span class="kn">import</span> <span class="n">LifecycleModel</span><span class="p">,</span> <span class="n">hook</span>
 
 
@@ -360,27 +432,17 @@
 </pre></div>
 
 
-<p>*This is not to say Signals are never useful; my team prefers to use them for incidental concerns not related to the business domain, like cache invalidation.</p>
-<h1 id="table-of-contents">Table of Contents:<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h1>
-<ul>
-<li><a href="#installation">Installation</a></li>
-<li><a href="#requirements">Requirements</a></li>
-<li><a href="#usage">Usage</a></li>
-<li><a href="#changelog">Changelog</a></li>
-<li><a href="#testing">Testing</a></li>
-<li><a href="#license">License</a></li>
-</ul>
-<h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
-<div class="codehilite"><pre><span></span>pip install django-lifecycle
-</pre></div>
-
-
-<h1 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h1>
+<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Python (3.3+)</li>
 <li>Django (1.8+)</li>
 </ul>
-<h1 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h1>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span>pip install django-lifecycle
+</pre></div>
+
+
+<h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <p>Either extend the provided abstract base model class:</p>
 <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">django_lifecycle</span> <span class="kn">import</span> <span class="n">LifecycleModel</span><span class="p">,</span> <span class="n">hook</span>
 
@@ -400,63 +462,8 @@
 </pre></div>
 
 
-<p>:exclamation: <em>If you are using <strong>Django 1.8 or below</strong> and want to extend the base model, you also have to add <code>django_lifecycle</code> to <code>INSTALLED_APPS</code></em>.</p>
-<p>Great, now we can start adding lifecycle hooks! Let's do a few examples that illustrate the ability to not only hook into certain events, but to add basic conditions that can replace the need for boilerplate conditional code. </p>
-<h1 id="changelog">Changelog <a id="changelog"></a><a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
-<h2 id="050-september-2019">0.5.0 (September 2019)<a class="headerlink" href="#050-september-2019" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Adds <code>was_not</code> condition</li>
-<li>Allow watching changes to FK model field values, not just FK references</li>
-</ul>
-<h2 id="042-july-2019">0.4.2 (July 2019)<a class="headerlink" href="#042-july-2019" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Fixes missing README.md issue that broke install.</li>
-</ul>
-<h2 id="041-june-2019">0.4.1 (June 2019)<a class="headerlink" href="#041-june-2019" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Fixes <a href="https://github.com/andrewgodwin/urlman">urlman</a>-compatability.</li>
-</ul>
-<h2 id="040-may-2019">0.4.0 (May 2019)<a class="headerlink" href="#040-may-2019" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Fixes <code>initial_value(field_name)</code> behavior - should return value even if no change. Thanks @adamJLev!</li>
-</ul>
-<h2 id="032-february-2019">0.3.2 (February 2019)<a class="headerlink" href="#032-february-2019" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Fixes bug preventing hooks from firing for custom PKs. Thanks @atugushev!</li>
-</ul>
-<h2 id="031-august-2018">0.3.1 (August 2018)<a class="headerlink" href="#031-august-2018" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Fixes m2m field bug, in which accessing auto-generated reverse field in <code>before_create</code> causes exception b/c PK does not exist yet. Thanks @garyd203!</li>
-</ul>
-<h2 id="030-april-2018">0.3.0 (April 2018)<a class="headerlink" href="#030-april-2018" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Resets model's comparison state for hook conditions after <code>save</code> called.</li>
-</ul>
-<h2 id="024-april-2018">0.2.4 (April 2018)<a class="headerlink" href="#024-april-2018" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Fixed support for adding multiple <code>@hook</code> decorators to same method.</li>
-</ul>
-<h2 id="023-april-2018">0.2.3 (April 2018)<a class="headerlink" href="#023-april-2018" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Removes residual mixin methods from earlier implementation.</li>
-</ul>
-<h2 id="022-april-2018">0.2.2 (April 2018)<a class="headerlink" href="#022-april-2018" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Save method now accepts <code>skip_hooks</code>, an optional boolean keyword argument that controls whether hooked methods are called.</li>
-</ul>
-<h2 id="021-april-2018">0.2.1 (April 2018)<a class="headerlink" href="#021-april-2018" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Fixed bug in <code>_potentially_hooked_methods</code> that caused unwanted side effects by accessing model instance methods decorated with <code>@cache_property</code> or <code>@property</code>. </li>
-</ul>
-<h2 id="020-april-2018">0.2.0 (April 2018)<a class="headerlink" href="#020-april-2018" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Added Django 1.8 support. Thanks @jtiai!</li>
-<li>Tox testing added for Python 3.4, 3.5, 3.6 and Django 1.8, 1.11 and 2.0. Thanks @jtiai!</li>
-</ul>
-<h1 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h1>
-<p>Tests are found in a simplified Django project in the <code>/tests</code> folder. Install the project requirements and do <code>./manage.py test</code> to run them.</p>
-<h1 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h1>
-<p>See <a href="LICENSE.md">License</a>.</p>
+<p>If you are using <strong>Django 1.8 or below</strong> and want to extend the base model, you also have to add <code>django_lifecycle</code> to <code>INSTALLED_APPS</code>_.</p>
+<p><a href="http://127.0.0.1:8000/examples/">Read on</a> to see more examples of how to use lifecycle hooks. </p>
                 
                   
                 

@@ -222,8 +222,8 @@
 
 
   <li class="md-nav__item">
-    <a href=".." title="Intro" class="md-nav__link">
-      Intro
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
     </a>
   </li>
 
@@ -261,43 +261,64 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#a-specific-lifecycle-moment" class="md-nav__link">
-    A specific lifecycle moment
+  <a href="#specific-lifecycle-moments" class="md-nav__link">
+    Specific lifecycle moments
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-transition-btwn-specific-values" class="md-nav__link">
-    A transition btwn specific values
+  <a href="#transitions-btwn-specific-values" class="md-nav__link">
+    Transitions btwn specific values
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-fields-current-value-is" class="md-nav__link">
-    A field's current value is
+  <a href="#preventing-state-transitions" class="md-nav__link">
+    Preventing state transitions
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-field-has-changed-at-all" class="md-nav__link">
-    A field has changed at all
+  <a href="#any-change-to-a-field" class="md-nav__link">
+    Any change to a field
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-fields-current-value-is-not" class="md-nav__link">
-    A field's current value is NOT
+  <a href="#when-a-fields-value-is-not" class="md-nav__link">
+    When a field's value is NOT
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#go-deeper-with-utility-methods" class="md-nav__link">
-    Go deeper with utility methods
+  <a href="#when-a-fields-value-was-not" class="md-nav__link">
+    When a field's value was NOT
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stacking-decorators" class="md-nav__link">
+    Stacking decorators
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#watching-multiple-fields" class="md-nav__link">
+    Watching multiple fields
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#going-deeper-with-utility-methods" class="md-nav__link">
+    Going deeper with utility methods
   </a>
   
 </li>
@@ -370,43 +391,64 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#a-specific-lifecycle-moment" class="md-nav__link">
-    A specific lifecycle moment
+  <a href="#specific-lifecycle-moments" class="md-nav__link">
+    Specific lifecycle moments
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-transition-btwn-specific-values" class="md-nav__link">
-    A transition btwn specific values
+  <a href="#transitions-btwn-specific-values" class="md-nav__link">
+    Transitions btwn specific values
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-fields-current-value-is" class="md-nav__link">
-    A field's current value is
+  <a href="#preventing-state-transitions" class="md-nav__link">
+    Preventing state transitions
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-field-has-changed-at-all" class="md-nav__link">
-    A field has changed at all
+  <a href="#any-change-to-a-field" class="md-nav__link">
+    Any change to a field
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-fields-current-value-is-not" class="md-nav__link">
-    A field's current value is NOT
+  <a href="#when-a-fields-value-is-not" class="md-nav__link">
+    When a field's value is NOT
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#go-deeper-with-utility-methods" class="md-nav__link">
-    Go deeper with utility methods
+  <a href="#when-a-fields-value-was-not" class="md-nav__link">
+    When a field's value was NOT
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stacking-decorators" class="md-nav__link">
+    Stacking decorators
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#watching-multiple-fields" class="md-nav__link">
+    Watching multiple fields
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#going-deeper-with-utility-methods" class="md-nav__link">
+    Going deeper with utility methods
   </a>
   
 </li>
@@ -431,9 +473,10 @@
                 
                 
                 <h1 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h1>
-<h2 id="a-specific-lifecycle-moment">A specific lifecycle moment<a class="headerlink" href="#a-specific-lifecycle-moment" title="Permanent link">&para;</a></h2>
-<p>For simple cases, you always want something to happen - after saving, before deleting - regardless of the model's previous or current state. 
-For example, you want to process a thumbnail image in the background and send the user an email when they first sign up:</p>
+<p>Here are some examples to illustrate how you can hook into specific lifecycle moments, optionally based on state transitions.</p>
+<h2 id="specific-lifecycle-moments">Specific lifecycle moments<a class="headerlink" href="#specific-lifecycle-moments" title="Permanent link">&para;</a></h2>
+<p>For simple cases, you might always want something to happen at a certin point, such as after saving or before deleting a model instance.
+When a user is first created, you could process a thumbnail image in the background and send the user an email:</p>
 <div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;after_create&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">do_after_create_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">enqueue_job</span><span class="p">(</span><span class="n">process_thumbnail</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">picture_url</span><span class="p">)</span>
@@ -449,15 +492,15 @@ For example, you want to process a thumbnail image in the background and send th
 <div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;after_delete&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">email_deleted_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mail</span><span class="o">.</span><span class="n">send_mail</span><span class="p">(</span>
-            <span class="s1">&#39;We have deleted your account&#39;</span><span class="p">,</span> <span class="s1">&#39;Thank you for your time.&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;We have deleted your account&#39;</span><span class="p">,</span> <span class="s1">&#39;We will miss you!.&#39;</span><span class="p">,</span>
             <span class="s1">&#39;customerservice@corporate.com&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;human@gmail.com&#39;</span><span class="p">],</span>
         <span class="p">)</span>
 </pre></div>
 
 
 <p>Read on to see how to only fire the hooked method if certain conditions about the model's current and previous state are met.</p>
-<h2 id="a-transition-btwn-specific-values">A transition btwn specific values<a class="headerlink" href="#a-transition-btwn-specific-values" title="Permanent link">&para;</a></h2>
-<p>Maybe you only want the hooked method to run only under certain circumstances related to the state of your model. If a model's <code>status</code> field change from "active" to "banned", you want to send an email to the user:</p>
+<h2 id="transitions-btwn-specific-values">Transitions btwn specific values<a class="headerlink" href="#transitions-btwn-specific-values" title="Permanent link">&para;</a></h2>
+<p>Maybe you only want the hooked method to run under certain circumstances related to the state of your model. If a model's <code>status</code> field change from <code>"active"</code> to <code>"banned"</code>, you may want to send an email to the user:</p>
 <div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;after_update&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">was</span><span class="o">=</span><span class="s1">&#39;active&#39;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s1">&#39;banned&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">email_banned_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mail</span><span class="o">.</span><span class="n">send_mail</span><span class="p">(</span>
@@ -467,9 +510,9 @@ For example, you want to process a thumbnail image in the background and send th
 </pre></div>
 
 
-<p>The <code>was</code> and <code>is_now</code> keyword arguments allow you to compare the model's state from when it was first instantiated to the current moment. You can also pass an <code>*</code> to indicate any value - these are the defaults, meaning that by default the hooked method will fire. The <code>when</code> keyword specifies which field to check against. </p>
-<h2 id="a-fields-current-value-is">A field's current value is<a class="headerlink" href="#a-fields-current-value-is" title="Permanent link">&para;</a></h2>
-<p>You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should always expire:</p>
+<p>The <code>was</code> and <code>is_now</code> keyword arguments allow you to compare the model's state from when it was first instantiated to the current moment. You can also pass <code>"*"</code> to indicate any value - these are the defaults, meaning that by default the hooked method will fire. The <code>when</code> keyword specifies which field to check against. </p>
+<h2 id="preventing-state-transitions">Preventing state transitions<a class="headerlink" href="#preventing-state-transitions" title="Permanent link">&para;</a></h2>
+<p>You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should expire instead:</p>
 <div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_delete&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;has_trial&#39;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">ensure_trial_not_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">CannotDeleteActiveTrial</span><span class="p">(</span><span class="s1">&#39;Cannot delete trial user!&#39;</span><span class="p">)</span>
@@ -477,42 +520,57 @@ For example, you want to process a thumbnail image in the background and send th
 
 
 <p>We've ommitted the <code>was</code> keyword meaning that the initial state of the <code>has_trial</code> field can be any value ("*").</p>
-<h2 id="a-field-has-changed-at-all">A field has changed at all<a class="headerlink" href="#a-field-has-changed-at-all" title="Permanent link">&para;</a></h2>
-<p>As we saw in the very first example, you can also pass the keyword argument <code>has_changed=True</code> to run the hooked method if a field has changed, regardless of previous or current value.</p>
+<h2 id="any-change-to-a-field">Any change to a field<a class="headerlink" href="#any-change-to-a-field" title="Permanent link">&para;</a></h2>
+<p>You can pass the keyword argument <code>has_changed=True</code> to run the hooked method if a field has changed.</p>
 <div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_update&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">timestamp_address_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">address_updated_at</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 </pre></div>
 
 
-<h2 id="a-fields-current-value-is-not">A field's current value is NOT<a class="headerlink" href="#a-fields-current-value-is-not" title="Permanent link">&para;</a></h2>
-<p>You can also have a hooked method fire when a field's value IS NOT equal to a certain value. See a common example below involving lowercasing a user's email. </p>
+<h2 id="when-a-fields-value-is-not">When a field's value is NOT<a class="headerlink" href="#when-a-fields-value-is-not" title="Permanent link">&para;</a></h2>
+<p>You can have a hooked method fire when a field's value IS NOT equal to a certain value.</p>
 <div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_save&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="n">is_not</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">lowercase_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 </pre></div>
 
 
-<h2 id="go-deeper-with-utility-methods">Go deeper with utility methods<a class="headerlink" href="#go-deeper-with-utility-methods" title="Permanent link">&para;</a></h2>
-<p>If you need to hook into events with more complex conditions, you can take advantage of <code>has_changed</code> and <code>initial_value</code> methods:</p>
-<p>```python
-    @hook('after_update')
-    def on_update(self):
-        if self.has_changed('username') and not self.has_changed('password'):
-            # do the thing here
-            if self.initial_value('login_attempts') == 2:
-                do_thing()
-            else:
-                do_other_thing()</p>
-<div class="codehilite"><pre><span></span>## Multiple decorators, Same Method &lt;a id=&quot;ex-multiple-decorators&quot;&gt;&lt;/a&gt;
+<h2 id="when-a-fields-value-was-not">When a field's value was NOT<a class="headerlink" href="#when-a-fields-value-was-not" title="Permanent link">&para;</a></h2>
+<p>You can have a hooked method fire when a field's initial value was not equal to a specific value.</p>
+<div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_save&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">was_not</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s2">&quot;published)</span>
+    <span class="k">def</span> <span class="nf">send_publish_alerts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">send_mass_email</span><span class="p">()</span>
+</pre></div>
 
-You can decorate the same method multiple times if you want. 
 
-```python
-    @hook(&#39;after_create&#39;)
-    @hook(&#39;after_delete&#39;)
-    def db_rows_changed(self):
-        do_something()
+<h2 id="stacking-decorators">Stacking decorators<a class="headerlink" href="#stacking-decorators" title="Permanent link">&para;</a></h2>
+<p>You can decorate the same method multiple times if you want to hook a method to multiple moments.</p>
+<div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s2">&quot;after_update&quot;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="nd">@hook</span><span class="p">(</span><span class="s2">&quot;after_create&quot;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">handle_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># do something</span>
+</pre></div>
+
+
+<h2 id="watching-multiple-fields">Watching multiple fields<a class="headerlink" href="#watching-multiple-fields" title="Permanent link">&para;</a></h2>
+<p>If you want to hook into the same moment, but base its conditions on multiple fields, you can use the <code>when_any</code> parameter.</p>
+<div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_save&#39;</span><span class="p">,</span> <span class="n">when_any</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="n">has_changed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">do_something</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># do something</span>
+</pre></div>
+
+
+<h2 id="going-deeper-with-utility-methods">Going deeper with utility methods<a class="headerlink" href="#going-deeper-with-utility-methods" title="Permanent link">&para;</a></h2>
+<p>If you need to hook into events with more complex conditions, you can take advantage of <code>has_changed</code> and <code>initial_value</code> <a href="../advanced/">utility methods</a>:</p>
+<div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;after_update&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_changed</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_changed</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">):</span>
+            <span class="c1"># do the thing here</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_value</span><span class="p">(</span><span class="s1">&#39;login_attempts&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">do_thing</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">do_other_thing</span><span class="p">()</span>
 </pre></div>
                 
                   
@@ -534,7 +592,7 @@ You can decorate the same method multiple times if you want.
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href=".." title="Intro" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href=".." title="Introduction" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -543,7 +601,7 @@ You can decorate the same method multiple times if you want.
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Intro
+                Introduction
               </span>
             </div>
           </a>

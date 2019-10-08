@@ -222,8 +222,8 @@
 
 
   <li class="md-nav__item">
-    <a href=".." title="Intro" class="md-nav__link">
-      Intro
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
     </a>
   </li>
 
@@ -389,7 +389,7 @@
                 
                 
                 <h1 id="available-hooks-conditions">Available Hooks &amp; Conditions<a class="headerlink" href="#available-hooks-conditions" title="Permanent link">&para;</a></h1>
-<p>You can hook into one or more lifecycle moments by annotating a model method with the <code>@hook</code> decorator. The moment name is passed as the first positional argument, <code>@hook('before_create')</code>, and optional keyword arguments can be passed to set up conditions for when the method should fire.</p>
+<p>You can hook into one or more lifecycle moments by adding the <code>@hook</code> decorator to a model's method. The moment name is passed as the first positional argument, <code>@hook('before_create')</code>, and optional keyword arguments can be passed to set up conditions for when the method should fire.</p>
 <h2 id="decorator-signature">Decorator Signature<a class="headerlink" href="#decorator-signature" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span>    <span class="nd">@hook</span><span class="p">(</span>
         <span class="n">moment</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
@@ -449,6 +449,7 @@
 </tbody>
 </table>
 <h2 id="condition-keyward-arguments">Condition Keyward Arguments<a class="headerlink" href="#condition-keyward-arguments" title="Permanent link">&para;</a></h2>
+<p>If you do not use any conditional parameters, the hook will fire every time the lifecycle moment occurs. You can use the keyword arguments below to conditionally fire the method depending on the initial or current state of a model instance's fields.</p>
 <table>
 <thead>
 <tr>
@@ -461,7 +462,7 @@
 <tr>
 <td align="center">when</td>
 <td align="center">str</td>
-<td align="center">The name of the field that you want to check against; required for the conditions below to be checked. Use the name of a FK field to watch changes to the related model <em>reference</em> or use dot-notation to watch changes to the <em>values</em> of fields on related models, e.g. <code>"organization.name"</code>. But <a href="#fk-hook-warning">please be aware</a> of potential performance drawbacks.</td>
+<td align="center">The name of the field that you want to check against; required for the conditions below to be checked. Use the name of a FK field to watch changes to the related model <em>reference</em> or use dot-notation to watch changes to the <em>values</em> of fields on related models, e.g. <code>"organization.name"</code>. But <a href="../fk_changes/#fk-hook-warning">please be aware</a> of potential performance drawbacks.</td>
 </tr>
 <tr>
 <td align="center">when_any</td>
