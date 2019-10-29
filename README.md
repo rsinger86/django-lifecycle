@@ -57,8 +57,12 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 
 # Changelog
 
+## 0.7.0 (October 2019)
+
+* Adds `changes_to` condition
+
 ## 0.6.0 (October 2019)
-* Adds `when_any` hook paramter to watch multiple fields for state changes
+* Adds `when_any` hook parameter to watch multiple fields for state changes
 
 ## 0.5.0 (September 2019)
 * Adds `was_not` condition

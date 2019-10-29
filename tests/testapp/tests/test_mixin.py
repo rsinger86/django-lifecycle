@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from django.test import TestCase
 
 from django_lifecycle import NotSet
-from tests.testapp.models import Organization, UserAccount
+from tests.testapp.models import CannotRename, Organization, UserAccount
 
 
 class LifecycleMixinTests(TestCase):
@@ -105,6 +105,7 @@ class LifecycleMixinTests(TestCase):
                         "is_not": NotSet,
                         "was": "*",
                         "was_not": NotSet,
+                        "changes_to": NotSet,
                     }
                 ],
             ),
@@ -120,6 +121,7 @@ class LifecycleMixinTests(TestCase):
                         "is_not": NotSet,
                         "was": "*",
                         "was_not": NotSet,
+                        "changes_to": NotSet,
                     }
                 ],
             ),
@@ -143,6 +145,7 @@ class LifecycleMixinTests(TestCase):
                         "is_not": NotSet,
                         "was": "*",
                         "was_not": NotSet,
+                        "changes_to": NotSet,
                     }
                 ],
             ),
@@ -158,6 +161,7 @@ class LifecycleMixinTests(TestCase):
                         "is_not": NotSet,
                         "was": "*",
                         "was_not": NotSet,
+                        "changes_to": NotSet,
                     }
                 ],
             ),
@@ -298,6 +302,27 @@ class LifecycleMixinTests(TestCase):
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
         self.assertFalse(user_account._check_is_not_condition("first_name", specs))
+
+    def test_changes_to_condition_should_pass(self):
+        specs = {"when": "last_name", "changes_to": "Flanders"}
+
+        data = self.stub_data
+        UserAccount.objects.create(**data)
+        user_account = UserAccount.objects.get()
+        with self.assertRaises(CannotRename, msg="Oh, not Flanders. Anybody but Flanders."):
+            user_account.last_name = "Flanders"
+            user_account.save()
+
+    def test_changes_to_condition_should_not_pass(self):
+        specs = {"when": "last_name", "changes_to": "Bouvier"}
+
+        data = self.stub_data
+        data["first_name"] = "Marge"
+        data["last_name"] = "Simpson"
+        UserAccount.objects.create(**data)
+        user_account = UserAccount.objects.get()
+        user_account.last_name = "Bouvier"
+        user_account.save()  # `CannotRename` exception is not raised
 
     def test_should_not_call_cached_property(self):
         """

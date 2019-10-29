@@ -67,6 +67,7 @@ def hook(
     has_changed: bool = None,
     is_not=NotSet,
     was_not=NotSet,
+    changes_to=NotSet,
 ):
     _validate_hook_params(hook, when, when_any, has_changed)
 
@@ -91,6 +92,7 @@ def hook(
                 "is_not": is_not,
                 "was": was,
                 "was_not": was_not,
+                "changes_to": changes_to,
             }
         )
 

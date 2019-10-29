@@ -3,7 +3,7 @@ Here are some examples to illustrate how you can hook into specific lifecycle mo
 
 ## Specific lifecycle moments
 
-For simple cases, you might always want something to happen at a certin point, such as after saving or before deleting a model instance.
+For simple cases, you might always want something to happen at a certain point, such as after saving or before deleting a model instance.
 When a user is first created, you could process a thumbnail image in the background and send the user an email:
 
 ```python
@@ -82,7 +82,27 @@ You can have a hooked method fire when a field's value IS NOT equal to a certain
 You can have a hooked method fire when a field's initial value was not equal to a specific value.
 
 ```python
-    @hook('before_save', when='status', was_not="published", is_now="published)
+    @hook('before_save', when='status', was_not="rejected", is_now="published")
+    def send_publish_alerts(self):
+        send_mass_email()
+```
+
+## When a field's value changes to
+
+You can have a hooked method fire when a field's initial value was not equal to a specific value
+but now is.
+
+```python
+    @hook('before_save', when='status', changes_to="published")
+    def send_publish_alerts(self):
+        send_mass_email()
+```
+
+Generally, `changes_to` is a shorthand for the situation when `was_not` and `is_now` have the
+same value. The sample above is equal to
+
+```python
+    @hook('before_save', when='status', was_not="published", is_now="published")
     def send_publish_alerts(self):
         send_mass_email()
 ```
