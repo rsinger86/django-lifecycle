@@ -1,4 +1,4 @@
-site_name: Dango Lifecycle Hooks
+site_name: Django Lifecycle Hooks
 
 theme:
   name: "material"
