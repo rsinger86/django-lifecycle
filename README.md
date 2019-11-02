@@ -38,7 +38,7 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
         
         
     def save(self, *args, **kwargs):
-        if self.pk is not None and self.contents != self._orig_contents):
+        if self.pk is not None and self.contents != self._orig_contents:
             self.updated_at = timezone.now()
 
         super().save(*args, **kwargs)
