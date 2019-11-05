@@ -159,7 +159,7 @@ class LifecycleModelMixin(object):
             field names on FK-related models. These will be strings that contain
             periods.
         """
-        watched: List[str] = []
+        watched = []  # List[str]
 
         for method in self._potentially_hooked_methods:
             for specs in method._hooked:
