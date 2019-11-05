@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 from django.test import TestCase
 
-from django_lifecycle import LifecycleModelMixin, NotSet
+from django_lifecycle import NotSet
 from tests.testapp.models import Organization, UserAccount
 
 
@@ -102,9 +102,9 @@ class LifecycleMixinTests(TestCase):
                         "when_any": None,
                         "has_changed": None,
                         "is_now": "Bob",
-                        "is_not": NotSet(),
+                        "is_not": NotSet,
                         "was": "*",
-                        "was_not": NotSet(),
+                        "was_not": NotSet,
                     }
                 ],
             ),
@@ -117,9 +117,9 @@ class LifecycleMixinTests(TestCase):
                         "when_any": None,
                         "has_changed": None,
                         "is_now": "Bill",
-                        "is_not": NotSet(),
+                        "is_not": NotSet,
                         "was": "*",
-                        "was_not": NotSet(),
+                        "was_not": NotSet,
                     }
                 ],
             ),
@@ -140,9 +140,9 @@ class LifecycleMixinTests(TestCase):
                         "when_any": ["first_name", "last_name", "password"],
                         "has_changed": None,
                         "is_now": "Bob",
-                        "is_not": NotSet(),
+                        "is_not": NotSet,
                         "was": "*",
-                        "was_not": NotSet(),
+                        "was_not": NotSet,
                     }
                 ],
             ),
@@ -155,9 +155,9 @@ class LifecycleMixinTests(TestCase):
                         "when_any": None,
                         "has_changed": None,
                         "is_now": "Bill",
-                        "is_not": NotSet(),
+                        "is_not": NotSet,
                         "was": "*",
-                        "was_not": NotSet(),
+                        "was_not": NotSet,
                     }
                 ],
             ),
