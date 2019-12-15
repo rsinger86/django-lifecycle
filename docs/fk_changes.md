@@ -2,7 +2,7 @@
 
 ## ForeignKey Reference Changes
 
-You can watch whether a foriegn key reference changes by putting the name of the FK field in the `when` parameter:
+You can watch whether a foreign key reference changes by putting the name of the FK field in the `when` parameter:
 
 ```python
 class Organization(models.Model):

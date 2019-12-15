@@ -82,7 +82,7 @@ You can have a hooked method fire when a field's value IS NOT equal to a certain
 You can have a hooked method fire when a field's initial value was not equal to a specific value.
 
 ```python
-    @hook('before_save', when='status', was_not="published", is_now="published)
+    @hook('before_save', when='status', was_not="published", is_now="published")
     def send_publish_alerts(self):
         send_mass_email()
 ```
