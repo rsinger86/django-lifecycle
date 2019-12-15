@@ -219,6 +219,9 @@ class LifecycleModelMixin(object):
         if not self._check_is_not_condition(field_name, specs):
             return False
 
+        if not self._check_changes_to_condition(field_name, specs):
+            return False
+
         return True
 
     def _check_has_changed(self, field_name: str, specs: dict) -> bool:
@@ -242,3 +245,10 @@ class LifecycleModelMixin(object):
     def _check_was_not_condition(self, field_name: str, specs: dict) -> bool:
         was_not = specs["was_not"]
         return was_not is NotSet or self.initial_value(field_name) != was_not
+
+    def _check_changes_to_condition(self, field_name: str, specs: dict) -> bool:
+        changes_to = specs["changes_to"]
+        return any([
+            changes_to is NotSet,
+            (self.initial_value(field_name) != changes_to and self._current_value(field_name) == changes_to)
+        ])

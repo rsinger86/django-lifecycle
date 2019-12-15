@@ -14,6 +14,10 @@ class CannotDeleteActiveTrial(Exception):
     pass
 
 
+class CannotRename(Exception):
+    pass
+
+
 class Organization(LifecycleModel):
     name = models.CharField(max_length=100)
 
@@ -60,6 +64,10 @@ class UserAccount(LifecycleModel):
     @hook("before_delete", when="has_trial", was="*", is_now=True)
     def ensure_trial_not_active(self):
         raise CannotDeleteActiveTrial("Cannot delete trial user!")
+
+    @hook("before_update", when="last_name", changes_to="Flanders")
+    def ensure_last_name_is_not_changed_to_flanders(self):
+        raise CannotRename("Oh, not Flanders. Anybody but Flanders.")
 
     @hook("after_update", when="organization.name", has_changed=True)
     def notify_org_name_change(self):

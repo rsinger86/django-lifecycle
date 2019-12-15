@@ -59,11 +59,14 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 
 # Changelog
 
+## 0.7.0 (December 2019)
+* Adds `changes_to` condition. Thanks @samitnuk!
+
 ## 0.6.1 (November 2019)
 * Remove variable type annotation for Python 3.5 compatability.
 
 ## 0.6.0 (October 2019)
-* Adds `when_any` hook paramter to watch multiple fields for state changes
+* Adds `when_any` hook parameter to watch multiple fields for state changes
 
 ## 0.5.0 (September 2019)
 * Adds `was_not` condition

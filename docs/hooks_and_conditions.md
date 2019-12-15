@@ -13,7 +13,8 @@ You can hook into one or more lifecycle moments by adding the `@hook` decorator 
         is_now: Any = '*',
         is_not: Any = None,
         was: Any = '*', 
-        was_not: Any = None
+        was_not: Any = None,
+        changes_to: Any = None,
     ):
 ```
 ## Lifecycle Moments
@@ -45,3 +46,4 @@ If you do not use any conditional parameters, the hook will fire every time the 
 | is_not | any | Only fire the hooked method if the value of the `when` field is NOT equal to this value  |
 | was | any | Only fire the hooked method if the value of the `when` field was equal to this value when first initialized; defaults to `*`.  |
 | was_not | any | Only fire the hooked method if the value of the `when` field was NOT equal to this value when first initialized. |
+| changes_to | any | Only fire the hooked method if the value of the `when` field was NOT equal to this value when first initialized but is currently equal to this value. |
