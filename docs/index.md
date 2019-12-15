@@ -84,6 +84,6 @@ class YourModel(LifecycleModelMixin, models.Model):
 
 ```
 
-If you are using **Django 1.8 or below** and want to extend the base model, you also have to add `django_lifecycle` to `INSTALLED_APPS`_.
+If you are using **Django 1.8 or below** and want to extend the base model, you also have to add `django_lifecycle` to `INSTALLED_APPS`.
 
-[Read on](http://127.0.0.1:8000/examples/) to see more examples of how to use lifecycle hooks. 
+[Read on](/examples/) to see more examples of how to use lifecycle hooks. 

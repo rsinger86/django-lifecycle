@@ -99,7 +99,7 @@ but now is.
 ```
 
 Generally, `changes_to` is a shorthand for the situation when `was_not` and `is_now` have the
-same value. The sample above is equal to
+same value. The sample above is equal to:
 
 ```python
     @hook('before_save', when='status', was_not="published", is_now="published")

@@ -5,6 +5,8 @@
 
 This project provides a `@hook` decorator as well as a base model and mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is [Signals](https://docs.djangoproject.com/en/dev/topics/signals/). However, my team often finds that Signals introduce unnesseary indirection and are at odds with Django's "fat models" approach.
 
+**Django Lifecycle Hooks** supports Python 3.5, 3.6, and 3.7, Django 2.0.x, 2.1.x, 2.2.x.
+
 In short, you can write model code like this:
 
 ```python
@@ -38,7 +40,7 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
         
         
     def save(self, *args, **kwargs):
-        if self.pk is not None and self.contents != self._orig_contents):
+        if self.pk is not None and self.contents != self._orig_contents:
             self.updated_at = timezone.now()
 
         super().save(*args, **kwargs)
@@ -57,9 +59,11 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 
 # Changelog
 
-## 0.7.0 (October 2019)
+## 0.7.0 (December 2019)
+* Adds `changes_to` condition. Thanks @samitnuk!
 
-* Adds `changes_to` condition
+## 0.6.1 (November 2019)
+* Remove variable type annotation for Python 3.5 compatability.
 
 ## 0.6.0 (October 2019)
 * Adds `when_any` hook parameter to watch multiple fields for state changes
