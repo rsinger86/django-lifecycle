@@ -60,7 +60,7 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 # Changelog
 
 ## 0.7.0 (December 2019)
-* Adds `changes_to` condition. Thanks @samitnuk!
+* Adds `changes_to` condition - thanks @samitnuk! Also some typo fixes in docs.
 
 ## 0.6.1 (November 2019)
 * Remove variable type annotation for Python 3.5 compatability.
