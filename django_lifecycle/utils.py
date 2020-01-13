@@ -41,7 +41,7 @@ def _get_model_descriptor_names(instance) -> List[str]:
             attr = getattr(type(instance), name)
 
             if isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
-                descriptor_names.extend([name, name + "_id"])
+                descriptor_names.append(name)
         except AttributeError:
             pass
 
@@ -49,7 +49,15 @@ def _get_model_descriptor_names(instance) -> List[str]:
 
 
 def _get_field_names(instance) -> List[str]:
-    return [field.name for field in instance._meta.get_fields()]
+    names = []
+
+    for f in instance._meta.get_fields():
+        names.append(f.name)
+
+        if instance._meta.get_field(f.name).get_internal_type() == "ForeignKey":
+            names.append(f.name + "_id")
+
+    return names
 
 
 def get_unhookable_attribute_names(instance) -> List[str]:
