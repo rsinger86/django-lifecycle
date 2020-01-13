@@ -41,7 +41,7 @@ def _get_model_descriptor_names(instance) -> List[str]:
             attr = getattr(type(instance), name)
 
             if isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
-                descriptor_names.append(name)
+                descriptor_names.extend([name, name + "_id"])
         except AttributeError:
             pass
 
