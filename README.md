@@ -59,6 +59,9 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 
 # Changelog
 
+## 0.7.1 (January 2020)
+* Fixes bug in `utils._get_field_names` that could cause recursion bug in some cases.
+
 ## 0.7.0 (December 2019)
 * Adds `changes_to` condition - thanks @samitnuk! Also some typo fixes in docs.
 
