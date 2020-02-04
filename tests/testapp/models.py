@@ -142,3 +142,18 @@ class ModelCustomPK(LifecycleModel):
     @hook("after_create")
     def answer_to_the_ultimate_question_of_life(self):
         self.answer = 42
+
+
+class Companies(LifecycleModel):
+    GUID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=200)
+    registered = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+    modified = models.DateTimeField(blank=True, null=True, auto_now=True)
+
+    @hook('before_update', when='name', has_changed=True)
+    def on_content_change(self):
+        self.name = 'test_name_on_update'
+
+    @hook('before_create')
+    def on_content_create(self):
+        self.name = 'test_name_on_create'
