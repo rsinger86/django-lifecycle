@@ -1,4 +1,4 @@
-Django==2.2.8
+Django==2.2.10
 djangorestframework==3.9.4
 pytz==2018.3
 sqlparse==0.3.0
