@@ -1,5 +1,17 @@
+Click==7.0
 Django==2.2.10
 djangorestframework==3.9.4
+Jinja2==2.11.1
+livereload==2.6.1
+Markdown==3.2.1
+MarkupSafe==1.1.1
+mkdocs==1.0.4
+mkdocs-material==4.6.3
+Pygments==2.5.2
+pymdown-extensions==6.3
 pytz==2018.3
+PyYAML==5.3
+six==1.14.0
 sqlparse==0.3.0
+tornado==6.0.3
 urlman==1.2.0
