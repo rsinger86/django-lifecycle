@@ -30,13 +30,13 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 
 ```python
     # same class and field declarations as above ...
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._orig_contents = self.contents
         self._orig_status = self.status
-        
-        
+
+
     def save(self, *args, **kwargs):
         if self.pk is not None and self.contents != self._orig_contents):
             self.updated_at = timezone.now()
@@ -58,7 +58,7 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 pip install django-lifecycle
 ```
 
-## Getting Started 
+## Getting Started
 
 Either extend the provided abstract base model class:
 
@@ -86,4 +86,4 @@ class YourModel(LifecycleModelMixin, models.Model):
 
 If you are using **Django 1.8 or below** and want to extend the base model, you also have to add `django_lifecycle` to `INSTALLED_APPS`.
 
-[Read on](/examples/) to see more examples of how to use lifecycle hooks. 
+[Read on](examples.md) to see more examples of how to use lifecycle hooks.
