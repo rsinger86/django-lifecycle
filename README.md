@@ -28,7 +28,7 @@ class Article(LifecycleModel):
         send_email(self.editor.email, "An article has published!")
 ```
 
-Instead of overriding `save` and `__init___` in a clunky way that hurts readability:
+Instead of overriding `save` and `__init__` in a clunky way that hurts readability:
 
 ```python
     # same class and field declarations as above ...
