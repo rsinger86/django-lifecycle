@@ -59,6 +59,10 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 0.7.5 (April 2020)
+* Adds static typed variables for hook names; thanks @Faisal-Manzer!
+* Fixes some typos in docs; thanks @tomdyson and @bmispelon!
+
 ## 0.7.1 (January 2020)
 * Fixes bug in `utils._get_field_names` that could cause recursion bug in some cases.
 
