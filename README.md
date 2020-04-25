@@ -10,7 +10,7 @@ This project provides a `@hook` decorator as well as a base model and mixin to a
 In short, you can write model code like this:
 
 ```python
-from django_lifecycle import LifecycleModel, hook
+from django_lifecycle import LifecycleModel, hook, BEFORE_UPDATE, AFTER_UPDATE
 
 
 class Article(LifecycleModel):
@@ -19,11 +19,11 @@ class Article(LifecycleModel):
     status = models.ChoiceField(choices=['draft', 'published'])
     editor = models.ForeignKey(AuthUser)
 
-    @hook('before_update', when='contents', has_changed=True)
+    @hook(BEFORE_UPDATE, when='contents', has_changed=True)
     def on_content_change(self):
         self.updated_at = timezone.now()
 
-    @hook('after_update', when="status", was="draft", is_now="published")
+    @hook(AFTER_UPDATE, when="status", was="draft", is_now="published")
     def on_publish(self):
         send_email(self.editor.email, "An article has published!")
 ```

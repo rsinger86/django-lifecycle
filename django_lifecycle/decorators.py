@@ -3,21 +3,11 @@ from typing import List
 
 from django_lifecycle import NotSet
 
+from .hooks import VALID_HOOKS
+
 
 class DjangoLifeCycleException(Exception):
     pass
-
-
-VALID_HOOKS = (
-    "before_save",
-    "after_save",
-    "before_create",
-    "after_create",
-    "before_update",
-    "after_update",
-    "before_delete",
-    "after_delete",
-)
 
 
 def _validate_hook_params(hook, when, when_any, has_changed):
