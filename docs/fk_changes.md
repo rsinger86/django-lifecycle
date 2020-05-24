@@ -14,7 +14,7 @@ class UserAccount(LifecycleModel):
     email = models.CharField(max_length=600)
     employer = models.ForeignKey(Organization, on_delete=models.SET_NULL)
 
-    @hook("after_update", when="employer", has_changed=True)
+    @hook(AFTER_UPDATE, when="employer", has_changed=True)
     def notify_user_of_employer_change(self):
         mail.send_mail("Update", "You now work for someone else!", [self.email])
 ```
@@ -34,7 +34,7 @@ class UserAccount(LifecycleModel):
     email = models.CharField(max_length=600)
     employer = models.ForeignKey(Organization, on_delete=models.SET_NULL)
 
-    @hook("after_update", when="employer.name", has_changed=True, is_now="Google")
+    @hook(AFTER_UPDATE, when="employer.name", has_changed=True, is_now="Google")
     def notify_user_of_google_buy_out(self):
         mail.send_mail("Update", "Google bought your employer!", ["to@example.com"],)
 ```
