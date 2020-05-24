@@ -5,8 +5,13 @@ from typing import Any, List
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.utils.functional import cached_property
 
-from django_lifecycle import NotSet
-
+from . import NotSet
+from .hooks import (
+    BEFORE_CREATE, BEFORE_UPDATE,
+    BEFORE_SAVE, BEFORE_DELETE,
+    AFTER_CREATE, AFTER_UPDATE,
+    AFTER_SAVE, AFTER_DELETE,
+)
 from .utils import get_unhookable_attribute_names
 
 
@@ -115,25 +120,25 @@ class LifecycleModelMixin(object):
         is_new = self._state.adding
 
         if is_new:
-            self._run_hooked_methods("before_create")
+            self._run_hooked_methods(BEFORE_CREATE)
         else:
-            self._run_hooked_methods("before_update")
+            self._run_hooked_methods(BEFORE_UPDATE)
 
-        self._run_hooked_methods("before_save")
+        self._run_hooked_methods(BEFORE_SAVE)
         save(*args, **kwargs)
-        self._run_hooked_methods("after_save")
+        self._run_hooked_methods(AFTER_SAVE)
 
         if is_new:
-            self._run_hooked_methods("after_create")
+            self._run_hooked_methods(AFTER_CREATE)
         else:
-            self._run_hooked_methods("after_update")
+            self._run_hooked_methods(AFTER_UPDATE)
 
         self._initial_state = self._snapshot_state()
 
     def delete(self, *args, **kwargs):
-        self._run_hooked_methods("before_delete")
+        self._run_hooked_methods(BEFORE_DELETE)
         super().delete(*args, **kwargs)
-        self._run_hooked_methods("after_delete")
+        self._run_hooked_methods(AFTER_DELETE)
 
     @cached_property
     def _potentially_hooked_methods(self):
