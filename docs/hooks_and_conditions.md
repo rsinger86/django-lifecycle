@@ -1,6 +1,8 @@
 # Available Hooks & Conditions
 
-You can hook into one or more lifecycle moments by adding the `@hook` decorator to a model's method. The moment name is passed as the first positional argument, `@hook('before_create')`, and optional keyword arguments can be passed to set up conditions for when the method should fire.
+You can hook into one or more lifecycle moments by adding the `@hook` decorator to a model's method. The moment name
+ is passed as the first positional argument, `@hook(BEFORE_CREATE)`, and optional keyword arguments can be passed to
+  set up conditions for when the method should fire.
 
 ## Decorator Signature
 
@@ -21,16 +23,19 @@ You can hook into one or more lifecycle moments by adding the `@hook` decorator 
 
 Below is a full list of hooks, in the same order in which they will get called during the respective operations:
 
-| Hook name       | When it fires   |
-|:-------------:|:-------------:|
-| before_save | Immediately before `save` is called |
-| after_save | Immediately after `save` is called
-| before_create | Immediately before `save` is called, if `pk` is `None` |
-| after_create | Immediately after `save` is called, if `pk` was initially `None` |
-| before_update | Immediately before `save` is called, if `pk` is NOT `None` |
-| after_update | Immediately after `save` is called, if `pk` was NOT `None` |
-| before_delete | Immediately before `delete` is called |
-| after_delete | Immediately after `delete` is called |
+| Hook constant   | Hook name     | When it fires   |
+|:---------------:|:-------------:|:----------------|
+| `BEFORE_SAVE`   | before_save   | Immediately before `save` is called |
+| `AFTER_SAVE`    | after_save    | Immediately after `save` is called
+| `BEFORE_CREATE` | before_create | Immediately before `save` is called, if `pk` is `None` |
+| `AFTER_CREATE`  | after_create  | Immediately after `save` is called, if `pk` was initially `None` |
+| `BEFORE_UPDATE` | before_update | Immediately before `save` is called, if `pk` is NOT `None` |
+| `AFTER_UPDATE`  | after_update  | Immediately after `save` is called, if `pk` was NOT `None` |
+| `BEFORE_DELETE` | before_delete | Immediately before `delete` is called |
+| `AFTER_DELETE`  | after_delete  | Immediately after `delete` is called |
+
+All of hook constants are strings containing the specific hook name, for example `AFTER_UPDATE` is string
+ `"after_update"` - preferably way is to use hook constant.  
 
 
 ## Condition Keyward Arguments
