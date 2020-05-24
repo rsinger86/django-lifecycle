@@ -20,7 +20,7 @@ classifiers = [
 ]
 setup(
     name="django-lifecycle",
-    version="0.7.5",
+    version="0.7.6",
     description="Declarative model lifecycle hooks.",
     author="Robert Singer",
     author_email="robertgsinger@gmail.com",
