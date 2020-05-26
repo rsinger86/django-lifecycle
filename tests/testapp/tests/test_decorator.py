@@ -16,5 +16,5 @@ class DecoratorTests(TestCase):
                 pass
 
         instance = FakeModel()
-        self.assertEqual(len(instance.multiple_hooks._hooked), 2)
-        self.assertEqual(len(instance.one_hook._hooked), 1)
+        self.assertEqual(len(type(instance).multiple_hooks._hooked), 2)
+        self.assertEqual(len(type(instance).one_hook._hooked), 1)

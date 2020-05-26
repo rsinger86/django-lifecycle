@@ -1,11 +1,13 @@
-from functools import reduce
-from inspect import ismethod
+from functools import reduce, wraps
 from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
+from django.db.models.base import ModelBase
+from django.utils.decorators import classproperty
 from django.utils.functional import cached_property
 
 from . import NotSet
+from .decorators import HookedMethod
 from .hooks import (
     BEFORE_CREATE, BEFORE_UPDATE,
     BEFORE_SAVE, BEFORE_DELETE,
@@ -140,17 +142,29 @@ class LifecycleModelMixin(object):
         super().delete(*args, **kwargs)
         self._run_hooked_methods(AFTER_DELETE)
 
-    @cached_property
-    def _potentially_hooked_methods(self):
-        skip = set(get_unhookable_attribute_names(self))
-        collected = []
+    # TODO: cache it on class
+    @classproperty
+    def _potentially_hooked_methods(cls) -> List[HookedMethod]:
+        skip = set(get_unhookable_attribute_names(cls))
 
-        for name in dir(self):
-            if name in skip:
-                continue
+        # really important to skip _potentially_hooked_methods to avoid recursion
+        skip |= set(dir(LifecycleModelMixin))
+
+        # collect attributes from models:
+        # * from classes in MRO line
+        # * including only instances of Django meta class ModelBase (so no object and no mixins)
+        # * excluding last in line, which is django Model itself
+        to_dir = [set(dir(cls)) for cls in cls.mro() if isinstance(cls, ModelBase)][:-1]
+
+        possible_names = set()
+        for parent_dir in to_dir:
+            possible_names |= parent_dir
+
+        collected = []
+        for name in possible_names - skip:
             try:
-                attr = getattr(self, name)
-                if ismethod(attr) and hasattr(attr, "_hooked"):
+                attr = getattr(cls, name)
+                if isinstance(attr, HookedMethod):
                     collected.append(attr)
             except AttributeError:
                 pass
@@ -185,7 +199,7 @@ class LifecycleModelMixin(object):
         """
         fired = []
 
-        for method in self._potentially_hooked_methods:
+        for method in self._potentially_hooked_methods:  # type: HookedMethod
             for callback_specs in method._hooked:
                 if callback_specs["hook"] != hook:
                     continue
@@ -196,15 +210,15 @@ class LifecycleModelMixin(object):
                 if when_field:
                     if self._check_callback_conditions(when_field, callback_specs):
                         fired.append(method.__name__)
-                        method()
+                        method(self)
                 elif when_any_field:
                     for field_name in when_any_field:
                         if self._check_callback_conditions(field_name, callback_specs):
                             fired.append(method.__name__)
-                            method()
+                            method(self)
                 else:
                     fired.append(method.__name__)
-                    method()
+                    method(self)
 
         return fired
 
