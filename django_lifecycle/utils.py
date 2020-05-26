@@ -1,3 +1,4 @@
+from functools import wraps
 from typing import Set
 
 from django.db.models.base import ModelBase
@@ -63,10 +64,24 @@ def _get_field_names(klass: ModelBase) -> Set[str]:
 
 
 def get_unhookable_attribute_names(klass) -> Set[str]:
-    from . import LifecycleModelMixin
     return (
             _get_field_names(klass) |
             _get_model_descriptor_names(klass) |
             _get_model_property_names(klass) |
             {'MultipleObjectsReturned', 'DoesNotExist'}
     )
+
+
+def cached_class_property(getter):
+    class CachedClassProperty:
+        def __init__(self, f):
+            self._f = f
+            self._name = f.__name__ + '__' + CachedClassProperty.__name__
+
+        @wraps(getter)
+        def __get__(self, instance, cls):
+            if not hasattr(cls, self._name):
+                setattr(cls, self._name, self._f(cls))
+            return getattr(cls, self._name)
+
+    return CachedClassProperty(getter)

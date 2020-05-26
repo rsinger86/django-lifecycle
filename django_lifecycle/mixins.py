@@ -1,10 +1,8 @@
-from functools import reduce, wraps
+from functools import reduce
 from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db.models.base import ModelBase
-from django.utils.decorators import classproperty
-from django.utils.functional import cached_property
 
 from . import NotSet
 from .decorators import HookedMethod
@@ -14,7 +12,7 @@ from .hooks import (
     AFTER_CREATE, AFTER_UPDATE,
     AFTER_SAVE, AFTER_DELETE,
 )
-from .utils import get_unhookable_attribute_names
+from .utils import get_unhookable_attribute_names, cached_class_property
 
 
 class LifecycleModelMixin(object):
@@ -31,14 +29,8 @@ class LifecycleModelMixin(object):
         if "_state" in state:
             del state["_state"]
 
-        if "_potentially_hooked_methods" in state:
-            del state["_potentially_hooked_methods"]
-
         if "_initial_state" in state:
             del state["_initial_state"]
-
-        if "_watched_fk_model_fields" in state:
-            del state["_watched_fk_model_fields"]
 
         return state
 
@@ -67,9 +59,9 @@ class LifecycleModelMixin(object):
     def _current_value(self, field_name: str) -> Any:
         if "." in field_name:
 
-            def getitem(obj, field_name: str):
+            def getitem(obj, name: str):
                 try:
-                    return getattr(obj, field_name)
+                    return getattr(obj, name)
                 except (AttributeError, ObjectDoesNotExist):
                     return None
 
@@ -83,10 +75,7 @@ class LifecycleModelMixin(object):
         """
         field_name = self._sanitize_field_name(field_name)
 
-        if field_name in self._initial_state:
-            return self._initial_state[field_name]
-
-        return None
+        return self._initial_state.get(field_name, None)
 
     def has_changed(self, field_name: str) -> bool:
         """
@@ -95,10 +84,7 @@ class LifecycleModelMixin(object):
         changed = self._diff_with_initial.keys()
         field_name = self._sanitize_field_name(field_name)
 
-        if field_name in changed:
-            return True
-
-        return False
+        return field_name in changed
 
     def _clear_watched_fk_model_cache(self):
         """
@@ -142,8 +128,7 @@ class LifecycleModelMixin(object):
         super().delete(*args, **kwargs)
         self._run_hooked_methods(AFTER_DELETE)
 
-    # TODO: cache it on class
-    @classproperty
+    @cached_class_property
     def _potentially_hooked_methods(cls) -> List[HookedMethod]:
         skip = set(get_unhookable_attribute_names(cls))
 
@@ -171,7 +156,7 @@ class LifecycleModelMixin(object):
 
         return collected
 
-    @cached_property
+    @cached_class_property
     def _watched_fk_model_fields(self) -> List[str]:
         """
             Gather up all field names (values in 'when' key) that correspond to
@@ -187,7 +172,7 @@ class LifecycleModelMixin(object):
 
         return watched
 
-    @cached_property
+    @cached_class_property
     def _watched_fk_models(self) -> List[str]:
         return [_.split(".")[0] for _ in self._watched_fk_model_fields]
 
