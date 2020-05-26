@@ -157,7 +157,7 @@ class LifecycleModelMixin(object):
         return collected
 
     @cached_class_property
-    def _watched_fk_model_fields(self) -> List[str]:
+    def _watched_fk_model_fields(cls) -> List[str]:
         """
             Gather up all field names (values in 'when' key) that correspond to
             field names on FK-related models. These will be strings that contain
@@ -165,7 +165,7 @@ class LifecycleModelMixin(object):
         """
         watched = []  # List[str]
 
-        for method in self._potentially_hooked_methods:
+        for method in cls._potentially_hooked_methods:
             for specs in method._hooked:
                 if specs["when"] is not None and "." in specs["when"]:
                     watched.append(specs["when"])
@@ -173,8 +173,8 @@ class LifecycleModelMixin(object):
         return watched
 
     @cached_class_property
-    def _watched_fk_models(self) -> List[str]:
-        return [_.split(".")[0] for _ in self._watched_fk_model_fields]
+    def _watched_fk_models(cls) -> List[str]:
+        return [_.split(".")[0] for _ in cls._watched_fk_model_fields]
 
     def _run_hooked_methods(self, hook: str) -> List[str]:
         """
