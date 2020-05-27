@@ -2,30 +2,8 @@ from functools import wraps
 from typing import Set
 
 from django.db.models.base import ModelBase
-from django.utils.functional import cached_property
 
 from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
-
-
-def _get_model_property_names(klass: ModelBase) -> Set[str]:
-    """
-        Gather up properties and cached_properties which may be methods
-        that were decorated. Need to inspect class versions b/c doing
-        getattr on them could cause unwanted side effects.
-    """
-    property_names = set()
-
-    for name in dir(klass):
-        try:
-            attr = getattr(type(klass), name)
-
-            if isinstance(attr, property) or isinstance(attr, cached_property):
-                property_names.add(name)
-
-        except AttributeError:
-            pass
-
-    return property_names
 
 
 def _get_model_descriptor_names(klass: ModelBase) -> Set[str]:
@@ -67,7 +45,6 @@ def get_unhookable_attribute_names(klass) -> Set[str]:
     return (
             _get_field_names(klass) |
             _get_model_descriptor_names(klass) |
-            _get_model_property_names(klass) |
             {'MultipleObjectsReturned', 'DoesNotExist'}
     )
 
