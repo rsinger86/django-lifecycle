@@ -3,30 +3,6 @@ from typing import Set
 
 from django.db.models.base import ModelBase
 
-from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
-
-
-def _get_model_descriptor_names(klass: ModelBase) -> Set[str]:
-    """
-    Attributes which are Django descriptors. These represent a field
-    which is a one-to-many or many-to-many relationship that is
-    potentially defined in another model, and doesn't otherwise appear
-    as a field on this model.
-    """
-
-    descriptor_names = set()
-
-    for name in dir(klass):
-        try:
-            attr = getattr(type(klass), name)
-
-            if isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
-                descriptor_names.add(name)
-        except AttributeError:
-            pass
-
-    return descriptor_names
-
 
 def _get_field_names(klass: ModelBase) -> Set[str]:
     names = set()
@@ -44,7 +20,6 @@ def _get_field_names(klass: ModelBase) -> Set[str]:
 def get_unhookable_attribute_names(klass) -> Set[str]:
     return (
             _get_field_names(klass) |
-            _get_model_descriptor_names(klass) |
             {'MultipleObjectsReturned', 'DoesNotExist'}
     )
 
