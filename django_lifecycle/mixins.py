@@ -2,7 +2,6 @@ from functools import reduce
 from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
-from django.db.models.base import ModelBase
 
 from . import NotSet
 from .decorators import HookedMethod
@@ -135,15 +134,8 @@ class LifecycleModelMixin(object):
         # really important to skip _potentially_hooked_methods to avoid recursion
         skip |= set(dir(LifecycleModelMixin))
 
-        # collect attributes from models:
-        # * from classes in MRO line
-        # * including only instances of Django meta class ModelBase (so no object and no mixins)
-        # * excluding last in line, which is django Model itself
-        to_dir = [set(dir(cls)) for cls in cls.mro() if isinstance(cls, ModelBase)][:-1]
-
-        possible_names = set()
-        for parent_dir in to_dir:
-            possible_names |= parent_dir
+        # collect all possible hooked attrs from class
+        possible_names = set(dir(cls))
 
         collected = []
         for name in possible_names - skip:
