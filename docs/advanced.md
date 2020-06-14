@@ -24,7 +24,7 @@ class UserAccount(LifecycleModel):
     marital_status = models.CharField(max_length=100)
 
     @hook("after_update")
-    def on_name_change_heck_on_marital_status(self):
+    def on_name_change_check_on_marital_status(self):
         if self.has_changed('last_name') and not self.has_changed('marital_status)
             send_mail(to=self.email, "Has your marital status changed recently?")
 ```
