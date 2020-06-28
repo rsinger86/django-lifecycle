@@ -324,9 +324,9 @@ class LifecycleMixinTests(TestCase):
         user_account.last_name = "Bouvier"
         user_account.save()  # `CannotRename` exception is not raised
 
-    def test_should_not_call_django_cached_property(self):
+    def test_should_not_call_cached_property(self):
         """
-            full_name is cached_property (Django). Accessing _potentially_hooked_methods
+            full_name is cached_property. Accessing _potentially_hooked_methods
             should not call it incidentally.
         """
         data = self.stub_data
@@ -337,21 +337,6 @@ class LifecycleMixinTests(TestCase):
         account.first_name = "Bartholomew"
         # Should be first time this property is accessed...
         self.assertEqual(account.full_name, "Bartholomew Simpson")
-
-    def test_should_not_call_builtin_cached_property(self):
-        """
-            full_name is cached_property. Accessing _potentially_hooked_methods
-            should not call it incidentally.
-        """
-        data = self.stub_data
-        data["first_name"] = "Bart"
-        data["last_name"] = "Simpson"
-        data["email"] = "bart@simpson.com"
-        account = UserAccount.objects.create(**data)
-        account._potentially_hooked_methods
-        account.first_name = "Bartholomew"
-        # Should be first time this property is accessed...
-        self.assertEqual(account.full_name_with_email, "Bartholomew Simpson (bart@simpson.com)")
 
     def test_comparison_state_should_reset_after_save(self):
         data = self.stub_data
