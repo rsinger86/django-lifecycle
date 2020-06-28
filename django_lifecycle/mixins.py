@@ -1,18 +1,17 @@
 from functools import reduce
-from inspect import ismethod
 from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
-from django.utils.functional import cached_property
 
 from . import NotSet
+from .decorators import HookedMethod
 from .hooks import (
     BEFORE_CREATE, BEFORE_UPDATE,
     BEFORE_SAVE, BEFORE_DELETE,
     AFTER_CREATE, AFTER_UPDATE,
     AFTER_SAVE, AFTER_DELETE,
 )
-from .utils import get_unhookable_attribute_names
+from .utils import get_unhookable_attribute_names, cached_class_property
 
 
 class LifecycleModelMixin(object):
@@ -29,14 +28,8 @@ class LifecycleModelMixin(object):
         if "_state" in state:
             del state["_state"]
 
-        if "_potentially_hooked_methods" in state:
-            del state["_potentially_hooked_methods"]
-
         if "_initial_state" in state:
             del state["_initial_state"]
-
-        if "_watched_fk_model_fields" in state:
-            del state["_watched_fk_model_fields"]
 
         return state
 
@@ -65,9 +58,9 @@ class LifecycleModelMixin(object):
     def _current_value(self, field_name: str) -> Any:
         if "." in field_name:
 
-            def getitem(obj, field_name: str):
+            def getitem(obj, name: str):
                 try:
-                    return getattr(obj, field_name)
+                    return getattr(obj, name)
                 except (AttributeError, ObjectDoesNotExist):
                     return None
 
@@ -81,10 +74,7 @@ class LifecycleModelMixin(object):
         """
         field_name = self._sanitize_field_name(field_name)
 
-        if field_name in self._initial_state:
-            return self._initial_state[field_name]
-
-        return None
+        return self._initial_state.get(field_name, None)
 
     def has_changed(self, field_name: str) -> bool:
         """
@@ -93,10 +83,7 @@ class LifecycleModelMixin(object):
         changed = self._diff_with_initial.keys()
         field_name = self._sanitize_field_name(field_name)
 
-        if field_name in changed:
-            return True
-
-        return False
+        return field_name in changed
 
     def _clear_watched_fk_model_cache(self):
         """
@@ -140,25 +127,29 @@ class LifecycleModelMixin(object):
         super().delete(*args, **kwargs)
         self._run_hooked_methods(AFTER_DELETE)
 
-    @cached_property
-    def _potentially_hooked_methods(self):
-        skip = set(get_unhookable_attribute_names(self))
-        collected = []
+    @cached_class_property
+    def _potentially_hooked_methods(cls) -> List[HookedMethod]:
+        skip = set(get_unhookable_attribute_names(cls))
 
-        for name in dir(self):
-            if name in skip:
-                continue
+        # really important to skip _potentially_hooked_methods to avoid recursion
+        skip |= set(dir(LifecycleModelMixin))
+
+        # collect all possible hooked attrs from class
+        possible_names = set(dir(cls))
+
+        collected = []
+        for name in possible_names - skip:
             try:
-                attr = getattr(self, name)
-                if ismethod(attr) and hasattr(attr, "_hooked"):
+                attr = getattr(cls, name)
+                if isinstance(attr, HookedMethod):
                     collected.append(attr)
             except AttributeError:
                 pass
 
         return collected
 
-    @cached_property
-    def _watched_fk_model_fields(self) -> List[str]:
+    @cached_class_property
+    def _watched_fk_model_fields(cls) -> List[str]:
         """
             Gather up all field names (values in 'when' key) that correspond to
             field names on FK-related models. These will be strings that contain
@@ -166,16 +157,16 @@ class LifecycleModelMixin(object):
         """
         watched = []  # List[str]
 
-        for method in self._potentially_hooked_methods:
+        for method in cls._potentially_hooked_methods:
             for specs in method._hooked:
                 if specs["when"] is not None and "." in specs["when"]:
                     watched.append(specs["when"])
 
         return watched
 
-    @cached_property
-    def _watched_fk_models(self) -> List[str]:
-        return [_.split(".")[0] for _ in self._watched_fk_model_fields]
+    @cached_class_property
+    def _watched_fk_models(cls) -> List[str]:
+        return [_.split(".")[0] for _ in cls._watched_fk_model_fields]
 
     def _run_hooked_methods(self, hook: str) -> List[str]:
         """
@@ -185,7 +176,7 @@ class LifecycleModelMixin(object):
         """
         fired = []
 
-        for method in self._potentially_hooked_methods:
+        for method in self._potentially_hooked_methods:  # type: HookedMethod
             for callback_specs in method._hooked:
                 if callback_specs["hook"] != hook:
                     continue
@@ -196,15 +187,15 @@ class LifecycleModelMixin(object):
                 if when_field:
                     if self._check_callback_conditions(when_field, callback_specs):
                         fired.append(method.__name__)
-                        method()
+                        method(self)
                 elif when_any_field:
                     for field_name in when_any_field:
                         if self._check_callback_conditions(field_name, callback_specs):
                             fired.append(method.__name__)
-                            method()
+                            method(self)
                 else:
                     fired.append(method.__name__)
-                    method()
+                    method(self)
 
         return fired
 
