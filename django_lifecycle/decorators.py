@@ -1,8 +1,7 @@
 from functools import wraps
 from typing import List
 
-from django_lifecycle import NotSet
-
+from . import NotSet
 from .hooks import VALID_HOOKS
 
 
@@ -48,44 +47,57 @@ def _validate_hook_params(hook, when, when_any, has_changed):
         )
 
 
+class HookedMethod:
+    """
+    Replacement for original method with stored information about registered hook.
+    """
+
+    def __init__(self, f, hook_spec):
+        self._f = f
+        self._hooked = f._hooked if isinstance(f, type(self)) else []
+        # FIFO to respect order of @hook decorators definition
+        self._hooked.append(hook_spec)
+        self.__name__ = f.__name__
+
+    def __get__(self, instance, owner):
+        """
+        Getter descriptor for access directly from class -> ModelA.<name>.
+        Used in LifecycleModelMixin._potentially_hooked_methods for detection hooked methods.
+        """
+        if not instance:
+            return self
+        return self._f
+
+    def __call__(self, *args, **kwargs):
+        """
+        Calling directly as model_instance.hooked_method().
+        """
+        return self._f(*args, **kwargs)
+
+
 def hook(
-    hook: str,
-    when: str = None,
-    when_any: List[str] = None,
-    was="*",
-    is_now="*",
-    has_changed: bool = None,
-    is_not=NotSet,
-    was_not=NotSet,
-    changes_to=NotSet,
+        hook: str,
+        when: str = None,
+        when_any: List[str] = None,
+        was="*",
+        is_now="*",
+        has_changed: bool = None,
+        is_not=NotSet,
+        was_not=NotSet,
+        changes_to=NotSet,
 ):
     _validate_hook_params(hook, when, when_any, has_changed)
 
-    def decorator(hooked_method):
-        if not hasattr(hooked_method, "_hooked"):
+    hook_spec = {
+        "hook": hook,
+        "when": when,
+        "when_any": when_any,
+        "has_changed": has_changed,
+        "is_now": is_now,
+        "is_not": is_not,
+        "was": was,
+        "was_not": was_not,
+        "changes_to": changes_to,
+    }
 
-            @wraps(hooked_method)
-            def func(*args, **kwargs):
-                hooked_method(*args, **kwargs)
-
-            func._hooked = []
-        else:
-            func = hooked_method
-
-        func._hooked.append(
-            {
-                "hook": hook,
-                "when": when,
-                "when_any": when_any,
-                "has_changed": has_changed,
-                "is_now": is_now,
-                "is_not": is_not,
-                "was": was,
-                "was_not": was_not,
-                "changes_to": changes_to,
-            }
-        )
-
-        return func
-
-    return decorator
+    return lambda fnc: wraps(fnc)(HookedMethod(fnc, hook_spec))

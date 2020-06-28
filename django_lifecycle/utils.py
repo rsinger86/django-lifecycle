@@ -1,69 +1,39 @@
-from typing import List
+from functools import wraps
+from typing import Set
 
-from django.utils.functional import cached_property
-
-from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
-
-
-def _get_model_property_names(instance) -> List[str]:
-    """
-        Gather up properties and cached_properties which may be methods
-        that were decorated. Need to inspect class versions b/c doing
-        getattr on them could cause unwanted side effects.
-    """
-    property_names = []
-
-    for name in dir(instance):
-        try:
-            attr = getattr(type(instance), name)
-
-            if isinstance(attr, property) or isinstance(attr, cached_property):
-                property_names.append(name)
-
-        except AttributeError:
-            pass
-
-    return property_names
+from django.db.models.base import ModelBase
 
 
-def _get_model_descriptor_names(instance) -> List[str]:
-    """
-    Attributes which are Django descriptors. These represent a field
-    which is a one-to-many or many-to-many relationship that is
-    potentially defined in another model, and doesn't otherwise appear
-    as a field on this model.
-    """
+def _get_field_names(klass: ModelBase) -> Set[str]:
+    names = set()
 
-    descriptor_names = []
+    for f in klass._meta.get_fields():
+        names.add(f.name)
 
-    for name in dir(instance):
-        try:
-            attr = getattr(type(instance), name)
-
-            if isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
-                descriptor_names.append(name)
-        except AttributeError:
-            pass
-
-    return descriptor_names
-
-
-def _get_field_names(instance) -> List[str]:
-    names = []
-
-    for f in instance._meta.get_fields():
-        names.append(f.name)
-
-        if instance._meta.get_field(f.name).get_internal_type() == "ForeignKey":
-            names.append(f.name + "_id")
+        if klass._meta.get_field(f.name).get_internal_type() == "ForeignKey":
+            # TODO: not robust for cases with custom Field(db_column=...) definition
+            names.add(f.name + "_id")
 
     return names
 
 
-def get_unhookable_attribute_names(instance) -> List[str]:
+def get_unhookable_attribute_names(klass) -> Set[str]:
     return (
-        _get_field_names(instance)
-        + _get_model_descriptor_names(instance)
-        + _get_model_property_names(instance)
-        + ["_run_hooked_methods"]
+            _get_field_names(klass) |
+            {'MultipleObjectsReturned', 'DoesNotExist'}
     )
+
+
+def cached_class_property(getter):
+    class CachedClassProperty:
+        def __init__(self, f):
+            self._f = f
+            self._name = f.__name__ + '__' + CachedClassProperty.__name__
+
+        @wraps(getter)
+        def __get__(self, instance, cls):
+            if not hasattr(cls, self._name):
+                setattr(cls, self._name, self._f(cls))
+            return getattr(cls, self._name)
+
+    return CachedClassProperty(getter)

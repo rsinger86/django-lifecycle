@@ -97,9 +97,9 @@ class UserAccountTestCase(TestCase):
         account.save()
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
-            mail.outbox[0].subject, "The name of your organization has changed!"
+            {mail.outbox[0].subject, mail.outbox[1].subject},
+            {"The name of your organization has changed!", "You were moved to our online school!"}
         )
-        self.assertEqual(mail.outbox[1].subject, "You were moved to our online school!")
 
     def test_email_user_about_name_change(self):
         account = UserAccount.objects.create(**self.stub_data)
