@@ -1,9 +1,6 @@
-import warnings
 from distutils.version import StrictVersion
 
 import django
-
-warnings.warn("Module django_info is unused by django_lifecycle itself and will be removed.", DeprecationWarning)
 
 DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = []
 
@@ -47,6 +44,7 @@ if StrictVersion(django.__version__) >= StrictVersion("1.11"):
     from django.db.models.fields.related_descriptors import ForwardOneToOneDescriptor
 
     DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES.extend([ForwardOneToOneDescriptor])
+
 
 DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = tuple(DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES)
 IS_GTE_1_POINT_9 = StrictVersion(django.__version__) >= StrictVersion("1.9")

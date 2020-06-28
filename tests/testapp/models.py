@@ -3,8 +3,7 @@ import uuid
 from django.utils import timezone
 from django.core import mail
 from django.db import models
-from django.utils.functional import cached_property as django_cached_property
-from functools import cached_property as builtin_cached_property
+from django.utils.functional import cached_property
 from django_lifecycle import hook
 from django_lifecycle.models import LifecycleModel
 
@@ -120,13 +119,9 @@ class UserAccount(LifecycleModel):
             ["to@example.com"],
         )
 
-    @django_cached_property
+    @cached_property
     def full_name(self):
         return self.first_name + " " + self.last_name
-
-    @builtin_cached_property
-    def full_name_with_email(self):
-        return self.first_name + " " + self.last_name + " (" + (self.email or '') + ")"
 
 
 class Locale(models.Model):
