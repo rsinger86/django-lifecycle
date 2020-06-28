@@ -30,7 +30,7 @@ Or you want to email a user when their account is deleted. You could add the dec
 
 Read on to see how to only fire the hooked method if certain conditions about the model's current and previous state are met.
 
-## Transitions btwn specific values
+## Transitions between specific values
 
 Maybe you only want the hooked method to run under certain circumstances related to the state of your model. If a model's `status` field change from `"active"` to `"banned"`, you may want to send an email to the user:
 
@@ -47,7 +47,7 @@ The `was` and `is_now` keyword arguments allow you to compare the model's state 
 
 ## Preventing state transitions
 
-You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should expire instead:
+You can also enforce certain disallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should expire instead:
 
 ```python
     @hook(BEFORE_DELETE, when='has_trial', is_now=True)
@@ -55,7 +55,7 @@ You can also enforce certain dissallowed transitions. For example, maybe you don
         raise CannotDeleteActiveTrial('Cannot delete trial user!')
 ```
 
-We've ommitted the `was` keyword meaning that the initial state of the `has_trial` field can be any value ("*").
+We've omitted the `was` keyword meaning that the initial state of the `has_trial` field can be any value ("*").
 
 ## Any change to a field
 

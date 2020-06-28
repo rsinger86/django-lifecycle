@@ -21,12 +21,12 @@ class UserAccount(LifecycleModel):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
-    marietal_status = models.CharField(max_length=100)
+    marital_status = models.CharField(max_length=100)
 
     @hook("after_update")
-    def on_name_change_heck_on_marietal_status(self):
-        if self.has_changed('last_name') and not self.has_changed('marietal_status)
-            send_mail(to=self.email, "Has your marietal status changed recently?")
+    def on_name_change_check_on_marital_status(self):
+        if self.has_changed('last_name') and not self.has_changed('marital_status)
+            send_mail(to=self.email, "Has your marital status changed recently?")
 ```
 
 

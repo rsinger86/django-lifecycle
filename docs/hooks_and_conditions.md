@@ -38,11 +38,11 @@ All of hook constants are strings containing the specific hook name, for example
  `"after_update"` - preferably way is to use hook constant.  
 
 
-## Condition Keyward Arguments
+## Condition Keyword Arguments
 
 If you do not use any conditional parameters, the hook will fire every time the lifecycle moment occurs. You can use the keyword arguments below to conditionally fire the method depending on the initial or current state of a model instance's fields.
 
-| Keywarg arg       | Type   | Details |
+| Keyword arg       | Type   | Details |
 |:-------------:|:-------------:|:-------------:|
 | when | str | The name of the field that you want to check against; required for the conditions below to be checked. Use the name of a FK field to watch changes to the related model *reference* or use dot-notation to watch changes to the *values* of fields on related models, e.g. `"organization.name"`. But [please be aware](fk_changes.md#fk-hook-warning) of potential performance drawbacks. |
 | when_any | List[str] | Similar to the `when` parameter, but takes a list of field names. The hooked method will fire if any of the corresponding fields meet the keyword conditions. Useful if you don't like stacking decorators. |
