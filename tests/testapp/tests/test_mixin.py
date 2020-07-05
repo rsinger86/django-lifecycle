@@ -304,8 +304,6 @@ class LifecycleMixinTests(TestCase):
         self.assertFalse(user_account._check_is_not_condition("first_name", specs))
 
     def test_changes_to_condition_should_pass(self):
-        specs = {"when": "last_name", "changes_to": "Flanders"}
-
         data = self.stub_data
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
@@ -314,8 +312,6 @@ class LifecycleMixinTests(TestCase):
             user_account.save()
 
     def test_changes_to_condition_should_not_pass(self):
-        specs = {"when": "last_name", "changes_to": "Bouvier"}
-
         data = self.stub_data
         data["first_name"] = "Marge"
         data["last_name"] = "Simpson"

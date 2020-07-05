@@ -22,7 +22,7 @@ class UserAccountTestCase(TestCase):
         self.assertTrue(isinstance(account.joined_at, datetime.datetime))
 
     def test_send_welcome_email_after_create(self):
-        account = UserAccount.objects.create(**self.stub_data)
+        UserAccount.objects.create(**self.stub_data)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Welcome!")
 
@@ -118,4 +118,3 @@ class UserAccountTestCase(TestCase):
         account.email = "Homer.Simpson@springfieldnuclear"
         account.save(skip_hooks=True)
         self.assertEqual(account.email, "Homer.Simpson@springfieldnuclear")
-
