@@ -192,6 +192,7 @@ class LifecycleModelMixin(object):
 
                 when_field = callback_specs.get("when")
                 when_any_field = callback_specs.get("when_any")
+                has_changed = callback_specs.get("has_changed")
 
                 if when_field:
                     if self._check_callback_conditions(when_field, callback_specs):
@@ -202,6 +203,10 @@ class LifecycleModelMixin(object):
                         if self._check_callback_conditions(field_name, callback_specs):
                             fired.append(method.__name__)
                             method()
+                elif has_changed:
+                    if self._diff_with_initial:
+                        fired.append(method.__name__)
+                        method()
                 else:
                     fired.append(method.__name__)
                     method()

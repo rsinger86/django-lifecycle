@@ -128,6 +128,17 @@ If you want to hook into the same moment, but base its conditions on multiple fi
         # do something
 ```
 
+## Watching any fields
+
+If you want a hook to fire if _any_ field changes for a model, then don't
+include `when` or `when_any`.
+
+```python
+    @hook(BEFORE_SAVE, has_changed=True)
+    def do_something(self):
+        # do something
+```
+
 ## Going deeper with utility methods
 
 If you need to hook into events with more complex conditions, you can take advantage of `has_changed` and `initial_value` [utility methods](advanced.md):
