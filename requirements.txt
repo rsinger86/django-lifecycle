@@ -15,3 +15,4 @@ six==1.14.0
 sqlparse==0.3.0
 tornado==6.0.3
 urlman==1.2.0
+packaging==20.4

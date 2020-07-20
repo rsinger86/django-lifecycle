@@ -1,10 +1,10 @@
-from distutils.version import StrictVersion
+from packaging.version import Version
 
 import django
 
 DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = []
 
-if StrictVersion(django.__version__) < StrictVersion("1.9"):
+if Version(django.__version__) < Version("1.9"):
     from django.db.models.fields.related import (
         SingleRelatedObjectDescriptor,
         ReverseSingleRelatedObjectDescriptor,
@@ -23,7 +23,7 @@ if StrictVersion(django.__version__) < StrictVersion("1.9"):
         ]
     )
 
-if StrictVersion(django.__version__) >= StrictVersion("1.9"):
+if Version(django.__version__) >= Version("1.9"):
     from django.db.models.fields.related_descriptors import (
         ForwardManyToOneDescriptor,
         ReverseOneToOneDescriptor,
@@ -40,11 +40,11 @@ if StrictVersion(django.__version__) >= StrictVersion("1.9"):
         ]
     )
 
-if StrictVersion(django.__version__) >= StrictVersion("1.11"):
+if Version(django.__version__) >= Version("1.11"):
     from django.db.models.fields.related_descriptors import ForwardOneToOneDescriptor
 
     DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES.extend([ForwardOneToOneDescriptor])
 
 
 DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = tuple(DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES)
-IS_GTE_1_POINT_9 = StrictVersion(django.__version__) >= StrictVersion("1.9")
+IS_GTE_1_POINT_9 = Version(django.__version__) >= Version("1.9")
