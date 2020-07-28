@@ -47,8 +47,8 @@ If you do not use any conditional parameters, the hook will fire every time the 
 | when | str | The name of the field that you want to check against; required for the conditions below to be checked. Use the name of a FK field to watch changes to the related model *reference* or use dot-notation to watch changes to the *values* of fields on related models, e.g. `"organization.name"`. But [please be aware](fk_changes.md#fk-hook-warning) of potential performance drawbacks. |
 | when_any | List[str] | Similar to the `when` parameter, but takes a list of field names. The hooked method will fire if any of the corresponding fields meet the keyword conditions. Useful if you don't like stacking decorators. |
 | has_changed | bool | Only fire the hooked method if the value of the `when` field has changed since the model was initialized  |
-| is_now | any | Only fire the hooked method if the value of the `when` field is currently equal to this value; defaults to `*`.  |
-| is_not | any | Only fire the hooked method if the value of the `when` field is NOT equal to this value  |
-| was | any | Only fire the hooked method if the value of the `when` field was equal to this value when first initialized; defaults to `*`.  |
-| was_not | any | Only fire the hooked method if the value of the `when` field was NOT equal to this value when first initialized. |
-| changes_to | any | Only fire the hooked method if the value of the `when` field was NOT equal to this value when first initialized but is currently equal to this value. |
+| is_now | Any | Only fire the hooked method if the value of the `when` field is currently equal to this value; defaults to `*`.  |
+| is_not | Any | Only fire the hooked method if the value of the `when` field is NOT equal to this value  |
+| was | Any | Only fire the hooked method if the value of the `when` field was equal to this value when first initialized; defaults to `*`.  |
+| was_not | Any | Only fire the hooked method if the value of the `when` field was NOT equal to this value when first initialized. |
+| changes_to | Any | Only fire the hooked method if the value of the `when` field was NOT equal to this value when first initialized but is currently equal to this value. |
