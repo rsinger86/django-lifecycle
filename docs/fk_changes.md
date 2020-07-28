@@ -22,7 +22,7 @@ class UserAccount(LifecycleModel):
 To be clear: This hook will fire when the value in the database column that stores the foreign key (in this case, `organization_id`) changes. Read on to see how to watch for changes to *fields on the related model*.
 
 ## ForeignKey Field Value Changes
-You can have a hooked method fire based on the *value of a field* on a foreign key-related model using dot notation:
+You can have a hooked method fire based on the *value of a field* on a foreign key-related model using dot-notation:
 
 ```python
 class Organization(models.Model):
