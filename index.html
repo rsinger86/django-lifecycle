@@ -390,10 +390,12 @@
                 
                 <h1 id="django-lifecycle-hooks">Django Lifecycle Hooks<a class="headerlink" href="#django-lifecycle-hooks" title="Permanent link">&para;</a></h1>
 <p><a href="https://pypi.python.org/pypi/django-lifecycle"><img alt="Package version" src="https://badge.fury.io/py/django-lifecycle.svg" /></a>
-<a href="https://img.shields.io/pypi/status/django-lifecycle.svg/"><img alt="Python versions" src="https://img.shields.io/pypi/status/django-lifecycle.svg" /></a></p>
-<p>This project provides a <code>@hook</code> decorator as well as a base model and mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is <a href="https://docs.djangoproject.com/en/dev/topics/signals/">Signals</a>. However, my team often finds that Signals introduce unnesseary indirection and are at odds with Django's "fat models" approach.</p>
+<a href="https://img.shields.io/pypi/status/django-lifecycle.svg/"><img alt="Python versions" src="https://img.shields.io/pypi/status/django-lifecycle.svg" /></a>
+<a href="https://pypi.org/project/django-lifecycle/"><img alt="Python versions" src="https://img.shields.io/pypi/pyversions/django-lifecycle.svg" /></a>
+<img alt="PyPI - Django Version" src="https://img.shields.io/pypi/djversions/django-lifecycle" /></p>
+<p>This project provides a <code>@hook</code> decorator as well as a base model and mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is <a href="https://docs.djangoproject.com/en/dev/topics/signals/">Signals</a>. However, my team often finds that Signals introduce unnecessary indirection and are at odds with Django's "fat models" approach.</p>
 <p>In short, you can write model code like this:</p>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">django_lifecycle</span> <span class="kn">import</span> <span class="n">LifecycleModel</span><span class="p">,</span> <span class="n">hook</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">django_lifecycle</span> <span class="kn">import</span> <span class="n">LifecycleModel</span><span class="p">,</span> <span class="n">hook</span><span class="p">,</span> <span class="n">BEFORE_UPDATE</span><span class="p">,</span> <span class="n">AFTER_UPDATE</span>
 
 
 <span class="k">class</span> <span class="nc">Article</span><span class="p">(</span><span class="n">LifecycleModel</span><span class="p">):</span>
@@ -402,11 +404,11 @@
     <span class="n">status</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;draft&#39;</span><span class="p">,</span> <span class="s1">&#39;published&#39;</span><span class="p">])</span>
     <span class="n">editor</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">AuthUser</span><span class="p">)</span>
 
-    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_update&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;contents&#39;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nd">@hook</span><span class="p">(</span><span class="n">BEFORE_UPDATE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;contents&#39;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">on_content_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
-    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;after_update&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="n">was</span><span class="o">=</span><span class="s2">&quot;draft&quot;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">)</span>
+    <span class="nd">@hook</span><span class="p">(</span><span class="n">AFTER_UPDATE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="n">was</span><span class="o">=</span><span class="s2">&quot;draft&quot;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">on_publish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">send_email</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s2">&quot;An article has published!&quot;</span><span class="p">)</span>
 </code></pre></div>

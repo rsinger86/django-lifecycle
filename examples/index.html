@@ -268,8 +268,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#transitions-btwn-specific-values" class="md-nav__link">
-    Transitions btwn specific values
+  <a href="#transitions-between-specific-values" class="md-nav__link">
+    Transitions between specific values
   </a>
   
 </li>
@@ -405,8 +405,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#transitions-btwn-specific-values" class="md-nav__link">
-    Transitions btwn specific values
+  <a href="#transitions-between-specific-values" class="md-nav__link">
+    Transitions between specific values
   </a>
   
 </li>
@@ -491,7 +491,7 @@
 <h2 id="specific-lifecycle-moments">Specific lifecycle moments<a class="headerlink" href="#specific-lifecycle-moments" title="Permanent link">&para;</a></h2>
 <p>For simple cases, you might always want something to happen at a certain point, such as after saving or before deleting a model instance.
 When a user is first created, you could process a thumbnail image in the background and send the user an email:</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;after_create&#39;</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">AFTER_CREATE</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">do_after_create_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">enqueue_job</span><span class="p">(</span><span class="n">process_thumbnail</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">picture_url</span><span class="p">)</span>
 
@@ -503,7 +503,7 @@ When a user is first created, you could process a thumbnail image in the backgro
 
 
 <p>Or you want to email a user when their account is deleted. You could add the decorated method below:</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;after_delete&#39;</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">AFTER_DELETE</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">email_deleted_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mail</span><span class="o">.</span><span class="n">send_mail</span><span class="p">(</span>
             <span class="s1">&#39;We have deleted your account&#39;</span><span class="p">,</span> <span class="s1">&#39;We will miss you!.&#39;</span><span class="p">,</span>
@@ -513,9 +513,9 @@ When a user is first created, you could process a thumbnail image in the backgro
 
 
 <p>Read on to see how to only fire the hooked method if certain conditions about the model's current and previous state are met.</p>
-<h2 id="transitions-btwn-specific-values">Transitions btwn specific values<a class="headerlink" href="#transitions-btwn-specific-values" title="Permanent link">&para;</a></h2>
+<h2 id="transitions-between-specific-values">Transitions between specific values<a class="headerlink" href="#transitions-between-specific-values" title="Permanent link">&para;</a></h2>
 <p>Maybe you only want the hooked method to run under certain circumstances related to the state of your model. If a model's <code>status</code> field change from <code>"active"</code> to <code>"banned"</code>, you may want to send an email to the user:</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;after_update&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">was</span><span class="o">=</span><span class="s1">&#39;active&#39;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s1">&#39;banned&#39;</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">AFTER_UPDATE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">was</span><span class="o">=</span><span class="s1">&#39;active&#39;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s1">&#39;banned&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">email_banned_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mail</span><span class="o">.</span><span class="n">send_mail</span><span class="p">(</span>
             <span class="s1">&#39;You have been banned&#39;</span><span class="p">,</span> <span class="s1">&#39;You may or may not deserve it.&#39;</span><span class="p">,</span>
@@ -526,17 +526,17 @@ When a user is first created, you could process a thumbnail image in the backgro
 
 <p>The <code>was</code> and <code>is_now</code> keyword arguments allow you to compare the model's state from when it was first instantiated to the current moment. You can also pass <code>"*"</code> to indicate any value - these are the defaults, meaning that by default the hooked method will fire. The <code>when</code> keyword specifies which field to check against. </p>
 <h2 id="preventing-state-transitions">Preventing state transitions<a class="headerlink" href="#preventing-state-transitions" title="Permanent link">&para;</a></h2>
-<p>You can also enforce certain dissallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should expire instead:</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_delete&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;has_trial&#39;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<p>You can also enforce certain disallowed transitions. For example, maybe you don't want your staff to be able to delete an active trial because they should expire instead:</p>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">BEFORE_DELETE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;has_trial&#39;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">ensure_trial_not_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">CannotDeleteActiveTrial</span><span class="p">(</span><span class="s1">&#39;Cannot delete trial user!&#39;</span><span class="p">)</span>
 </code></pre></div>
 
 
-<p>We've ommitted the <code>was</code> keyword meaning that the initial state of the <code>has_trial</code> field can be any value ("*").</p>
+<p>We've omitted the <code>was</code> keyword meaning that the initial state of the <code>has_trial</code> field can be any value ("*").</p>
 <h2 id="any-change-to-a-field">Any change to a field<a class="headerlink" href="#any-change-to-a-field" title="Permanent link">&para;</a></h2>
 <p>You can pass the keyword argument <code>has_changed=True</code> to run the hooked method if a field has changed.</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_update&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">BEFORE_UPDATE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">timestamp_address_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">address_updated_at</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 </code></pre></div>
@@ -544,7 +544,7 @@ When a user is first created, you could process a thumbnail image in the backgro
 
 <h2 id="when-a-fields-value-is-not">When a field's value is NOT<a class="headerlink" href="#when-a-fields-value-is-not" title="Permanent link">&para;</a></h2>
 <p>You can have a hooked method fire when a field's value IS NOT equal to a certain value.</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_save&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="n">is_not</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">BEFORE_SAVE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="n">is_not</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">lowercase_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 </code></pre></div>
@@ -552,7 +552,7 @@ When a user is first created, you could process a thumbnail image in the backgro
 
 <h2 id="when-a-fields-value-was-not">When a field's value was NOT<a class="headerlink" href="#when-a-fields-value-was-not" title="Permanent link">&para;</a></h2>
 <p>You can have a hooked method fire when a field's initial value was not equal to a specific value.</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_save&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">was_not</span><span class="o">=</span><span class="s2">&quot;rejected&quot;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">BEFORE_SAVE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">was_not</span><span class="o">=</span><span class="s2">&quot;rejected&quot;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">send_publish_alerts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">send_mass_email</span><span class="p">()</span>
 </code></pre></div>
@@ -561,7 +561,7 @@ When a user is first created, you could process a thumbnail image in the backgro
 <h2 id="when-a-fields-value-changes-to">When a field's value changes to<a class="headerlink" href="#when-a-fields-value-changes-to" title="Permanent link">&para;</a></h2>
 <p>You can have a hooked method fire when a field's initial value was not equal to a specific value
 but now is.</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_save&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">changes_to</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">BEFORE_SAVE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">changes_to</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">send_publish_alerts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">send_mass_email</span><span class="p">()</span>
 </code></pre></div>
@@ -569,7 +569,7 @@ but now is.</p>
 
 <p>Generally, <code>changes_to</code> is a shorthand for the situation when <code>was_not</code> and <code>is_now</code> have the
 same value. The sample above is equal to:</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_save&#39;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">was_not</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">BEFORE_SAVE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">was_not</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">,</span> <span class="n">is_now</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">send_publish_alerts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">send_mass_email</span><span class="p">()</span>
 </code></pre></div>
@@ -577,8 +577,8 @@ same value. The sample above is equal to:</p>
 
 <h2 id="stacking-decorators">Stacking decorators<a class="headerlink" href="#stacking-decorators" title="Permanent link">&para;</a></h2>
 <p>You can decorate the same method multiple times if you want to hook a method to multiple moments.</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s2">&quot;after_update&quot;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="nd">@hook</span><span class="p">(</span><span class="s2">&quot;after_create&quot;</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">AFTER_UPDATE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s2">&quot;published&quot;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nd">@hook</span><span class="p">(</span><span class="n">AFTER_CREATE</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">handle_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># do something</span>
 </code></pre></div>
@@ -586,7 +586,7 @@ same value. The sample above is equal to:</p>
 
 <h2 id="watching-multiple-fields">Watching multiple fields<a class="headerlink" href="#watching-multiple-fields" title="Permanent link">&para;</a></h2>
 <p>If you want to hook into the same moment, but base its conditions on multiple fields, you can use the <code>when_any</code> parameter.</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;before_save&#39;</span><span class="p">,</span> <span class="n">when_any</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">BEFORE_SAVE</span><span class="p">,</span> <span class="n">when_any</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="n">has_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">do_something</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># do something</span>
 </code></pre></div>
@@ -594,7 +594,7 @@ same value. The sample above is equal to:</p>
 
 <h2 id="going-deeper-with-utility-methods">Going deeper with utility methods<a class="headerlink" href="#going-deeper-with-utility-methods" title="Permanent link">&para;</a></h2>
 <p>If you need to hook into events with more complex conditions, you can take advantage of <code>has_changed</code> and <code>initial_value</code> <a href="../advanced/">utility methods</a>:</p>
-<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="s1">&#39;after_update&#39;</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">AFTER_UPDATE</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">on_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_changed</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_changed</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">):</span>
             <span class="c1"># do the thing here</span>

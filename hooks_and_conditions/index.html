@@ -287,8 +287,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#condition-keyward-arguments" class="md-nav__link">
-    Condition Keyward Arguments
+  <a href="#condition-keyword-arguments" class="md-nav__link">
+    Condition Keyword Arguments
   </a>
   
 </li>
@@ -363,8 +363,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#condition-keyward-arguments" class="md-nav__link">
-    Condition Keyward Arguments
+  <a href="#condition-keyword-arguments" class="md-nav__link">
+    Condition Keyword Arguments
   </a>
   
 </li>
@@ -389,7 +389,9 @@
                 
                 
                 <h1 id="available-hooks-conditions">Available Hooks &amp; Conditions<a class="headerlink" href="#available-hooks-conditions" title="Permanent link">&para;</a></h1>
-<p>You can hook into one or more lifecycle moments by adding the <code>@hook</code> decorator to a model's method. The moment name is passed as the first positional argument, <code>@hook('before_create')</code>, and optional keyword arguments can be passed to set up conditions for when the method should fire.</p>
+<p>You can hook into one or more lifecycle moments by adding the <code>@hook</code> decorator to a model's method. The moment name
+ is passed as the first positional argument, <code>@hook(BEFORE_CREATE)</code>, and optional keyword arguments can be passed to
+  set up conditions for when the method should fire.</p>
 <h2 id="decorator-signature">Decorator Signature<a class="headerlink" href="#decorator-signature" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span>
         <span class="n">moment</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
@@ -410,51 +412,62 @@
 <table>
 <thead>
 <tr>
+<th align="center">Hook constant</th>
 <th align="center">Hook name</th>
-<th align="center">When it fires</th>
+<th align="left">When it fires</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td align="center"><code>BEFORE_SAVE</code></td>
 <td align="center">before_save</td>
-<td align="center">Immediately before <code>save</code> is called</td>
+<td align="left">Immediately before <code>save</code> is called</td>
 </tr>
 <tr>
+<td align="center"><code>AFTER_SAVE</code></td>
 <td align="center">after_save</td>
-<td align="center">Immediately after <code>save</code> is called</td>
+<td align="left">Immediately after <code>save</code> is called</td>
 </tr>
 <tr>
+<td align="center"><code>BEFORE_CREATE</code></td>
 <td align="center">before_create</td>
-<td align="center">Immediately before <code>save</code> is called, if <code>pk</code> is <code>None</code></td>
+<td align="left">Immediately before <code>save</code> is called, if <code>pk</code> is <code>None</code></td>
 </tr>
 <tr>
+<td align="center"><code>AFTER_CREATE</code></td>
 <td align="center">after_create</td>
-<td align="center">Immediately after <code>save</code> is called, if <code>pk</code> was initially <code>None</code></td>
+<td align="left">Immediately after <code>save</code> is called, if <code>pk</code> was initially <code>None</code></td>
 </tr>
 <tr>
+<td align="center"><code>BEFORE_UPDATE</code></td>
 <td align="center">before_update</td>
-<td align="center">Immediately before <code>save</code> is called, if <code>pk</code> is NOT <code>None</code></td>
+<td align="left">Immediately before <code>save</code> is called, if <code>pk</code> is NOT <code>None</code></td>
 </tr>
 <tr>
+<td align="center"><code>AFTER_UPDATE</code></td>
 <td align="center">after_update</td>
-<td align="center">Immediately after <code>save</code> is called, if <code>pk</code> was NOT <code>None</code></td>
+<td align="left">Immediately after <code>save</code> is called, if <code>pk</code> was NOT <code>None</code></td>
 </tr>
 <tr>
+<td align="center"><code>BEFORE_DELETE</code></td>
 <td align="center">before_delete</td>
-<td align="center">Immediately before <code>delete</code> is called</td>
+<td align="left">Immediately before <code>delete</code> is called</td>
 </tr>
 <tr>
+<td align="center"><code>AFTER_DELETE</code></td>
 <td align="center">after_delete</td>
-<td align="center">Immediately after <code>delete</code> is called</td>
+<td align="left">Immediately after <code>delete</code> is called</td>
 </tr>
 </tbody>
 </table>
-<h2 id="condition-keyward-arguments">Condition Keyward Arguments<a class="headerlink" href="#condition-keyward-arguments" title="Permanent link">&para;</a></h2>
+<p>All of hook constants are strings containing the specific hook name, for example <code>AFTER_UPDATE</code> is string
+ <code>"after_update"</code> - preferably way is to use hook constant.  </p>
+<h2 id="condition-keyword-arguments">Condition Keyword Arguments<a class="headerlink" href="#condition-keyword-arguments" title="Permanent link">&para;</a></h2>
 <p>If you do not use any conditional parameters, the hook will fire every time the lifecycle moment occurs. You can use the keyword arguments below to conditionally fire the method depending on the initial or current state of a model instance's fields.</p>
 <table>
 <thead>
 <tr>
-<th align="center">Keywarg arg</th>
+<th align="center">Keyword arg</th>
 <th align="center">Type</th>
 <th align="center">Details</th>
 </tr>
@@ -477,27 +490,27 @@
 </tr>
 <tr>
 <td align="center">is_now</td>
-<td align="center">any</td>
+<td align="center">Any</td>
 <td align="center">Only fire the hooked method if the value of the <code>when</code> field is currently equal to this value; defaults to <code>*</code>.</td>
 </tr>
 <tr>
 <td align="center">is_not</td>
-<td align="center">any</td>
+<td align="center">Any</td>
 <td align="center">Only fire the hooked method if the value of the <code>when</code> field is NOT equal to this value</td>
 </tr>
 <tr>
 <td align="center">was</td>
-<td align="center">any</td>
+<td align="center">Any</td>
 <td align="center">Only fire the hooked method if the value of the <code>when</code> field was equal to this value when first initialized; defaults to <code>*</code>.</td>
 </tr>
 <tr>
 <td align="center">was_not</td>
-<td align="center">any</td>
+<td align="center">Any</td>
 <td align="center">Only fire the hooked method if the value of the <code>when</code> field was NOT equal to this value when first initialized.</td>
 </tr>
 <tr>
 <td align="center">changes_to</td>
-<td align="center">any</td>
+<td align="center">Any</td>
 <td align="center">Only fire the hooked method if the value of the <code>when</code> field was NOT equal to this value when first initialized but is currently equal to this value.</td>
 </tr>
 </tbody>
