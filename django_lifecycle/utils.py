@@ -54,8 +54,14 @@ def _get_field_names(instance) -> List[str]:
     for f in instance._meta.get_fields():
         names.append(f.name)
 
-        if instance._meta.get_field(f.name).get_internal_type() == "ForeignKey":
-            names.append(f.name + "_id")
+        try:
+            internal_type = instance._meta.get_field(f.name).get_internal_type()
+        except AttributeError:
+            # Skip fields which don't provide a `get_internal_type` method, e.g. GenericForeignKey
+            continue
+        else:
+            if internal_type == "ForeignKey":
+                names.append(f.name + "_id")
 
     return names
 
