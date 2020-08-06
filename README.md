@@ -62,6 +62,9 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 0.7.7 (August 2020)
+* Fixes issue with `GenericForeignKey`. Thanks @bmbouter!
+
 ## 0.7.6 (May 2020)
 * Updates to use constants for hook names; updates docs to indicate Python 3.8/Django 3.x support. Thanks @thejoeejoee!
 
