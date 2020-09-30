@@ -1,5 +1,5 @@
 from functools import reduce, lru_cache
-from inspect import ismethod
+from inspect import isfunction
 from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
@@ -24,7 +24,7 @@ class LifecycleModelMixin(object):
     def _snapshot_state(self):
         state = self.__dict__.copy()
 
-        for watched_related_field in self.__class__._watched_fk_model_fields():
+        for watched_related_field in self._watched_fk_model_fields():
             state[watched_related_field] = self._current_value(watched_related_field)
 
         if "_state" in state:
@@ -103,7 +103,7 @@ class LifecycleModelMixin(object):
         """
 
         """
-        for watched_field_name in self.__class__._watched_fk_models():
+        for watched_field_name in self._watched_fk_models():
             field = self._meta.get_field(watched_field_name)
 
             if field.is_relation and field.is_cached(self):
@@ -151,7 +151,7 @@ class LifecycleModelMixin(object):
                 continue
             try:
                 attr = getattr(cls, name)
-                if ismethod(attr) and hasattr(attr, "_hooked"):
+                if isfunction(attr) and hasattr(attr, "_hooked"):
                     collected.append(attr)
             except AttributeError:
                 pass
@@ -188,7 +188,7 @@ class LifecycleModelMixin(object):
         """
         fired = []
 
-        for method in self.__class__._potentially_hooked_methods():
+        for method in self._potentially_hooked_methods():
             for callback_specs in method._hooked:
                 if callback_specs["hook"] != hook:
                     continue
@@ -199,15 +199,15 @@ class LifecycleModelMixin(object):
                 if when_field:
                     if self._check_callback_conditions(when_field, callback_specs):
                         fired.append(method.__name__)
-                        method()
+                        method(self)
                 elif when_any_field:
                     for field_name in when_any_field:
                         if self._check_callback_conditions(field_name, callback_specs):
                             fired.append(method.__name__)
-                            method()
+                            method(self)
                 else:
                     fired.append(method.__name__)
-                    method()
+                    method(self)
 
         return fired
 
