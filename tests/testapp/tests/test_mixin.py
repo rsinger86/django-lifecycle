@@ -92,80 +92,84 @@ class LifecycleMixinTests(TestCase):
     def test_run_hooked_methods_for_when(self):
         instance = UserAccount(first_name="Bob")
 
-        instance._potentially_hooked_methods = [
-            MagicMock(
-                __name__="method_that_does_fires",
-                _hooked=[
-                    {
-                        "hook": "after_create",
-                        "when": "first_name",
-                        "when_any": None,
-                        "has_changed": None,
-                        "is_now": "Bob",
-                        "is_not": NotSet,
-                        "was": "*",
-                        "was_not": NotSet,
-                        "changes_to": NotSet,
-                    }
-                ],
-            ),
-            MagicMock(
-                __name__="method_that_does_not_fire",
-                _hooked=[
-                    {
-                        "hook": "after_create",
-                        "when": "first_name",
-                        "when_any": None,
-                        "has_changed": None,
-                        "is_now": "Bill",
-                        "is_not": NotSet,
-                        "was": "*",
-                        "was_not": NotSet,
-                        "changes_to": NotSet,
-                    }
-                ],
-            ),
-        ]
+        instance._potentially_hooked_methods = MagicMock(
+            return_value=[
+                MagicMock(
+                    __name__="method_that_does_fires",
+                    _hooked=[
+                        {
+                            "hook": "after_create",
+                            "when": "first_name",
+                            "when_any": None,
+                            "has_changed": None,
+                            "is_now": "Bob",
+                            "is_not": NotSet,
+                            "was": "*",
+                            "was_not": NotSet,
+                            "changes_to": NotSet,
+                        }
+                    ],
+                ),
+                MagicMock(
+                    __name__="method_that_does_not_fire",
+                    _hooked=[
+                        {
+                            "hook": "after_create",
+                            "when": "first_name",
+                            "when_any": None,
+                            "has_changed": None,
+                            "is_now": "Bill",
+                            "is_not": NotSet,
+                            "was": "*",
+                            "was_not": NotSet,
+                            "changes_to": NotSet,
+                        }
+                    ],
+                ),
+            ]
+        )
         fired_methods = instance._run_hooked_methods("after_create")
         self.assertEqual(fired_methods, ["method_that_does_fires"])
 
     def test_run_hooked_methods_for_when_any(self):
         instance = UserAccount(first_name="Bob")
 
-        instance._potentially_hooked_methods = [
-            MagicMock(
-                __name__="method_that_does_fires",
-                _hooked=[
-                    {
-                        "hook": "after_create",
-                        "when": None,
-                        "when_any": ["first_name", "last_name", "password"],
-                        "has_changed": None,
-                        "is_now": "Bob",
-                        "is_not": NotSet,
-                        "was": "*",
-                        "was_not": NotSet,
-                        "changes_to": NotSet,
-                    }
-                ],
-            ),
-            MagicMock(
-                __name__="method_that_does_not_fire",
-                _hooked=[
-                    {
-                        "hook": "after_create",
-                        "when": "first_name",
-                        "when_any": None,
-                        "has_changed": None,
-                        "is_now": "Bill",
-                        "is_not": NotSet,
-                        "was": "*",
-                        "was_not": NotSet,
-                        "changes_to": NotSet,
-                    }
-                ],
-            ),
-        ]
+        instance._potentially_hooked_methods = MagicMock(
+            return_value = [
+                MagicMock(
+                    __name__="method_that_does_fires",
+                    _hooked=[
+                        {
+                            "hook": "after_create",
+                            "when": None,
+                            "when_any": ["first_name", "last_name", "password"],
+                            "has_changed": None,
+                            "is_now": "Bob",
+                            "is_not": NotSet,
+                            "was": "*",
+                            "was_not": NotSet,
+                            "changes_to": NotSet,
+                        }
+                    ],
+                ),
+                MagicMock(
+                    __name__="method_that_does_not_fire",
+                    _hooked=[
+                        {
+                            "hook": "after_create",
+                            "when": "first_name",
+                            "when_any": None,
+                            "has_changed": None,
+                            "is_now": "Bill",
+                            "is_not": NotSet,
+                            "was": "*",
+                            "was_not": NotSet,
+                            "changes_to": NotSet,
+                        }
+                    ],
+                ),
+            ]
+        )
         fired_methods = instance._run_hooked_methods("after_create")
         self.assertEqual(fired_methods, ["method_that_does_fires"])
 
