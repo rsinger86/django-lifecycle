@@ -62,6 +62,10 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 0.8.0 (October 2020)
+* Significant performance improvements. Thanks @dralley!
+
+
 ## 0.7.7 (August 2020)
 * Fixes issue with `GenericForeignKey`. Thanks @bmbouter!
 
