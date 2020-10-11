@@ -142,6 +142,7 @@ class LifecycleModelMixin(object):
         self._run_hooked_methods(AFTER_DELETE)
 
     @classmethod
+    @lru_cache(typed=True)
     def _potentially_hooked_methods(cls):
         skip = set(cls._get_unhookable_attribute_names())
         collected = []
@@ -234,11 +235,7 @@ class LifecycleModelMixin(object):
 
     def _check_has_changed(self, field_name: str, specs: dict) -> bool:
         has_changed = specs["has_changed"]
-
-        if has_changed is None:
-            return True
-
-        return has_changed == self.has_changed(field_name)
+        return has_changed is None or has_changed == self.has_changed(field_name)
 
     def _check_is_now_condition(self, field_name: str, specs: dict) -> bool:
         return specs["is_now"] in (self._current_value(field_name), "*")
@@ -271,14 +268,10 @@ class LifecycleModelMixin(object):
         property_names = []
 
         for name in dir(cls):
-            try:
-                attr = getattr(cls, name)
+            attr = getattr(cls, name, None)
 
-                if isinstance(attr, property) or isinstance(attr, cached_property):
-                    property_names.append(name)
-
-            except AttributeError:
-                pass
+            if attr and (isinstance(attr, property) or isinstance(attr, cached_property)):
+                property_names.append(name)
 
         return property_names
 
@@ -294,13 +287,10 @@ class LifecycleModelMixin(object):
         descriptor_names = []
 
         for name in dir(cls):
-            try:
-                attr = getattr(cls, name)
+            attr = getattr(cls, name, None)
 
-                if isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
-                    descriptor_names.append(name)
-            except AttributeError:
-                pass
+            if attr and isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
+                descriptor_names.append(name)
 
         return descriptor_names
 
