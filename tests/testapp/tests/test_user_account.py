@@ -118,3 +118,14 @@ class UserAccountTestCase(TestCase):
         account.email = "Homer.Simpson@springfieldnuclear"
         account.save(skip_hooks=True)
         self.assertEqual(account.email, "Homer.Simpson@springfieldnuclear")
+
+    def test_delete_should_return_default_django_value(self):
+        """
+            Hooked method that auto-lowercases email should be skipped.
+        """
+        UserAccount.objects.create(**self.stub_data)
+        value = UserAccount.objects.all().delete()
+
+        self.assertEqual(
+            value, (1, {"testapp.Locale_users": 0, "testapp.UserAccount": 1})
+        )

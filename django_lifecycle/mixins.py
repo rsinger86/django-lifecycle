@@ -7,10 +7,14 @@ from django.utils.functional import cached_property
 
 from . import NotSet
 from .hooks import (
-    BEFORE_CREATE, BEFORE_UPDATE,
-    BEFORE_SAVE, BEFORE_DELETE,
-    AFTER_CREATE, AFTER_UPDATE,
-    AFTER_SAVE, AFTER_DELETE,
+    BEFORE_CREATE,
+    BEFORE_UPDATE,
+    BEFORE_SAVE,
+    BEFORE_DELETE,
+    AFTER_CREATE,
+    AFTER_UPDATE,
+    AFTER_SAVE,
+    AFTER_DELETE,
 )
 
 from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
@@ -138,8 +142,9 @@ class LifecycleModelMixin(object):
 
     def delete(self, *args, **kwargs):
         self._run_hooked_methods(BEFORE_DELETE)
-        super().delete(*args, **kwargs)
+        value = super().delete(*args, **kwargs)
         self._run_hooked_methods(AFTER_DELETE)
+        return value
 
     @classmethod
     @lru_cache(typed=True)
@@ -253,10 +258,15 @@ class LifecycleModelMixin(object):
 
     def _check_changes_to_condition(self, field_name: str, specs: dict) -> bool:
         changes_to = specs["changes_to"]
-        return any([
-            changes_to is NotSet,
-            (self.initial_value(field_name) != changes_to and self._current_value(field_name) == changes_to)
-        ])
+        return any(
+            [
+                changes_to is NotSet,
+                (
+                    self.initial_value(field_name) != changes_to
+                    and self._current_value(field_name) == changes_to
+                ),
+            ]
+        )
 
     @classmethod
     def _get_model_property_names(cls) -> List[str]:
@@ -270,7 +280,9 @@ class LifecycleModelMixin(object):
         for name in dir(cls):
             attr = getattr(cls, name, None)
 
-            if attr and (isinstance(attr, property) or isinstance(attr, cached_property)):
+            if attr and (
+                isinstance(attr, property) or isinstance(attr, cached_property)
+            ):
                 property_names.append(name)
 
         return property_names
