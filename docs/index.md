@@ -52,8 +52,8 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 ## Requirements
 
-* Python (3.3+)
-* Django (1.8+)
+* Python (3.5+)
+* Django (2.0+)
 
 ## Installation
 
@@ -86,7 +86,5 @@ class YourModel(LifecycleModelMixin, models.Model):
     name = models.CharField(max_length=50)
 
 ```
-
-If you are using **Django 1.8 or below** and want to extend the base model, you also have to add `django_lifecycle` to `INSTALLED_APPS`.
 
 [Read on](examples.md) to see more examples of how to use lifecycle hooks.
