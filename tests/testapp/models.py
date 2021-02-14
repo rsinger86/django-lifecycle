@@ -1,13 +1,13 @@
 import uuid
 
-from django.utils import timezone
 from django.core import mail
 from django.db import models
+from django.utils import timezone
 from django.utils.functional import cached_property
+from urlman import Urls
+
 from django_lifecycle import hook
 from django_lifecycle.models import LifecycleModel
-
-import urlman
 
 
 class CannotDeleteActiveTrial(Exception):
@@ -40,7 +40,7 @@ class UserAccount(LifecycleModel):
         choices=(("active", "Active"), ("banned", "Banned"), ("inactive", "Inactive")),
     )
 
-    class urls(urlman.Urls):
+    class urls(Urls):
         view = "/books/{self.pk}/"
 
     @hook("before_save", when="email", is_not=None)
@@ -53,7 +53,7 @@ class UserAccount(LifecycleModel):
 
     @hook("after_create")
     def do_after_create_jobs(self):
-        ## queue background job to process thumbnail image...
+        # queue background job to process thumbnail image...
         mail.send_mail(
             "Welcome!", "Thank you for joining.", "from@example.com", ["to@example.com"]
         )

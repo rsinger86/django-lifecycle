@@ -22,7 +22,7 @@ class UserAccountTestCase(TestCase):
         self.assertTrue(isinstance(account.joined_at, datetime.datetime))
 
     def test_send_welcome_email_after_create(self):
-        account = UserAccount.objects.create(**self.stub_data)
+        UserAccount.objects.create(**self.stub_data)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Welcome!")
 
@@ -126,3 +126,13 @@ class UserAccountTestCase(TestCase):
         account.save(skip_hooks=True)
         self.assertEqual(account.email, "Homer.Simpson@springfieldnuclear")
 
+    def test_delete_should_return_default_django_value(self):
+        """
+            Hooked method that auto-lowercases email should be skipped.
+        """
+        UserAccount.objects.create(**self.stub_data)
+        value = UserAccount.objects.all().delete()
+
+        self.assertEqual(
+            value, (1, {"testapp.Locale_users": 0, "testapp.UserAccount": 1})
+        )

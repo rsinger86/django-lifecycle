@@ -13,22 +13,21 @@ These are available on your model instance when the mixin or extend the base mod
 You can use these methods for more advanced checks, for example:
 
 ```python
-from datetime import timedelta
-from django_lifecycle import LifecycleModel
+from django_lifecycle import LifecycleModel, AFTER_UPDATE, hook
 
 
 class UserAccount(LifecycleModel):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
-    marietal_status = models.CharField(max_length=100)
+    marital_status = models.CharField(max_length=100)
 
-    @hook("after_update")
+    @hook(AFTER_UPDATE)
     def on_name_change_heck_on_marietal_status(self):
-        if self.has_changed('last_name') and not self.has_changed('marietal_status)
+        if self.has_changed('last_name') and not self.has_changed('marietal_status'):
             send_mail(to=self.email, "Has your marietal status changed recently?")
-```
 
+```
 
 ## Suppressing Hooked Methods <a id="suppressing"></a>
 

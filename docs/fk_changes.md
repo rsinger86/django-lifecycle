@@ -14,7 +14,7 @@ class UserAccount(LifecycleModel):
     email = models.CharField(max_length=600)
     employer = models.ForeignKey(Organization, on_delete=models.SET_NULL)
 
-    @hook("after_update", when="employer", has_changed=True)
+    @hook(AFTER_UPDATE, when="employer", has_changed=True)
     def notify_user_of_employer_change(self):
         mail.send_mail("Update", "You now work for someone else!", [self.email])
 ```
@@ -22,7 +22,7 @@ class UserAccount(LifecycleModel):
 To be clear: This hook will fire when the value in the database column that stores the foreign key (in this case, `organization_id`) changes. Read on to see how to watch for changes to *fields on the related model*.
 
 ## ForeignKey Field Value Changes
-You can have a hooked method fire based on the *value of a field* on a foreign key-related model using dot notation:
+You can have a hooked method fire based on the *value of a field* on a foreign key-related model using dot-notation:
 
 ```python
 class Organization(models.Model):
@@ -34,7 +34,7 @@ class UserAccount(LifecycleModel):
     email = models.CharField(max_length=600)
     employer = models.ForeignKey(Organization, on_delete=models.SET_NULL)
 
-    @hook("after_update", when="employer.name", has_changed=True, is_now="Google")
+    @hook(AFTER_UPDATE, when="employer.name", has_changed=True, is_now="Google")
     def notify_user_of_google_buy_out(self):
         mail.send_mail("Update", "Google bought your employer!", ["to@example.com"],)
 ```

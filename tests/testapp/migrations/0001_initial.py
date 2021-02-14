@@ -25,7 +25,10 @@ class Migration(migrations.Migration):
                 ('password_updated_at', models.DateTimeField(null=True)),
                 ('joined_at', models.DateTimeField(null=True)),
                 ('has_trial', models.BooleanField(default=False)),
-                ('status', models.CharField(choices=[('active', 'Active'), ('banned', 'Banned'), ('inactive', 'Inactive')], default='active', max_length=30)),
+                ('status', models.CharField(
+                    choices=[('active', 'Active'), ('banned', 'Banned'), ('inactive', 'Inactive')],
+                    default='active', max_length=30
+                )),
             ],
             options={
                 'abstract': False,

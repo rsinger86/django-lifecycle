@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+
+mkdocs gh-deploy
+python setup.py sdist --verbose
+twine upload dist/*

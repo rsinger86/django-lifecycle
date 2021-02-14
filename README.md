@@ -2,15 +2,18 @@
 
 [![Package version](https://badge.fury.io/py/django-lifecycle.svg)](https://pypi.python.org/pypi/django-lifecycle)
 [![Python versions](https://img.shields.io/pypi/status/django-lifecycle.svg)](https://img.shields.io/pypi/status/django-lifecycle.svg/)
+[![Python versions](https://img.shields.io/pypi/pyversions/django-lifecycle.svg)](https://pypi.org/project/django-lifecycle/)
+![PyPI - Django Version](https://img.shields.io/pypi/djversions/django-lifecycle)
 
-This project provides a `@hook` decorator as well as a base model and mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is [Signals](https://docs.djangoproject.com/en/dev/topics/signals/). However, my team often finds that Signals introduce unnesseary indirection and are at odds with Django's "fat models" approach.
 
-**Django Lifecycle Hooks** supports Python 3.5, 3.6, and 3.7, Django 2.0.x, 2.1.x, 2.2.x.
+This project provides a `@hook` decorator as well as a base model and mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is [Signals](https://docs.djangoproject.com/en/dev/topics/signals/). However, my team often finds that Signals introduce unnecessary indirection and are at odds with Django's "fat models" approach.
+
+**Django Lifecycle Hooks** supports Python 3.5, 3.6, 3.7, 3.8 and 3.9, Django 2.0.x, 2.1.x, 2.2.x, 3.0.x and 3.1.x.
 
 In short, you can write model code like this:
 
 ```python
-from django_lifecycle import LifecycleModel, hook
+from django_lifecycle import LifecycleModel, hook, BEFORE_UPDATE, AFTER_UPDATE
 
 
 class Article(LifecycleModel):
@@ -19,16 +22,16 @@ class Article(LifecycleModel):
     status = models.ChoiceField(choices=['draft', 'published'])
     editor = models.ForeignKey(AuthUser)
 
-    @hook('before_update', when='contents', has_changed=True)
+    @hook(BEFORE_UPDATE, when='contents', has_changed=True)
     def on_content_change(self):
         self.updated_at = timezone.now()
 
-    @hook('after_update', when="status", was="draft", is_now="published")
+    @hook(AFTER_UPDATE, when="status", was="draft", is_now="published")
     def on_publish(self):
         send_email(self.editor.email, "An article has published!")
 ```
 
-Instead of overriding `save` and `__init___` in a clunky way that hurts readability:
+Instead of overriding `save` and `__init__` in a clunky way that hurts readability:
 
 ```python
     # same class and field declarations as above ...
@@ -58,6 +61,22 @@ Instead of overriding `save` and `__init___` in a clunky way that hurts readabil
 ---
 
 # Changelog
+
+## 0.8.1 (January 2021)
+* Added missing return to `delete()` method override. Thanks @oaosman84!
+
+## 0.8.0 (October 2020)
+* Significant performance improvements. Thanks @dralley!
+
+## 0.7.7 (August 2020)
+* Fixes issue with `GenericForeignKey`. Thanks @bmbouter!
+
+## 0.7.6 (May 2020)
+* Updates to use constants for hook names; updates docs to indicate Python 3.8/Django 3.x support. Thanks @thejoeejoee!
+
+## 0.7.5 (April 2020)
+* Adds static typed variables for hook names; thanks @Faisal-Manzer!
+* Fixes some typos in docs; thanks @tomdyson and @bmispelon!
 
 ## 0.7.1 (January 2020)
 * Fixes bug in `utils._get_field_names` that could cause recursion bug in some cases.

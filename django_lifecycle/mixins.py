@@ -1,13 +1,23 @@
-from functools import reduce
-from inspect import ismethod
+from functools import reduce, lru_cache
+from inspect import isfunction
 from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.utils.functional import cached_property
 
-from django_lifecycle import NotSet
+from . import NotSet
+from .hooks import (
+    BEFORE_CREATE,
+    BEFORE_UPDATE,
+    BEFORE_SAVE,
+    BEFORE_DELETE,
+    AFTER_CREATE,
+    AFTER_UPDATE,
+    AFTER_SAVE,
+    AFTER_DELETE,
+)
 
-from .utils import get_unhookable_attribute_names
+from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
 
 
 class LifecycleModelMixin(object):
@@ -18,7 +28,7 @@ class LifecycleModelMixin(object):
     def _snapshot_state(self):
         state = self.__dict__.copy()
 
-        for watched_related_field in self._watched_fk_model_fields:
+        for watched_related_field in self._watched_fk_model_fields():
             state[watched_related_field] = self._current_value(watched_related_field)
 
         if "_state" in state:
@@ -97,7 +107,7 @@ class LifecycleModelMixin(object):
         """
 
         """
-        for watched_field_name in self._watched_fk_models:
+        for watched_field_name in self._watched_fk_models():
             field = self._meta.get_field(watched_field_name)
 
             if field.is_relation and field.is_cached(self):
@@ -115,45 +125,48 @@ class LifecycleModelMixin(object):
         is_new = self._state.adding
 
         if is_new:
-            self._run_hooked_methods("before_create")
+            self._run_hooked_methods(BEFORE_CREATE)
         else:
-            self._run_hooked_methods("before_update")
+            self._run_hooked_methods(BEFORE_UPDATE)
 
-        self._run_hooked_methods("before_save")
+        self._run_hooked_methods(BEFORE_SAVE)
         save(*args, **kwargs)
-        self._run_hooked_methods("after_save")
+        self._run_hooked_methods(AFTER_SAVE)
 
         if is_new:
-            self._run_hooked_methods("after_create")
+            self._run_hooked_methods(AFTER_CREATE)
         else:
-            self._run_hooked_methods("after_update")
+            self._run_hooked_methods(AFTER_UPDATE)
 
         self._initial_state = self._snapshot_state()
 
     def delete(self, *args, **kwargs):
-        self._run_hooked_methods("before_delete")
-        super().delete(*args, **kwargs)
-        self._run_hooked_methods("after_delete")
+        self._run_hooked_methods(BEFORE_DELETE)
+        value = super().delete(*args, **kwargs)
+        self._run_hooked_methods(AFTER_DELETE)
+        return value
 
-    @cached_property
-    def _potentially_hooked_methods(self):
-        skip = set(get_unhookable_attribute_names(self))
+    @classmethod
+    @lru_cache(typed=True)
+    def _potentially_hooked_methods(cls):
+        skip = set(cls._get_unhookable_attribute_names())
         collected = []
 
-        for name in dir(self):
+        for name in dir(cls):
             if name in skip:
                 continue
             try:
-                attr = getattr(self, name)
-                if ismethod(attr) and hasattr(attr, "_hooked"):
+                attr = getattr(cls, name)
+                if isfunction(attr) and hasattr(attr, "_hooked"):
                     collected.append(attr)
             except AttributeError:
                 pass
 
         return collected
 
-    @cached_property
-    def _watched_fk_model_fields(self) -> List[str]:
+    @classmethod
+    @lru_cache(typed=True)
+    def _watched_fk_model_fields(cls) -> List[str]:
         """
             Gather up all field names (values in 'when' key) that correspond to
             field names on FK-related models. These will be strings that contain
@@ -161,16 +174,17 @@ class LifecycleModelMixin(object):
         """
         watched = []  # List[str]
 
-        for method in self._potentially_hooked_methods:
+        for method in cls._potentially_hooked_methods():
             for specs in method._hooked:
                 if specs["when"] is not None and "." in specs["when"]:
                     watched.append(specs["when"])
 
         return watched
 
-    @cached_property
-    def _watched_fk_models(self) -> List[str]:
-        return [_.split(".")[0] for _ in self._watched_fk_model_fields]
+    @classmethod
+    @lru_cache(typed=True)
+    def _watched_fk_models(cls) -> List[str]:
+        return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
     def _run_hooked_methods(self, hook: str) -> List[str]:
         """
@@ -180,7 +194,7 @@ class LifecycleModelMixin(object):
         """
         fired = []
 
-        for method in self._potentially_hooked_methods:
+        for method in self._potentially_hooked_methods():
             for callback_specs in method._hooked:
                 if callback_specs["hook"] != hook:
                     continue
@@ -200,7 +214,7 @@ class LifecycleModelMixin(object):
 
                 # Only call the method once per hook
                 fired.append(method.__name__)
-                method()
+                method(self)
                 break
 
         return fired
@@ -228,11 +242,7 @@ class LifecycleModelMixin(object):
 
     def _check_has_changed(self, field_name: str, specs: dict) -> bool:
         has_changed = specs["has_changed"]
-
-        if has_changed is None:
-            return True
-
-        return has_changed == self.has_changed(field_name)
+        return has_changed is None or has_changed == self.has_changed(field_name)
 
     def _check_is_now_condition(self, field_name: str, specs: dict) -> bool:
         return specs["is_now"] in (self._current_value(field_name), "*")
@@ -250,7 +260,77 @@ class LifecycleModelMixin(object):
 
     def _check_changes_to_condition(self, field_name: str, specs: dict) -> bool:
         changes_to = specs["changes_to"]
-        return any([
-            changes_to is NotSet,
-            (self.initial_value(field_name) != changes_to and self._current_value(field_name) == changes_to)
-        ])
+        return any(
+            [
+                changes_to is NotSet,
+                (
+                    self.initial_value(field_name) != changes_to
+                    and self._current_value(field_name) == changes_to
+                ),
+            ]
+        )
+
+    @classmethod
+    def _get_model_property_names(cls) -> List[str]:
+        """
+            Gather up properties and cached_properties which may be methods
+            that were decorated. Need to inspect class versions b/c doing
+            getattr on them could cause unwanted side effects.
+        """
+        property_names = []
+
+        for name in dir(cls):
+            attr = getattr(cls, name, None)
+
+            if attr and (
+                isinstance(attr, property) or isinstance(attr, cached_property)
+            ):
+                property_names.append(name)
+
+        return property_names
+
+    @classmethod
+    def _get_model_descriptor_names(cls) -> List[str]:
+        """
+        Attributes which are Django descriptors. These represent a field
+        which is a one-to-many or many-to-many relationship that is
+        potentially defined in another model, and doesn't otherwise appear
+        as a field on this model.
+        """
+
+        descriptor_names = []
+
+        for name in dir(cls):
+            attr = getattr(cls, name, None)
+
+            if attr and isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
+                descriptor_names.append(name)
+
+        return descriptor_names
+
+    @classmethod
+    def _get_field_names(cls) -> List[str]:
+        names = []
+
+        for f in cls._meta.get_fields():
+            names.append(f.name)
+
+            try:
+                internal_type = cls._meta.get_field(f.name).get_internal_type()
+            except AttributeError:
+                # Skip fields which don't provide a `get_internal_type` method, e.g. GenericForeignKey
+                continue
+            else:
+                if internal_type == "ForeignKey":
+                    names.append(f.name + "_id")
+
+        return names
+
+    @classmethod
+    def _get_unhookable_attribute_names(cls) -> List[str]:
+        return (
+            cls._get_field_names()
+            + cls._get_model_descriptor_names()
+            + cls._get_model_property_names()
+            + ["_run_hooked_methods"]
+        )
