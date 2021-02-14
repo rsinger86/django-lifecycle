@@ -32,6 +32,7 @@ class UserAccount(LifecycleModel):
     joined_at = models.DateTimeField(null=True)
     has_trial = models.BooleanField(default=False)
     organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL)
+    name_changes = models.IntegerField(default=0)
 
     status = models.CharField(
         default="active",
@@ -61,7 +62,12 @@ class UserAccount(LifecycleModel):
     def timestamp_password_change(self):
         self.password_updated_at = timezone.now()
 
-    @hook("before_delete", when="has_trial", was="*", is_now=True)
+    @hook('before_update', when='first_name', has_changed=True)
+    @hook('before_update', when='last_name', has_changed=True)
+    def count_name_changes(self):
+        self.name_changes += 1
+
+    @hook("before_delete", when='has_trial', was='*', is_now=True)
     def ensure_trial_not_active(self):
         raise CannotDeleteActiveTrial("Cannot delete trial user!")
 
