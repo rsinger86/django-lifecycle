@@ -62,6 +62,9 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 0.9.1 (March 2021)
+* Makes hooks work with OneToOneFields. Thanks @bahmdev!
+
 ## 0.9.0 (February 2021)
 * Prevents calling a hooked method twice with the same state. Thanks @garyd203!
 
