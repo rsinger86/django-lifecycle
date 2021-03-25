@@ -10,7 +10,7 @@ mkdocs-material==4.6.3
 Pygments==2.5.2
 pymdown-extensions==6.3
 pytz==2018.3
-PyYAML==5.3
+PyYAML==5.4
 six==1.14.0
 sqlparse==0.3.0
 tornado==6.0.3
