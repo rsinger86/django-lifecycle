@@ -3,6 +3,7 @@ from inspect import isfunction
 from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
+from django.db import transaction
 from django.utils.functional import cached_property
 
 from . import NotSet
@@ -114,6 +115,7 @@ class LifecycleModelMixin(object):
             if field.is_relation and field.is_cached(self):
                 field.delete_cached_value(self)
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         skip_hooks = kwargs.pop("skip_hooks", False)
         save = super().save
@@ -141,6 +143,7 @@ class LifecycleModelMixin(object):
 
         self._initial_state = self._snapshot_state()
 
+    @transaction.atomic
     def delete(self, *args, **kwargs):
         self._run_hooked_methods(BEFORE_DELETE)
         value = super().delete(*args, **kwargs)
