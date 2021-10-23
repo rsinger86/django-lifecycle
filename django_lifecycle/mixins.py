@@ -106,9 +106,7 @@ class LifecycleModelMixin(object):
         return False
 
     def _clear_watched_fk_model_cache(self):
-        """
-
-        """
+        """ """
         for watched_field_name in self._watched_fk_models():
             field = self._meta.get_field(watched_field_name)
 
@@ -172,9 +170,9 @@ class LifecycleModelMixin(object):
     @lru_cache(typed=True)
     def _watched_fk_model_fields(cls) -> List[str]:
         """
-            Gather up all field names (values in 'when' key) that correspond to
-            field names on FK-related models. These will be strings that contain
-            periods.
+        Gather up all field names (values in 'when' key) that correspond to
+        field names on FK-related models. These will be strings that contain
+        periods.
         """
         watched = []  # List[str]
 
@@ -192,9 +190,9 @@ class LifecycleModelMixin(object):
 
     def _run_hooked_methods(self, hook: str) -> List[str]:
         """
-            Iterate through decorated methods to find those that should be
-            triggered by the current hook. If conditions exist, check them before
-            running otherwise go ahead and run.
+        Iterate through decorated methods to find those that should be
+        triggered by the current hook. If conditions exist, check them before
+        running otherwise go ahead and run.
         """
         fired = []
 
@@ -210,10 +208,12 @@ class LifecycleModelMixin(object):
                     if not self._check_callback_conditions(when_field, callback_specs):
                         continue
                 elif when_any_field:
-                    if not any([
-                        self._check_callback_conditions(field_name, callback_specs)
-                        for field_name in when_any_field
-                    ]):
+                    if not any(
+                        [
+                            self._check_callback_conditions(field_name, callback_specs)
+                            for field_name in when_any_field
+                        ]
+                    ):
                         continue
 
                 # Only call the method once per hook
@@ -277,9 +277,9 @@ class LifecycleModelMixin(object):
     @classmethod
     def _get_model_property_names(cls) -> List[str]:
         """
-            Gather up properties and cached_properties which may be methods
-            that were decorated. Need to inspect class versions b/c doing
-            getattr on them could cause unwanted side effects.
+        Gather up properties and cached_properties which may be methods
+        that were decorated. Need to inspect class versions b/c doing
+        getattr on them could cause unwanted side effects.
         """
         property_names = []
 
