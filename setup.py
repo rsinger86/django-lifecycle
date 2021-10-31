@@ -38,6 +38,7 @@ classifiers = [
     "Framework :: Django :: 2.2",
     "Framework :: Django :: 3.0",
     "Framework :: Django :: 3.1",
+    "Framework :: Django :: 3.2",
 ]
 setup(
     name="django-lifecycle",
@@ -52,8 +53,5 @@ setup(
     long_description=readme(),
     classifiers=classifiers,
     long_description_content_type="text/markdown",
-    install_requires=[
-        "Django>=2.0",
-        "urlman>=1.2.0"
-    ],
+    install_requires=["Django>=2.0", "urlman>=1.2.0"],
 )

@@ -61,6 +61,10 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 0.9.3 (October 2021)
+
+- Correct packge info to note that Django 3.2 is supported.
+
 ## 0.9.2 (October 2021)
 
 - Run hooked methods inside transactions, just as signals do. Thanks @amirmotlagh!
