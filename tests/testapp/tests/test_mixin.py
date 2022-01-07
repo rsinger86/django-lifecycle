@@ -136,7 +136,7 @@ class LifecycleMixinTests(TestCase):
         instance = UserAccount(first_name="Bob")
 
         instance._potentially_hooked_methods = MagicMock(
-            return_value = [
+            return_value=[
                 MagicMock(
                     __name__="method_that_does_fires",
                     _hooked=[
@@ -208,9 +208,9 @@ class LifecycleMixinTests(TestCase):
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
 
-        self.assertFalse(user_account._check_has_changed("first_name", specs))
+        self.assertFalse(user_account._check_has_changed("first_name", specs, True))
         user_account.first_name = "Ned"
-        self.assertTrue(user_account._check_has_changed("first_name", specs))
+        self.assertTrue(user_account._check_has_changed("first_name", specs, True))
 
     def test_check_is_now_condition_wildcard_should_pass(self):
         specs = {"when": "first_name", "is_now": "*"}
@@ -312,7 +312,9 @@ class LifecycleMixinTests(TestCase):
         data = self.stub_data
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        with self.assertRaises(CannotRename, msg="Oh, not Flanders. Anybody but Flanders."):
+        with self.assertRaises(
+            CannotRename, msg="Oh, not Flanders. Anybody but Flanders."
+        ):
             user_account.last_name = "Flanders"
             user_account.save()
 
@@ -320,15 +322,21 @@ class LifecycleMixinTests(TestCase):
         user_account = UserAccount.objects.create(**self.stub_data)
         user_account.first_name = "Flanders"
         user_account.last_name = "Flanders"
-        with self.assertRaises(CannotRename, msg="Oh, not Flanders. Anybody but Flanders."):
+        with self.assertRaises(
+            CannotRename, msg="Oh, not Flanders. Anybody but Flanders."
+        ):
             user_account.last_name = "Flanders"
             user_account.save(update_fields=["last_name"])
 
-    def test_changes_to_condition_not_included_in_update_fields_should_not_fire_hook(self):
+    def test_changes_to_condition_not_included_in_update_fields_should_not_fire_hook(
+        self,
+    ):
         user_account = UserAccount.objects.create(**self.stub_data)
         user_account.first_name = "Flanders"
         user_account.last_name = "Flanders"
-        user_account.save(update_fields=["first_name"])  # `CannotRename` exception is not raised
+        user_account.save(
+            update_fields=["first_name"]
+        )  # `CannotRename` exception is not raised
 
         user_account.refresh_from_db()
         self.assertEqual(user_account.first_name, "Flanders")
@@ -345,8 +353,8 @@ class LifecycleMixinTests(TestCase):
 
     def test_should_not_call_cached_property(self):
         """
-            full_name is cached_property. Accessing _potentially_hooked_methods
-            should not call it incidentally.
+        full_name is cached_property. Accessing _potentially_hooked_methods
+        should not call it incidentally.
         """
         data = self.stub_data
         data["first_name"] = "Bart"
