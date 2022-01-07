@@ -126,26 +126,26 @@ class LifecycleModelMixin(object):
         is_new = self._state.adding
 
         if is_new:
-            self._run_hooked_methods(BEFORE_CREATE)
+            self._run_hooked_methods(BEFORE_CREATE, **kwargs)
         else:
-            self._run_hooked_methods(BEFORE_UPDATE)
+            self._run_hooked_methods(BEFORE_UPDATE, **kwargs)
 
-        self._run_hooked_methods(BEFORE_SAVE)
+        self._run_hooked_methods(BEFORE_SAVE, **kwargs)
         save(*args, **kwargs)
-        self._run_hooked_methods(AFTER_SAVE)
+        self._run_hooked_methods(AFTER_SAVE, **kwargs)
 
         if is_new:
-            self._run_hooked_methods(AFTER_CREATE)
+            self._run_hooked_methods(AFTER_CREATE, **kwargs)
         else:
-            self._run_hooked_methods(AFTER_UPDATE)
+            self._run_hooked_methods(AFTER_UPDATE, **kwargs)
 
         self._initial_state = self._snapshot_state()
 
     @transaction.atomic
     def delete(self, *args, **kwargs):
-        self._run_hooked_methods(BEFORE_DELETE)
+        self._run_hooked_methods(BEFORE_DELETE, **kwargs)
         value = super().delete(*args, **kwargs)
-        self._run_hooked_methods(AFTER_DELETE)
+        self._run_hooked_methods(AFTER_DELETE, **kwargs)
         return value
 
     @classmethod
@@ -188,7 +188,7 @@ class LifecycleModelMixin(object):
     def _watched_fk_models(cls) -> List[str]:
         return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
-    def _run_hooked_methods(self, hook: str) -> List[str]:
+    def _run_hooked_methods(self, hook: str, **kwargs) -> List[str]:
         """
         Iterate through decorated methods to find those that should be
         triggered by the current hook. If conditions exist, check them before
@@ -204,14 +204,24 @@ class LifecycleModelMixin(object):
                 when_field = callback_specs.get("when")
                 when_any_field = callback_specs.get("when_any")
 
+                # None is explicit instead of an empty list; since Django aborts the save with an empty list
+                update_fields = kwargs.get("update_fields", None)
+                update_fields_exist = update_fields is not None
+
                 if when_field:
+                    if update_fields_exist and when_field not in update_fields:
+                        continue
                     if not self._check_callback_conditions(when_field, callback_specs):
                         continue
                 elif when_any_field:
+                    filtered_when_any_fields = when_any_field
+                    if update_fields_exist:
+                        filtered_when_any_fields = list(set(update_fields) & set(when_any_field))  # Intersected.
+
                     if not any(
                         [
                             self._check_callback_conditions(field_name, callback_specs)
-                            for field_name in when_any_field
+                            for field_name in filtered_when_any_fields
                         ]
                     ):
                         continue

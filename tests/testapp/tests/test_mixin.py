@@ -316,6 +316,24 @@ class LifecycleMixinTests(TestCase):
             user_account.last_name = "Flanders"
             user_account.save()
 
+    def test_changes_to_condition_included_in_update_fields_should_fire_hook(self):
+        user_account = UserAccount.objects.create(**self.stub_data)
+        user_account.first_name = "Flanders"
+        user_account.last_name = "Flanders"
+        with self.assertRaises(CannotRename, msg="Oh, not Flanders. Anybody but Flanders."):
+            user_account.last_name = "Flanders"
+            user_account.save(update_fields=["last_name"])
+
+    def test_changes_to_condition_not_included_in_update_fields_should_not_fire_hook(self):
+        user_account = UserAccount.objects.create(**self.stub_data)
+        user_account.first_name = "Flanders"
+        user_account.last_name = "Flanders"
+        user_account.save(update_fields=["first_name"])  # `CannotRename` exception is not raised
+
+        user_account.refresh_from_db()
+        self.assertEqual(user_account.first_name, "Flanders")
+        self.assertNotEqual(user_account.last_name, "Flanders")
+
     def test_changes_to_condition_should_not_pass(self):
         data = self.stub_data
         data["first_name"] = "Marge"
