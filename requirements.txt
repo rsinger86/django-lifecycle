@@ -1,6 +1,7 @@
 asgiref==3.4.1
 Click==7.0
 Django==3.2.8
+django-capture-on-commit-callbacks==1.10.0
 djangorestframework==3.11.2
 ghp-import==2.0.2
 importlib-metadata==4.8.1
