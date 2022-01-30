@@ -366,3 +366,85 @@ class LifecycleMixinTests(TestCase):
         self.assertTrue(account.has_changed("first_name"))
         account.save()
         self.assertFalse(account.has_changed("first_name"))
+
+    def test_run_hooked_methods_for_on_commit(self):
+        instance = UserAccount(first_name="Bob")
+
+        instance._potentially_hooked_methods = MagicMock(
+            return_value = [
+                MagicMock(
+                    __name__="method_that_fires_on_commit",
+                    _hooked=[
+                        {
+                            "hook": "after_create",
+                            "when": None,
+                            "when_any": None,
+                            "has_changed": None,
+                            "is_now": "*",
+                            "is_not": NotSet,
+                            "was": "*",
+                            "was_not": NotSet,
+                            "changes_to": NotSet,
+                            "on_commit": True
+                        }
+                    ],
+                ),
+                MagicMock(
+                    __name__="method_that_fires_in_transaction",
+                    _hooked=[
+                        {
+                            "hook": "after_create",
+                            "when": None,
+                            "when_any": None,
+                            "has_changed": None,
+                            "is_now": "*",
+                            "is_not": NotSet,
+                            "was": "*",
+                            "was_not": NotSet,
+                            "changes_to": NotSet,
+                            "on_commit": False
+                        }
+                    ],
+                ),
+                MagicMock(
+                    __name__="method_that_fires_in_default",
+                    _hooked=[
+                        {
+                            "hook": "after_create",
+                            "when": None,
+                            "when_any": None,
+                            "has_changed": None,
+                            "is_now": "*",
+                            "is_not": NotSet,
+                            "was": "*",
+                            "was_not": NotSet,
+                            "changes_to": NotSet,
+                            "on_commit": None
+                        }
+                    ],
+                ),
+                MagicMock(
+                    __name__="after_save_method_that_fires_on_commit",
+                    _hooked=[
+                        {
+                            "hook": "after_save",
+                            "when": None,
+                            "when_any": None,
+                            "has_changed": None,
+                            "is_now": "*",
+                            "is_not": NotSet,
+                            "was": "*",
+                            "was_not": NotSet,
+                            "changes_to": NotSet,
+                            "on_commit": True
+                        }
+                    ],
+                ),
+            ]
+        )
+
+        fired_methods = instance._run_hooked_methods("after_create")
+        self.assertEqual(fired_methods, ["method_that_fires_on_commit_on_commit", "method_that_fires_in_transaction", "method_that_fires_in_default"])
+
+        fired_methods = instance._run_hooked_methods("after_save")
+        self.assertEqual(fired_methods, ["after_save_method_that_fires_on_commit_on_commit"])
