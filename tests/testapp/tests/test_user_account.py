@@ -3,6 +3,8 @@ import datetime
 from django.core import mail
 from django.test import TestCase
 
+from django_capture_on_commit_callbacks import capture_on_commit_callbacks
+
 from tests.testapp.models import CannotDeleteActiveTrial, Organization, UserAccount
 
 
@@ -22,7 +24,10 @@ class UserAccountTestCase(TestCase):
         self.assertTrue(isinstance(account.joined_at, datetime.datetime))
 
     def test_send_welcome_email_after_create(self):
-        UserAccount.objects.create(**self.stub_data)
+        with capture_on_commit_callbacks(execute=True) as callbacks:
+            UserAccount.objects.create(**self.stub_data)
+        
+        self.assertEquals(len(callbacks), 1, msg=f"{callbacks}")
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Welcome!")
 
@@ -73,12 +78,16 @@ class UserAccountTestCase(TestCase):
         org = Organization.objects.create(name="Hogwarts")
         UserAccount.objects.create(**self.stub_data, organization=org)
         mail.outbox = []
+
         account = UserAccount.objects.get()
 
-        org.name = "Coursera Wizardry"
-        org.save()
+        with capture_on_commit_callbacks(execute=True) as callbacks:
+            org.name = "Coursera Wizardry"
+            org.save()
 
-        account.save()
+            account.save()
+        
+        self.assertEquals(len(callbacks), 1)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject, "The name of your organization has changed!"
@@ -95,18 +104,23 @@ class UserAccountTestCase(TestCase):
     def test_additional_notify_sent_for_specific_org_name_change(self):
         org = Organization.objects.create(name="Hogwarts")
         UserAccount.objects.create(**self.stub_data, organization=org)
+
         mail.outbox = []
-        account = UserAccount.objects.get()
 
-        org.name = "Hogwarts Online"
-        org.save()
+        with capture_on_commit_callbacks(execute=True) as callbacks:
+            account = UserAccount.objects.get()
 
-        account.save()
+            org.name = "Hogwarts Online"
+            org.save()
+
+            account.save()
+
+        self.assertEquals(len(callbacks), 1, msg="Only one hook should be an on_commit callback")
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
-            mail.outbox[0].subject, "The name of your organization has changed!"
+            mail.outbox[1].subject, "The name of your organization has changed!"
         )
-        self.assertEqual(mail.outbox[1].subject, "You were moved to our online school!")
+        self.assertEqual(mail.outbox[0].subject, "You were moved to our online school!")
 
     def test_email_user_about_name_change(self):
         account = UserAccount.objects.create(**self.stub_data)
