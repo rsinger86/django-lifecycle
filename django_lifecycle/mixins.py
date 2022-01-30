@@ -1,4 +1,4 @@
-from functools import reduce, lru_cache
+from functools import partial, reduce, lru_cache
 from inspect import isfunction
 from typing import Any, List
 
@@ -238,9 +238,10 @@ class LifecycleModelMixin(object):
                     # the same hook within the atomic transaction and on_commit
                     method_name = method_name + "_on_commit"
 
-                    def _on_commit_func():
-                        method(self)
-                        
+                    # Use partial to create a function closure that binds `self`
+                    # to ensure its available to execute later.
+                    _on_commit_func = partial(method, self)
+                    _on_commit_func.__name__ = method_name
                     transaction.on_commit(_on_commit_func)
                 else:
                     method(self)
