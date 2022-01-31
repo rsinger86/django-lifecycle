@@ -28,6 +28,14 @@ Or you want to email a user when their account is deleted. You could add the dec
         )
 ```
 
+Or if you want to enqueue a background job that depends on state being committed to your database
+
+```python
+    @hook(AFTER_CREATE, on_commit=True)
+    def do_after_create_jobs(self):
+        enqueue_job(send_item_shipped_notication, self.item_id)
+```
+
 Read on to see how to only fire the hooked method if certain conditions about the model's current and previous state are met.
 
 ## Transitions between specific values
