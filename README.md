@@ -61,6 +61,11 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 0.9.5 (February 2022)
+
+- Makes the `has_changed`, `changes_to` conditions depend on whether the field in question was included in the SQL update/insert statement by checking
+  the `update_fields` argument passed to save.
+
 ## 0.9.4 (February 2022)
 
 - Adds optional @hook `on_commit` argument for executing hooks when the database transaction is committed. Thanks @amcclosky!
