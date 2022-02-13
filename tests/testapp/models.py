@@ -51,7 +51,7 @@ class UserAccount(LifecycleModel):
     def timestamp_joined_at(self):
         self.joined_at = timezone.now()
 
-    @hook("after_create")
+    @hook("after_create", on_commit=True)
     def do_after_create_jobs(self):
         # queue background job to process thumbnail image...
         mail.send_mail(
@@ -75,7 +75,7 @@ class UserAccount(LifecycleModel):
     def ensure_last_name_is_not_changed_to_flanders(self):
         raise CannotRename("Oh, not Flanders. Anybody but Flanders.")
 
-    @hook("after_update", when="organization.name", has_changed=True)
+    @hook("after_update", when="organization.name", has_changed=True, on_commit=True)
     def notify_org_name_change(self):
         mail.send_mail(
             "The name of your organization has changed!",

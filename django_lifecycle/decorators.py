@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import List
+from typing import List, Optional
 
 from django_lifecycle import NotSet
 
@@ -10,7 +10,7 @@ class DjangoLifeCycleException(Exception):
     pass
 
 
-def _validate_hook_params(hook, when, when_any, has_changed):
+def _validate_hook_params(hook, when, when_any, has_changed, on_commit):
     if hook not in VALID_HOOKS:
         raise DjangoLifeCycleException(
             "%s is not a valid hook; must be one of %s" % (hook, VALID_HOOKS)
@@ -46,6 +46,13 @@ def _validate_hook_params(hook, when, when_any, has_changed):
         raise DjangoLifeCycleException(
             "Can pass either 'when' or 'when_any' but not both"
         )
+    
+    if on_commit is not None:
+        if not hook.startswith("after_"):
+            raise DjangoLifeCycleException("'on_commit' hook param is only valid with AFTER_* hooks")
+
+        if not isinstance(on_commit, bool):
+            raise DjangoLifeCycleException("'on_commit' hook param must be a boolean")
 
 
 def hook(
@@ -58,8 +65,9 @@ def hook(
     is_not=NotSet,
     was_not=NotSet,
     changes_to=NotSet,
+    on_commit: Optional[bool] = None
 ):
-    _validate_hook_params(hook, when, when_any, has_changed)
+    _validate_hook_params(hook, when, when_any, has_changed, on_commit)
 
     def decorator(hooked_method):
         if not hasattr(hooked_method, "_hooked"):
@@ -83,6 +91,7 @@ def hook(
                 "was": was,
                 "was_not": was_not,
                 "changes_to": changes_to,
+                "on_commit": on_commit
             }
         )
 

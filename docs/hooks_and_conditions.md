@@ -17,6 +17,7 @@ You can hook into one or more lifecycle moments by adding the `@hook` decorator 
         was: Any = '*', 
         was_not: Any = None,
         changes_to: Any = None,
+        on_commit: Optional[bool] = None
     ):
 ```
 ## Lifecycle Moments
@@ -52,3 +53,4 @@ If you do not use any conditional parameters, the hook will fire every time the 
 | was | Any | Only fire the hooked method if the value of the `when` field was equal to this value when first initialized; defaults to `*`.  |
 | was_not | Any | Only fire the hooked method if the value of the `when` field was NOT equal to this value when first initialized. |
 | changes_to | Any | Only fire the hooked method if the value of the `when` field was NOT equal to this value when first initialized but is currently equal to this value. |
+| on_commit | bool | When `True` only fire the hooked method after the current database transaction has been commited or not at all. (Only applies to `AFTER_*` hooks)  |

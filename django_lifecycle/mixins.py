@@ -1,4 +1,4 @@
-from functools import reduce, lru_cache
+from functools import partial, reduce, lru_cache
 from inspect import isfunction
 from typing import Any, List
 
@@ -200,6 +200,8 @@ class LifecycleModelMixin(object):
             for callback_specs in method._hooked:
                 if callback_specs["hook"] != hook:
                     continue
+                
+                on_commit = callback_specs.get("on_commit", False)
 
                 when_field = callback_specs.get("when")
                 when_any_field = callback_specs.get("when_any")
@@ -225,10 +227,27 @@ class LifecycleModelMixin(object):
                         ]
                     ):
                         continue
+                
+                # Save method name before potentially wrapping with `on_commit`
+                method_name = method.__name__
+    
+                # Apply `on_commit` after saving the method as `fired` to preserve
+                # the non-anonymous name
+                if on_commit:
+                    # Append `_on_commit` to the existing method name to allow for firing
+                    # the same hook within the atomic transaction and on_commit
+                    method_name = method_name + "_on_commit"
+
+                    # Use partial to create a function closure that binds `self`
+                    # to ensure its available to execute later.
+                    _on_commit_func = partial(method, self)
+                    _on_commit_func.__name__ = method_name
+                    transaction.on_commit(_on_commit_func)
+                else:
+                    method(self)
 
                 # Only call the method once per hook
-                fired.append(method.__name__)
-                method(self)
+                fired.append(method_name)
                 break
 
         return fired
