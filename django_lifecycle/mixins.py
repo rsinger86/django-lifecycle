@@ -205,27 +205,35 @@ class LifecycleModelMixin(object):
 
                 when_field = callback_specs.get("when")
                 when_any_field = callback_specs.get("when_any")
-
-                # None is explicit instead of an empty list; since Django aborts the save with an empty list
                 update_fields = kwargs.get("update_fields", None)
-                update_fields_exist = update_fields is not None
+                is_partial_fields_update = update_fields is not None
 
                 if when_field:
-                    if update_fields_exist and when_field not in update_fields:
-                        continue
-                    if not self._check_callback_conditions(when_field, callback_specs):
+                    if not self._check_callback_conditions(
+                        when_field,
+                        callback_specs,
+                        is_synced=(
+                            is_partial_fields_update is False
+                            or when_field in update_fields
+                        ),
+                    ):
                         continue
                 elif when_any_field:
-                    filtered_when_any_fields = when_any_field
-                    if update_fields_exist:
-                        filtered_when_any_fields = list(set(update_fields) & set(when_any_field))  # Intersected.
+                    any_condition_matched = False
 
-                    if not any(
-                        [
-                            self._check_callback_conditions(field_name, callback_specs)
-                            for field_name in filtered_when_any_fields
-                        ]
-                    ):
+                    for field_name in when_any_field:
+                        if self._check_callback_conditions(
+                            field_name,
+                            callback_specs,
+                            is_synced=(
+                                is_partial_fields_update is False
+                                or field_name in update_fields
+                            ),
+                        ):
+                            any_condition_matched = True
+                            break
+
+                    if not any_condition_matched:
                         continue
                 
                 # Save method name before potentially wrapping with `on_commit`
@@ -252,8 +260,13 @@ class LifecycleModelMixin(object):
 
         return fired
 
-    def _check_callback_conditions(self, field_name: str, specs: dict) -> bool:
-        if not self._check_has_changed(field_name, specs):
+    def _check_callback_conditions(
+        self, field_name: str, specs: dict, is_synced: bool
+    ) -> bool:
+        if not self._check_has_changed(field_name, specs, is_synced):
+            return False
+
+        if not self._check_changes_to_condition(field_name, specs, is_synced):
             return False
 
         if not self._check_is_now_condition(field_name, specs):
@@ -268,12 +281,12 @@ class LifecycleModelMixin(object):
         if not self._check_is_not_condition(field_name, specs):
             return False
 
-        if not self._check_changes_to_condition(field_name, specs):
-            return False
-
         return True
 
-    def _check_has_changed(self, field_name: str, specs: dict) -> bool:
+    def _check_has_changed(self, field_name: str, specs: dict, is_synced: bool) -> bool:
+        if not is_synced:
+            return False
+
         has_changed = specs["has_changed"]
         return has_changed is None or has_changed == self.has_changed(field_name)
 
@@ -291,7 +304,12 @@ class LifecycleModelMixin(object):
         was_not = specs["was_not"]
         return was_not is NotSet or self.initial_value(field_name) != was_not
 
-    def _check_changes_to_condition(self, field_name: str, specs: dict) -> bool:
+    def _check_changes_to_condition(
+        self, field_name: str, specs: dict, is_synced: bool
+    ) -> bool:
+        if not is_synced:
+            return False
+
         changes_to = specs["changes_to"]
         return any(
             [
