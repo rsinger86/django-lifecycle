@@ -61,6 +61,10 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 0.9.4 (February 2022)
+
+- Adds optional @hook `on_commit` argument for executing hooks when the database transaction is committed. Thanks @amcclosky!
+
 ## 0.9.3 (October 2021)
 
 - Correct packge info to note that Django 3.2 is supported.
