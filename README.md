@@ -61,6 +61,10 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 0.9.6 (February 2022)
+
+- Adds missing `packaging` to `install_requires`. Thanks @mikedep333!
+
 ## 0.9.5 (February 2022)
 
 - Makes the `has_changed`, `changes_to` conditions depend on whether the field in question was included in the SQL update/insert statement by checking
