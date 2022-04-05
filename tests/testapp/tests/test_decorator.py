@@ -2,7 +2,7 @@ from django.db import models
 from django.test import TestCase
 
 from django_lifecycle import hook, LifecycleModelMixin, AFTER_CREATE
-from django_lifecycle.priority import HIGHEST_PRIORITY, LOWEST_PRIORITY
+from django_lifecycle.priority import HIGHEST_PRIORITY, LOWER_PRIORITY
 
 
 class DecoratorTests(TestCase):
@@ -32,7 +32,7 @@ class DecoratorTests(TestCase):
             def top_priority(self):
                 pass
 
-            @hook(AFTER_CREATE, priority=LOWEST_PRIORITY)
+            @hook(AFTER_CREATE, priority=LOWER_PRIORITY)
             def lowest_priority(self):
                 pass
 
