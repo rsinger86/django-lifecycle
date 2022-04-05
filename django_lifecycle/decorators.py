@@ -4,13 +4,14 @@ from typing import List, Optional
 from django_lifecycle import NotSet
 
 from .hooks import VALID_HOOKS
+from .priority import DEFAULT_PRIORITY
 
 
 class DjangoLifeCycleException(Exception):
     pass
 
 
-def _validate_hook_params(hook, when, when_any, has_changed, on_commit):
+def _validate_hook_params(hook, when, when_any, has_changed, priority, on_commit):
     if hook not in VALID_HOOKS:
         raise DjangoLifeCycleException(
             "%s is not a valid hook; must be one of %s" % (hook, VALID_HOOKS)
@@ -54,6 +55,9 @@ def _validate_hook_params(hook, when, when_any, has_changed, on_commit):
         if not isinstance(on_commit, bool):
             raise DjangoLifeCycleException("'on_commit' hook param must be a boolean")
 
+    if priority < 0:
+        raise DjangoLifeCycleException("'priority' hook param must be a positive integer")
+
 
 def hook(
     hook: str,
@@ -65,9 +69,10 @@ def hook(
     is_not=NotSet,
     was_not=NotSet,
     changes_to=NotSet,
+    priority: int = DEFAULT_PRIORITY,
     on_commit: Optional[bool] = None
 ):
-    _validate_hook_params(hook, when, when_any, has_changed, on_commit)
+    _validate_hook_params(hook, when, when_any, has_changed, priority, on_commit)
 
     def decorator(hooked_method):
         if not hasattr(hooked_method, "_hooked"):
@@ -91,6 +96,7 @@ def hook(
                 "was": was,
                 "was_not": was_not,
                 "changes_to": changes_to,
+                "priority": priority,
                 "on_commit": on_commit
             }
         )

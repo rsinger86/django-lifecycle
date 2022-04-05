@@ -1,12 +1,15 @@
+from dataclasses import dataclass, field
 from functools import partial, reduce, lru_cache
 from inspect import isfunction
-from typing import Any, List
+from operator import attrgetter, itemgetter
+from typing import Any, List, Iterable
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import transaction
 from django.utils.functional import cached_property
 
 from . import NotSet
+from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
 from .hooks import (
     BEFORE_CREATE,
     BEFORE_UPDATE,
@@ -18,7 +21,40 @@ from .hooks import (
     AFTER_DELETE,
 )
 
-from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
+
+@dataclass
+class HookedMethod:
+    method: Any
+    priority: int
+    on_commit: bool
+
+    @property
+    def name(self) -> str:
+        method_name = self.method.__name__
+
+        if self.on_commit:
+            # Append `_on_commit` to the existing method name to allow for firing
+            # the same hook within the atomic transaction and on_commit
+            return f"{method_name}_on_commit"
+        else:
+            return method_name
+
+    def _run_on_commit(self, instance):
+        # Use partial to create a function closure that binds `self`
+        # to ensure it's available to execute later.
+        _on_commit_func = partial(self.method, instance)
+        _on_commit_func.__name__ = self.name
+        transaction.on_commit(_on_commit_func)
+
+    def run(self, instance):
+        if self.on_commit:
+            self._run_on_commit(instance)
+        else:
+            self.method(instance)
+
+    @classmethod
+    def sort_by_priority(cls, hooked_methods: Iterable["HookedMethod"]):
+        return sorted(hooked_methods, key=attrgetter("priority"))
 
 
 class LifecycleModelMixin(object):
@@ -188,19 +224,27 @@ class LifecycleModelMixin(object):
     def _watched_fk_models(cls) -> List[str]:
         return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
-    def _run_hooked_methods(self, hook: str, **kwargs) -> List[str]:
+    @classmethod
+    def _sort_callback_specs_by_priority(cls, callback_specs: Iterable[dict]) -> List[dict]:
+        return sorted(callback_specs, key=itemgetter("priority"))
+
+    def _get_hooked_methods(self, hook: str, **kwargs) -> List[HookedMethod]:
         """
         Iterate through decorated methods to find those that should be
         triggered by the current hook. If conditions exist, check them before
-        running otherwise go ahead and run.
+        adding it to the list of methods to fire.
+
+        Then, sort the list.
         """
-        fired = []
+
+        hooked_methods = []
 
         for method in self._potentially_hooked_methods():
-            for callback_specs in method._hooked:
+            callback_specs_sorted_by_priority = self._sort_callback_specs_by_priority(method._hooked)
+            for callback_specs in callback_specs_sorted_by_priority:
                 if callback_specs["hook"] != hook:
                     continue
-                
+
                 on_commit = callback_specs.get("on_commit", False)
 
                 when_field = callback_specs.get("when")
@@ -235,28 +279,26 @@ class LifecycleModelMixin(object):
 
                     if not any_condition_matched:
                         continue
-                
-                # Save method name before potentially wrapping with `on_commit`
-                method_name = method.__name__
-    
-                # Apply `on_commit` after saving the method as `fired` to preserve
-                # the non-anonymous name
-                if on_commit:
-                    # Append `_on_commit` to the existing method name to allow for firing
-                    # the same hook within the atomic transaction and on_commit
-                    method_name = method_name + "_on_commit"
 
-                    # Use partial to create a function closure that binds `self`
-                    # to ensure its available to execute later.
-                    _on_commit_func = partial(method, self)
-                    _on_commit_func.__name__ = method_name
-                    transaction.on_commit(_on_commit_func)
-                else:
-                    method(self)
+                hooked_method = HookedMethod(
+                    method=method,
+                    priority=callback_specs["priority"],
+                    on_commit=on_commit,
+                )
+                hooked_methods.append(hooked_method)
 
-                # Only call the method once per hook
-                fired.append(method_name)
+                # Only store the method once per hook
                 break
+
+        return HookedMethod.sort_by_priority(hooked_methods)
+
+    def _run_hooked_methods(self, hook: str, **kwargs) -> List[str]:
+        """ Run hooked methods """
+        fired = []
+
+        for method in self._get_hooked_methods(hook, **kwargs):
+            method.run(self)
+            fired.append(method.name)
 
         return fired
 

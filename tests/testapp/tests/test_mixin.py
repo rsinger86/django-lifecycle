@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from django.test import TestCase
 
 from django_lifecycle import NotSet
+from django_lifecycle.priority import DEFAULT_PRIORITY
 from tests.testapp.models import CannotRename, Organization, UserAccount
 
 
@@ -108,6 +109,7 @@ class LifecycleMixinTests(TestCase):
                             "was": "*",
                             "was_not": NotSet,
                             "changes_to": NotSet,
+                            "priority": DEFAULT_PRIORITY,
                         }
                     ],
                 ),
@@ -124,6 +126,7 @@ class LifecycleMixinTests(TestCase):
                             "was": "*",
                             "was_not": NotSet,
                             "changes_to": NotSet,
+                            "priority": DEFAULT_PRIORITY,
                         }
                     ],
                 ),
@@ -150,6 +153,7 @@ class LifecycleMixinTests(TestCase):
                             "was": "*",
                             "was_not": NotSet,
                             "changes_to": NotSet,
+                            "priority": DEFAULT_PRIORITY,
                         }
                     ],
                 ),
@@ -166,6 +170,7 @@ class LifecycleMixinTests(TestCase):
                             "was": "*",
                             "was_not": NotSet,
                             "changes_to": NotSet,
+                            "priority": DEFAULT_PRIORITY,
                         }
                     ],
                 ),
@@ -393,6 +398,7 @@ class LifecycleMixinTests(TestCase):
                             "was": "*",
                             "was_not": NotSet,
                             "changes_to": NotSet,
+                            "priority": DEFAULT_PRIORITY,
                             "on_commit": True
                         }
                     ],
@@ -410,6 +416,7 @@ class LifecycleMixinTests(TestCase):
                             "was": "*",
                             "was_not": NotSet,
                             "changes_to": NotSet,
+                            "priority": DEFAULT_PRIORITY,
                             "on_commit": False
                         }
                     ],
@@ -427,6 +434,7 @@ class LifecycleMixinTests(TestCase):
                             "was": "*",
                             "was_not": NotSet,
                             "changes_to": NotSet,
+                            "priority": DEFAULT_PRIORITY,
                             "on_commit": None
                         }
                     ],
@@ -444,6 +452,7 @@ class LifecycleMixinTests(TestCase):
                             "was": "*",
                             "was_not": NotSet,
                             "changes_to": NotSet,
+                            "priority": DEFAULT_PRIORITY,
                             "on_commit": True
                         }
                     ],
