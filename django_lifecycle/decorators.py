@@ -1,8 +1,8 @@
 from functools import wraps
+from operator import itemgetter
 from typing import List, Optional
 
 from django_lifecycle import NotSet
-
 from .hooks import VALID_HOOKS
 from .priority import DEFAULT_PRIORITY
 
@@ -100,6 +100,9 @@ def hook(
                 "on_commit": on_commit
             }
         )
+
+        # Sort hooked methods by priority
+        func._hooked = sorted(func._hooked, key=itemgetter("priority"))
 
         return func
 

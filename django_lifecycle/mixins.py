@@ -224,9 +224,6 @@ class LifecycleModelMixin(object):
     def _watched_fk_models(cls) -> List[str]:
         return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
-    @classmethod
-    def _sort_callback_specs_by_priority(cls, callback_specs: Iterable[dict]) -> List[dict]:
-        return sorted(callback_specs, key=itemgetter("priority"))
 
     def _get_hooked_methods(self, hook: str, **kwargs) -> List[HookedMethod]:
         """
@@ -240,8 +237,7 @@ class LifecycleModelMixin(object):
         hooked_methods = []
 
         for method in self._potentially_hooked_methods():
-            callback_specs_sorted_by_priority = self._sort_callback_specs_by_priority(method._hooked)
-            for callback_specs in callback_specs_sorted_by_priority:
+            for callback_specs in method._hooked:
                 if callback_specs["hook"] != hook:
                     continue
 
