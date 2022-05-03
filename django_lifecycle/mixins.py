@@ -1,14 +1,13 @@
-from dataclasses import dataclass, field
 from functools import partial, reduce, lru_cache
 from inspect import isfunction
-from operator import attrgetter, itemgetter
-from typing import Any, List, Iterable
+from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import transaction
 from django.utils.functional import cached_property
 
 from . import NotSet
+from .abstract import AbstractHookedMethod
 from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
 from .hooks import (
     BEFORE_CREATE,
@@ -22,39 +21,38 @@ from .hooks import (
 )
 
 
-@dataclass
-class HookedMethod:
-    method: Any
-    priority: int
-    on_commit: bool
+class HookedMethod(AbstractHookedMethod):
+    @property
+    def name(self) -> str:
+        return self.method.__name__
+
+    def run(self, instance: Any) -> None:
+        self.method(instance)
+
+
+class OnCommitHookedMethod(AbstractHookedMethod):
+    """ Hooked method that should run on_commit """
 
     @property
     def name(self) -> str:
-        method_name = self.method.__name__
+        # Append `_on_commit` to the existing method name to allow for firing
+        # the same hook within the atomic transaction and on_commit
+        return f"{self.method.__name__}_on_commit"
 
-        if self.on_commit:
-            # Append `_on_commit` to the existing method name to allow for firing
-            # the same hook within the atomic transaction and on_commit
-            return f"{method_name}_on_commit"
-        else:
-            return method_name
-
-    def _run_on_commit(self, instance):
+    def run(self, instance: Any) -> None:
         # Use partial to create a function closure that binds `self`
         # to ensure it's available to execute later.
         _on_commit_func = partial(self.method, instance)
         _on_commit_func.__name__ = self.name
         transaction.on_commit(_on_commit_func)
 
-    def run(self, instance):
-        if self.on_commit:
-            self._run_on_commit(instance)
-        else:
-            self.method(instance)
 
-    @classmethod
-    def sort_by_priority(cls, hooked_methods: Iterable["HookedMethod"]):
-        return sorted(hooked_methods, key=attrgetter("priority"))
+def instantiate_hooked_method(method: Any, callback_specs: dict) -> AbstractHookedMethod:
+    hooked_method_class = OnCommitHookedMethod if callback_specs.get("on_commit", False) else HookedMethod
+    return hooked_method_class(
+        method=method,
+        priority=callback_specs["priority"],
+    )
 
 
 class LifecycleModelMixin(object):
@@ -225,7 +223,7 @@ class LifecycleModelMixin(object):
         return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
 
-    def _get_hooked_methods(self, hook: str, **kwargs) -> List[HookedMethod]:
+    def _get_hooked_methods(self, hook: str, **kwargs) -> List[AbstractHookedMethod]:
         """
         Iterate through decorated methods to find those that should be
         triggered by the current hook. If conditions exist, check them before
@@ -240,8 +238,6 @@ class LifecycleModelMixin(object):
             for callback_specs in method._hooked:
                 if callback_specs["hook"] != hook:
                     continue
-
-                on_commit = callback_specs.get("on_commit", False)
 
                 when_field = callback_specs.get("when")
                 when_any_field = callback_specs.get("when_any")
@@ -276,17 +272,13 @@ class LifecycleModelMixin(object):
                     if not any_condition_matched:
                         continue
 
-                hooked_method = HookedMethod(
-                    method=method,
-                    priority=callback_specs["priority"],
-                    on_commit=on_commit,
-                )
+                hooked_method = instantiate_hooked_method(method, callback_specs)
                 hooked_methods.append(hooked_method)
 
                 # Only store the method once per hook
                 break
 
-        return HookedMethod.sort_by_priority(hooked_methods)
+        return sorted(hooked_methods)
 
     def _run_hooked_methods(self, hook: str, **kwargs) -> List[str]:
         """ Run hooked methods """
