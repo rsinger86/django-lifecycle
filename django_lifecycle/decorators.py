@@ -3,6 +3,7 @@ from functools import wraps
 from typing import List, Optional, Any
 
 from django_lifecycle import NotSet
+from .dataclass_validation import Validations
 
 from .hooks import VALID_HOOKS
 
@@ -12,7 +13,7 @@ class DjangoLifeCycleException(Exception):
 
 
 @dataclass
-class HookConfig:
+class HookConfig(Validations):
     hook: str
     when: Optional[str] = None
     when_any: Optional[List[str]] = None
@@ -24,53 +25,75 @@ class HookConfig:
     changes_to: Any = NotSet
     on_commit: bool = False
 
-    def __post_init__(self):
-        if self.hook not in VALID_HOOKS:
+    def validate_hook(self, value, **kwargs):
+        if value not in VALID_HOOKS:
             raise DjangoLifeCycleException(
                 "%s is not a valid hook; must be one of %s" % (hook, VALID_HOOKS)
             )
 
-        if self.has_changed is not None and not isinstance(self.has_changed, bool):
-            raise DjangoLifeCycleException("'has_changed' hook param must be a boolean")
+        return value
 
-        if self.when is not None and not isinstance(self.when, str):
+    def validate_when(self, value, **kwargs):
+        if value is not None and not isinstance(value, str):
             raise DjangoLifeCycleException(
                 "'when' hook param must be a string matching the name of a model field"
             )
 
-        if self.when_any is not None:
-            when_any_error_msg = (
-                "'when_any' hook param must be a list of strings "
-                "matching the names of model fields"
+        return value
+
+    def validate_when_any(self, value, **kwargs):
+        if value is None:
+            return
+
+        when_any_error_msg = (
+            "'when_any' hook param must be a list of strings "
+            "matching the names of model fields"
+        )
+
+        if not isinstance(value, list):
+            raise DjangoLifeCycleException(when_any_error_msg)
+
+        if len(value) == 0:
+            raise DjangoLifeCycleException(
+                "'when_any' hook param must contain at least one field name"
             )
 
-            if not isinstance(self.when_any, list):
+        for field_name in value:
+            if not isinstance(field_name, str):
                 raise DjangoLifeCycleException(when_any_error_msg)
 
-            if len(self.when_any) == 0:
-                raise DjangoLifeCycleException(
-                    "'when_any' hook param must contain at least one field name"
-                )
+        return value
 
-            for field_name in self.when_any:
-                if not isinstance(field_name, str):
-                    raise DjangoLifeCycleException(when_any_error_msg)
+    def validate_has_changed(self, value, **kwargs):
+        if value is not None and not isinstance(value, bool):
+            raise DjangoLifeCycleException("'has_changed' hook param must be a boolean")
 
+        return value
+
+    def validate_on_commit(self, value, **kwargs):
+        if value is None:
+            return
+
+        if not isinstance(value, bool):
+            raise DjangoLifeCycleException("'on_commit' hook param must be a boolean")
+
+        return value
+
+    def validate_on_commit_only_for_after_hooks(self):
+        if self.on_commit and not self.hook.startswith("after_"):
+            raise DjangoLifeCycleException(
+                "'on_commit' hook param is only valid with AFTER_* hooks"
+            )
+
+    def validate_when_and_when_any(self):
         if self.when is not None and self.when_any is not None:
             raise DjangoLifeCycleException(
                 "Can pass either 'when' or 'when_any' but not both"
             )
 
-        if self.on_commit:
-            if not self.hook.startswith("after_"):
-                raise DjangoLifeCycleException(
-                    "'on_commit' hook param is only valid with AFTER_* hooks"
-                )
-
-            if not isinstance(self.on_commit, bool):
-                raise DjangoLifeCycleException(
-                    "'on_commit' hook param must be a boolean"
-                )
+    def validate(self):
+        self.validate_when_and_when_any()
+        self.validate_on_commit_only_for_after_hooks()
 
     def __call__(self, hooked_method):
         if not hasattr(hooked_method, "_hooked"):
