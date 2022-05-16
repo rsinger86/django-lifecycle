@@ -20,11 +20,13 @@ class Validations:
         """
         for name, field in self.__dataclass_fields__.items():
             validator_name = f"validate_{name}"
-            if method := getattr(self, validator_name, None):
+            method = getattr(self, validator_name, None)
+            if callable(method):
                 logger.debug(f"Calling validator: {validator_name}")
                 new_value = method(getattr(self, name), field=field)
                 setattr(self, name, new_value)
 
-        if (validate := getattr(self, "validate", None)) and callable(validate):
+        validate = getattr(self, "validate", None)
+        if callable(validate):
             logger.debug(f"Calling validator: validate")
             validate()
