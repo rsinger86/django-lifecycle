@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from . import NotSet
 from .abstract import AbstractHookedMethod
 from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
+from .decorators import HookConfig
 from .hooks import (
     BEFORE_CREATE,
     BEFORE_UPDATE,
@@ -47,11 +48,11 @@ class OnCommitHookedMethod(AbstractHookedMethod):
         transaction.on_commit(_on_commit_func)
 
 
-def instantiate_hooked_method(method: Any, callback_specs: dict) -> AbstractHookedMethod:
-    hooked_method_class = OnCommitHookedMethod if callback_specs.get("on_commit", False) else HookedMethod
+def instantiate_hooked_method(method: Any, callback_specs: HookConfig) -> AbstractHookedMethod:
+    hooked_method_class = OnCommitHookedMethod if callback_specs.on_commit else HookedMethod
     return hooked_method_class(
         method=method,
-        priority=callback_specs["priority"],
+        priority=callback_specs.priority,
     )
 
 
@@ -211,9 +212,9 @@ class LifecycleModelMixin(object):
         watched = []  # List[str]
 
         for method in cls._potentially_hooked_methods():
-            for specs in method._hooked:
-                if specs["when"] is not None and "." in specs["when"]:
-                    watched.append(specs["when"])
+            for hook_config in method._hooked:
+                if hook_config.when is not None and "." in hook_config.when:
+                    watched.append(hook_config.when)
 
         return watched
 
@@ -236,11 +237,11 @@ class LifecycleModelMixin(object):
 
         for method in self._potentially_hooked_methods():
             for callback_specs in method._hooked:
-                if callback_specs["hook"] != hook:
+                if callback_specs.hook != hook:
                     continue
 
-                when_field = callback_specs.get("when")
-                when_any_field = callback_specs.get("when_any")
+                when_field = callback_specs.when
+                when_any_field = callback_specs.when_any
                 update_fields = kwargs.get("update_fields", None)
                 is_partial_fields_update = update_fields is not None
 
@@ -313,34 +314,34 @@ class LifecycleModelMixin(object):
 
         return True
 
-    def _check_has_changed(self, field_name: str, specs: dict, is_synced: bool) -> bool:
+    def _check_has_changed(self, field_name: str, specs: HookConfig, is_synced: bool) -> bool:
         if not is_synced:
             return False
 
-        has_changed = specs["has_changed"]
+        has_changed = specs.has_changed
         return has_changed is None or has_changed == self.has_changed(field_name)
 
-    def _check_is_now_condition(self, field_name: str, specs: dict) -> bool:
-        return specs["is_now"] in (self._current_value(field_name), "*")
+    def _check_is_now_condition(self, field_name: str, specs: HookConfig) -> bool:
+        return specs.is_now in (self._current_value(field_name), "*")
 
-    def _check_is_not_condition(self, field_name: str, specs: dict) -> bool:
-        is_not = specs["is_not"]
+    def _check_is_not_condition(self, field_name: str, specs: HookConfig) -> bool:
+        is_not = specs.is_not
         return is_not is NotSet or self._current_value(field_name) != is_not
 
-    def _check_was_condition(self, field_name: str, specs: dict) -> bool:
-        return specs["was"] in (self.initial_value(field_name), "*")
+    def _check_was_condition(self, field_name: str, specs: HookConfig) -> bool:
+        return specs.was in (self.initial_value(field_name), "*")
 
-    def _check_was_not_condition(self, field_name: str, specs: dict) -> bool:
-        was_not = specs["was_not"]
+    def _check_was_not_condition(self, field_name: str, specs: HookConfig) -> bool:
+        was_not = specs.was_not
         return was_not is NotSet or self.initial_value(field_name) != was_not
 
     def _check_changes_to_condition(
-        self, field_name: str, specs: dict, is_synced: bool
+        self, field_name: str, specs: HookConfig, is_synced: bool
     ) -> bool:
         if not is_synced:
             return False
 
-        changes_to = specs["changes_to"]
+        changes_to = specs.changes_to
         return any(
             [
                 changes_to is NotSet,
