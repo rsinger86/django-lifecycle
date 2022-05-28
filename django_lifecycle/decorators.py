@@ -1,18 +1,19 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import wraps
-from typing import List, Optional, Any
+from typing import Any
+from typing import List, Optional
 
 from django_lifecycle import NotSet
 from .dataclass_validation import Validations
-
 from .hooks import VALID_HOOKS
+from .priority import DEFAULT_PRIORITY
 
 
 class DjangoLifeCycleException(Exception):
     pass
 
 
-@dataclass
+@dataclass(order=False)
 class HookConfig(Validations):
     hook: str
     when: Optional[str] = None
@@ -24,6 +25,7 @@ class HookConfig(Validations):
     was_not: Any = NotSet
     changes_to: Any = NotSet
     on_commit: bool = False
+    priority: int = DEFAULT_PRIORITY
 
     def validate_hook(self, value, **kwargs):
         if value not in VALID_HOOKS:
@@ -79,6 +81,12 @@ class HookConfig(Validations):
 
         return value
 
+    def validate_priority(self, value, **kwargs):
+        if self.priority < 0:
+            raise DjangoLifeCycleException("'priority' hook param must be a positive integer")
+
+        return value
+
     def validate_on_commit_only_for_after_hooks(self):
         if self.on_commit and not self.hook.startswith("after_"):
             raise DjangoLifeCycleException(
@@ -95,6 +103,12 @@ class HookConfig(Validations):
         self.validate_when_and_when_any()
         self.validate_on_commit_only_for_after_hooks()
 
+    def __lt__(self, other):
+        if not isinstance(other, HookConfig):
+            return NotImplemented
+
+        return self.priority < other.priority
+
     def __call__(self, hooked_method):
         if not hasattr(hooked_method, "_hooked"):
 
@@ -107,6 +121,9 @@ class HookConfig(Validations):
             func = hooked_method
 
         func._hooked.append(self)
+
+        # Sort hooked methods by priority
+        func._hooked = sorted(func._hooked)
 
         return func
 

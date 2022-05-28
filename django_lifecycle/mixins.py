@@ -7,6 +7,8 @@ from django.db import transaction
 from django.utils.functional import cached_property
 
 from . import NotSet
+from .abstract import AbstractHookedMethod
+from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
 from .decorators import HookConfig
 from .hooks import (
     BEFORE_CREATE,
@@ -19,7 +21,39 @@ from .hooks import (
     AFTER_DELETE,
 )
 
-from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
+
+class HookedMethod(AbstractHookedMethod):
+    @property
+    def name(self) -> str:
+        return self.method.__name__
+
+    def run(self, instance: Any) -> None:
+        self.method(instance)
+
+
+class OnCommitHookedMethod(AbstractHookedMethod):
+    """ Hooked method that should run on_commit """
+
+    @property
+    def name(self) -> str:
+        # Append `_on_commit` to the existing method name to allow for firing
+        # the same hook within the atomic transaction and on_commit
+        return f"{self.method.__name__}_on_commit"
+
+    def run(self, instance: Any) -> None:
+        # Use partial to create a function closure that binds `self`
+        # to ensure it's available to execute later.
+        _on_commit_func = partial(self.method, instance)
+        _on_commit_func.__name__ = self.name
+        transaction.on_commit(_on_commit_func)
+
+
+def instantiate_hooked_method(method: Any, callback_specs: HookConfig) -> AbstractHookedMethod:
+    hooked_method_class = OnCommitHookedMethod if callback_specs.on_commit else HookedMethod
+    return hooked_method_class(
+        method=method,
+        priority=callback_specs.priority,
+    )
 
 
 class LifecycleModelMixin(object):
@@ -189,20 +223,22 @@ class LifecycleModelMixin(object):
     def _watched_fk_models(cls) -> List[str]:
         return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
-    def _run_hooked_methods(self, hook: str, **kwargs) -> List[str]:
+
+    def _get_hooked_methods(self, hook: str, **kwargs) -> List[AbstractHookedMethod]:
         """
         Iterate through decorated methods to find those that should be
         triggered by the current hook. If conditions exist, check them before
-        running otherwise go ahead and run.
+        adding it to the list of methods to fire.
+
+        Then, sort the list.
         """
-        fired = []
+
+        hooked_methods = []
 
         for method in self._potentially_hooked_methods():
             for callback_specs in method._hooked:
                 if callback_specs.hook != hook:
                     continue
-
-                on_commit = callback_specs.on_commit
 
                 when_field = callback_specs.when
                 when_any_field = callback_specs.when_any
@@ -237,27 +273,21 @@ class LifecycleModelMixin(object):
                     if not any_condition_matched:
                         continue
 
-                # Save method name before potentially wrapping with `on_commit`
-                method_name = method.__name__
+                hooked_method = instantiate_hooked_method(method, callback_specs)
+                hooked_methods.append(hooked_method)
 
-                # Apply `on_commit` after saving the method as `fired` to preserve
-                # the non-anonymous name
-                if on_commit:
-                    # Append `_on_commit` to the existing method name to allow for firing
-                    # the same hook within the atomic transaction and on_commit
-                    method_name = method_name + "_on_commit"
-
-                    # Use partial to create a function closure that binds `self`
-                    # to ensure its available to execute later.
-                    _on_commit_func = partial(method, self)
-                    _on_commit_func.__name__ = method_name
-                    transaction.on_commit(_on_commit_func)
-                else:
-                    method(self)
-
-                # Only call the method once per hook
-                fired.append(method_name)
+                # Only store the method once per hook
                 break
+
+        return sorted(hooked_methods)
+
+    def _run_hooked_methods(self, hook: str, **kwargs) -> List[str]:
+        """ Run hooked methods """
+        fired = []
+
+        for method in self._get_hooked_methods(hook, **kwargs):
+            method.run(self)
+            fired.append(method.name)
 
         return fired
 
