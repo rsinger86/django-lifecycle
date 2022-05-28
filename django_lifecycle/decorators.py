@@ -83,7 +83,9 @@ class HookConfig(Validations):
 
     def validate_priority(self, value, **kwargs):
         if self.priority < 0:
-            raise DjangoLifeCycleException("'priority' hook param must be a positive integer")
+            raise DjangoLifeCycleException(
+                "'priority' hook param must be a positive integer"
+            )
 
         return value
 

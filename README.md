@@ -61,6 +61,12 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 1.0.0 (May 2022)
+
+- Drops Python 3.6 support
+- Adds `priority` hook kwarg to control the order in which hooked methods fire. Thanks @EnriqueSoria!
+- Internal cleanup/refactoring. Thanks @EnriqueSoria!
+
 ## 0.9.6 (February 2022)
 
 - Adds missing `packaging` to `install_requires`. Thanks @mikedep333!

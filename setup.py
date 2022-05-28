@@ -2,9 +2,9 @@
 import codecs
 import os
 import re
+from codecs import open
 
 from setuptools import setup
-from codecs import open
 
 
 def get_metadata(package, field):
@@ -27,8 +27,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.5",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
