@@ -26,8 +26,8 @@ class UserAccountTestCase(TestCase):
     def test_send_welcome_email_after_create(self):
         with capture_on_commit_callbacks(execute=True) as callbacks:
             UserAccount.objects.create(**self.stub_data)
-        
-        self.assertEquals(len(callbacks), 1, msg=f"{callbacks}")
+
+        self.assertEqual(len(callbacks), 1, msg=f"{callbacks}")
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Welcome!")
 
@@ -86,8 +86,8 @@ class UserAccountTestCase(TestCase):
             org.save()
 
             account.save()
-        
-        self.assertEquals(len(callbacks), 1)
+
+        self.assertEqual(len(callbacks), 1)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject, "The name of your organization has changed!"
@@ -115,7 +115,7 @@ class UserAccountTestCase(TestCase):
 
             account.save()
 
-        self.assertEquals(len(callbacks), 1, msg="Only one hook should be an on_commit callback")
+        self.assertEqual(len(callbacks), 1, msg="Only one hook should be an on_commit callback")
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             mail.outbox[1].subject, "The name of your organization has changed!"
@@ -179,9 +179,10 @@ class UserAccountTestCase(TestCase):
 
     def test_delete_should_return_default_django_value(self):
         """
-        Hooked method that auto-lowercases email should be skipped.
+        Note that `QuerySet.delete()` does a bulk delete and does not call any `delete()` methods on your models.
         """
-        UserAccount.objects.create(**self.stub_data)
-        value = UserAccount.objects.all().delete()
+        account = UserAccount.objects.create(**self.stub_data)
+        count, count_per_type = account.delete()
 
-        self.assertEqual(value, (1, {"testapp.UserAccount": 1}))
+        self.assertEqual(count, 1)
+        self.assertEqual(count_per_type["testapp.UserAccount"], 1)
