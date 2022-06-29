@@ -29,17 +29,13 @@ class HookConfig(Validations):
 
     def validate_hook(self, value, **kwargs):
         if value not in VALID_HOOKS:
-            raise DjangoLifeCycleException(
-                "%s is not a valid hook; must be one of %s" % (hook, VALID_HOOKS)
-            )
+            raise DjangoLifeCycleException(f"{hook} is not a valid hook; must be one of {VALID_HOOKS}")
 
         return value
 
     def validate_when(self, value, **kwargs):
         if value is not None and not isinstance(value, str):
-            raise DjangoLifeCycleException(
-                "'when' hook param must be a string matching the name of a model field"
-            )
+            raise DjangoLifeCycleException("'when' hook param must be a string matching the name of a model field")
 
         return value
 
@@ -47,18 +43,13 @@ class HookConfig(Validations):
         if value is None:
             return
 
-        when_any_error_msg = (
-            "'when_any' hook param must be a list of strings "
-            "matching the names of model fields"
-        )
+        when_any_error_msg = "'when_any' hook param must be a list of strings " "matching the names of model fields"
 
         if not isinstance(value, list):
             raise DjangoLifeCycleException(when_any_error_msg)
 
         if len(value) == 0:
-            raise DjangoLifeCycleException(
-                "'when_any' hook param must contain at least one field name"
-            )
+            raise DjangoLifeCycleException("'when_any' hook param must contain at least one field name")
 
         for field_name in value:
             if not isinstance(field_name, str):
@@ -83,23 +74,17 @@ class HookConfig(Validations):
 
     def validate_priority(self, value, **kwargs):
         if self.priority < 0:
-            raise DjangoLifeCycleException(
-                "'priority' hook param must be a positive integer"
-            )
+            raise DjangoLifeCycleException("'priority' hook param must be a positive integer")
 
         return value
 
     def validate_on_commit_only_for_after_hooks(self):
         if self.on_commit and not self.hook.startswith("after_"):
-            raise DjangoLifeCycleException(
-                "'on_commit' hook param is only valid with AFTER_* hooks"
-            )
+            raise DjangoLifeCycleException("'on_commit' hook param is only valid with AFTER_* hooks")
 
     def validate_when_and_when_any(self):
         if self.when is not None and self.when_any is not None:
-            raise DjangoLifeCycleException(
-                "Can pass either 'when' or 'when_any' but not both"
-            )
+            raise DjangoLifeCycleException("Can pass either 'when' or 'when_any' but not both")
 
     def validate(self):
         self.validate_when_and_when_any()

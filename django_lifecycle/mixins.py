@@ -32,7 +32,7 @@ class HookedMethod(AbstractHookedMethod):
 
 
 class OnCommitHookedMethod(AbstractHookedMethod):
-    """ Hooked method that should run on_commit """
+    """Hooked method that should run on_commit"""
 
     @property
     def name(self) -> str:
@@ -56,7 +56,7 @@ def instantiate_hooked_method(method: Any, callback_specs: HookConfig) -> Abstra
     )
 
 
-class LifecycleModelMixin(object):
+class LifecycleModelMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._initial_state = self._snapshot_state()
@@ -223,16 +223,11 @@ class LifecycleModelMixin(object):
     def _watched_fk_models(cls) -> List[str]:
         return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
-
     def _get_hooked_methods(self, hook: str, **kwargs) -> List[AbstractHookedMethod]:
         """
-        Iterate through decorated methods to find those that should be
-        triggered by the current hook. If conditions exist, check them before
-        adding it to the list of methods to fire.
-
-        Then, sort the list.
+        Iterate through decorated methods to find those that should be triggered by the current hook. If conditions
+        exist, check them before adding it to the list of methods to fire. Then, sort the list.
         """
-
         hooked_methods = []
 
         for method in self._potentially_hooked_methods():
@@ -242,17 +237,21 @@ class LifecycleModelMixin(object):
 
                 when_field = callback_specs.when
                 when_any_field = callback_specs.when_any
+                has_changed_field = callback_specs.has_changed
+
                 update_fields = kwargs.get("update_fields", None)
+
                 is_partial_fields_update = update_fields is not None
+
+                if has_changed_field is not None and when_field is None and when_field is None:
+                    if not bool(self._diff_with_initial):
+                        continue
 
                 if when_field:
                     if not self._check_callback_conditions(
                         when_field,
                         callback_specs,
-                        is_synced=(
-                            is_partial_fields_update is False
-                            or when_field in update_fields
-                        ),
+                        is_synced=(is_partial_fields_update is False or when_field in update_fields),
                     ):
                         continue
                 elif when_any_field:
@@ -262,10 +261,7 @@ class LifecycleModelMixin(object):
                         if self._check_callback_conditions(
                             field_name,
                             callback_specs,
-                            is_synced=(
-                                is_partial_fields_update is False
-                                or field_name in update_fields
-                            ),
+                            is_synced=(is_partial_fields_update is False or field_name in update_fields),
                         ):
                             any_condition_matched = True
                             break
@@ -282,7 +278,7 @@ class LifecycleModelMixin(object):
         return sorted(hooked_methods)
 
     def _run_hooked_methods(self, hook: str, **kwargs) -> List[str]:
-        """ Run hooked methods """
+        """Run hooked methods"""
         fired = []
 
         for method in self._get_hooked_methods(hook, **kwargs):
@@ -291,9 +287,7 @@ class LifecycleModelMixin(object):
 
         return fired
 
-    def _check_callback_conditions(
-        self, field_name: str, specs: dict, is_synced: bool
-    ) -> bool:
+    def _check_callback_conditions(self, field_name: str, specs: HookConfig, is_synced: bool) -> bool:
         if not self._check_has_changed(field_name, specs, is_synced):
             return False
 
@@ -335,9 +329,7 @@ class LifecycleModelMixin(object):
         was_not = specs.was_not
         return was_not is NotSet or self.initial_value(field_name) != was_not
 
-    def _check_changes_to_condition(
-        self, field_name: str, specs: HookConfig, is_synced: bool
-    ) -> bool:
+    def _check_changes_to_condition(self, field_name: str, specs: HookConfig, is_synced: bool) -> bool:
         if not is_synced:
             return False
 
@@ -345,10 +337,7 @@ class LifecycleModelMixin(object):
         return any(
             [
                 changes_to is NotSet,
-                (
-                    self.initial_value(field_name) != changes_to
-                    and self._current_value(field_name) == changes_to
-                ),
+                (self.initial_value(field_name) != changes_to and self._current_value(field_name) == changes_to),
             ]
         )
 
@@ -364,9 +353,7 @@ class LifecycleModelMixin(object):
         for name in dir(cls):
             attr = getattr(cls, name, None)
 
-            if attr and (
-                isinstance(attr, property) or isinstance(attr, cached_property)
-            ):
+            if attr and (isinstance(attr, property) or isinstance(attr, cached_property)):
                 property_names.append(name)
 
         return property_names

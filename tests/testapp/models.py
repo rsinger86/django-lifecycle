@@ -54,20 +54,18 @@ class UserAccount(LifecycleModel):
     @hook("after_create", on_commit=True)
     def do_after_create_jobs(self):
         # queue background job to process thumbnail image...
-        mail.send_mail(
-            "Welcome!", "Thank you for joining.", "from@example.com", ["to@example.com"]
-        )
+        mail.send_mail("Welcome!", "Thank you for joining.", "from@example.com", ["to@example.com"])
 
     @hook("before_update", when="password", has_changed=True)
     def timestamp_password_change(self):
         self.password_updated_at = timezone.now()
 
-    @hook('before_update', when='first_name', has_changed=True)
-    @hook('before_update', when='last_name', has_changed=True)
+    @hook("before_update", when="first_name", has_changed=True)
+    @hook("before_update", when="last_name", has_changed=True)
     def count_name_changes(self):
         self.name_changes += 1
 
-    @hook("before_delete", when='has_trial', was='*', is_now=True)
+    @hook("before_delete", when="has_trial", was="*", is_now=True)
     def ensure_trial_not_active(self):
         raise CannotDeleteActiveTrial("Cannot delete trial user!")
 

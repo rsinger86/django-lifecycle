@@ -7,7 +7,7 @@ from django_lifecycle.priority import HIGHEST_PRIORITY, LOWER_PRIORITY
 
 class DecoratorTests(TestCase):
     def test_decorate_with_multiple_hooks(self):
-        class FakeModel(object):
+        class FakeModel:
             @hook("after_create")
             @hook("after_delete")
             def multiple_hooks(self):
@@ -23,7 +23,6 @@ class DecoratorTests(TestCase):
 
     def test_priority_hooks(self):
         class FakeModel(LifecycleModelMixin, models.Model):
-
             @hook(AFTER_CREATE)
             def mid_priority(self):
                 pass

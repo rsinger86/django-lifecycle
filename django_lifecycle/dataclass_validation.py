@@ -28,5 +28,5 @@ class Validations:
 
         validate = getattr(self, "validate", None)
         if callable(validate):
-            logger.debug(f"Calling validator: validate")
+            logger.debug(f"Calling validator: {validate}")
             validate()

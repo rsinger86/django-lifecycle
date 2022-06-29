@@ -49,15 +49,10 @@ class LifecycleMixinTests(TestCase):
         )
 
     def test_initial_value_for_fk_model_field(self):
-        UserAccount.objects.create(
-            **self.stub_data,
-            organization=Organization.objects.create(name="Dunder Mifflin")
-        )
+        UserAccount.objects.create(**self.stub_data, organization=Organization.objects.create(name="Dunder Mifflin"))
 
         user_account = UserAccount.objects.get()
-        self.assertEqual(
-            user_account.initial_value("organization.name"), "Dunder Mifflin"
-        )
+        self.assertEqual(user_account.initial_value("organization.name"), "Dunder Mifflin")
 
     def test_initial_value_if_field_has_changed(self):
         data = self.stub_data
@@ -80,17 +75,13 @@ class LifecycleMixinTests(TestCase):
         UserAccount.objects.create(**self.stub_data, organization=org)
         user_account = UserAccount.objects.get()
 
-        self.assertEqual(
-            user_account._current_value("organization.name"), "Dunder Mifflin"
-        )
+        self.assertEqual(user_account._current_value("organization.name"), "Dunder Mifflin")
 
         org.name = "Dwight's Paper Empire"
         org.save()
         user_account._clear_watched_fk_model_cache()
 
-        self.assertEqual(
-            user_account._current_value("organization.name"), "Dwight's Paper Empire"
-        )
+        self.assertEqual(user_account._current_value("organization.name"), "Dwight's Paper Empire")
 
     def test_run_hooked_methods_for_when(self):
         instance = UserAccount(first_name="Bob")
@@ -100,15 +91,35 @@ class LifecycleMixinTests(TestCase):
                 MagicMock(
                     __name__="method_that_does_fires",
                     _hooked=[
-                        HookConfig(hook="after_create", when="first_name", when_any=None, has_changed=None, is_now="Bob",
-                             is_not=NotSet, was="*", was_not=NotSet, changes_to=NotSet, priority=DEFAULT_PRIORITY)
+                        HookConfig(
+                            hook="after_create",
+                            when="first_name",
+                            when_any=None,
+                            has_changed=None,
+                            is_now="Bob",
+                            is_not=NotSet,
+                            was="*",
+                            was_not=NotSet,
+                            changes_to=NotSet,
+                            priority=DEFAULT_PRIORITY,
+                        )
                     ],
                 ),
                 MagicMock(
                     __name__="method_that_does_not_fire",
                     _hooked=[
-                        HookConfig(hook="after_create", when="first_name", when_any=None, has_changed=None, is_now="Bill",
-                             is_not=NotSet, was="*", was_not=NotSet, changes_to=NotSet, priority=DEFAULT_PRIORITY)
+                        HookConfig(
+                            hook="after_create",
+                            when="first_name",
+                            when_any=None,
+                            has_changed=None,
+                            is_now="Bill",
+                            is_not=NotSet,
+                            was="*",
+                            was_not=NotSet,
+                            changes_to=NotSet,
+                            priority=DEFAULT_PRIORITY,
+                        )
                     ],
                 ),
             ]
@@ -124,15 +135,35 @@ class LifecycleMixinTests(TestCase):
                 MagicMock(
                     __name__="method_that_does_fires",
                     _hooked=[
-                        HookConfig(hook="after_create", when=None, when_any=["first_name", "last_name", "password"],
-                             has_changed=None, is_now="Bob", is_not=NotSet, was="*", was_not=NotSet, changes_to=NotSet, priority=DEFAULT_PRIORITY)
+                        HookConfig(
+                            hook="after_create",
+                            when=None,
+                            when_any=["first_name", "last_name", "password"],
+                            has_changed=None,
+                            is_now="Bob",
+                            is_not=NotSet,
+                            was="*",
+                            was_not=NotSet,
+                            changes_to=NotSet,
+                            priority=DEFAULT_PRIORITY,
+                        )
                     ],
                 ),
                 MagicMock(
                     __name__="method_that_does_not_fire",
                     _hooked=[
-                        HookConfig(hook="after_create", when="first_name", when_any=None, has_changed=None, is_now="Bill",
-                             is_not=NotSet, was="*", was_not=NotSet, changes_to=NotSet, priority=DEFAULT_PRIORITY)
+                        HookConfig(
+                            hook="after_create",
+                            when="first_name",
+                            when_any=None,
+                            has_changed=None,
+                            is_now="Bill",
+                            is_not=NotSet,
+                            was="*",
+                            was_not=NotSet,
+                            changes_to=NotSet,
+                            priority=DEFAULT_PRIORITY,
+                        )
                     ],
                 ),
             ]
@@ -278,9 +309,7 @@ class LifecycleMixinTests(TestCase):
         data = self.stub_data
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        with self.assertRaises(
-            CannotRename, msg="Oh, not Flanders. Anybody but Flanders."
-        ):
+        with self.assertRaises(CannotRename, msg="Oh, not Flanders. Anybody but Flanders."):
             user_account.last_name = "Flanders"
             user_account.save()
 
@@ -288,9 +317,7 @@ class LifecycleMixinTests(TestCase):
         user_account = UserAccount.objects.create(**self.stub_data)
         user_account.first_name = "Flanders"
         user_account.last_name = "Flanders"
-        with self.assertRaises(
-            CannotRename, msg="Oh, not Flanders. Anybody but Flanders."
-        ):
+        with self.assertRaises(CannotRename, msg="Oh, not Flanders. Anybody but Flanders."):
             user_account.last_name = "Flanders"
             user_account.save(update_fields=["last_name"])
 
@@ -300,9 +327,7 @@ class LifecycleMixinTests(TestCase):
         user_account = UserAccount.objects.create(**self.stub_data)
         user_account.first_name = "Flanders"
         user_account.last_name = "Flanders"
-        user_account.save(
-            update_fields=["first_name"]
-        )  # `CannotRename` exception is not raised
+        user_account.save(update_fields=["first_name"])  # `CannotRename` exception is not raised
 
         user_account.refresh_from_db()
         self.assertEqual(user_account.first_name, "Flanders")
@@ -345,40 +370,91 @@ class LifecycleMixinTests(TestCase):
         instance = UserAccount(first_name="Bob")
 
         instance._potentially_hooked_methods = MagicMock(
-            return_value = [
+            return_value=[
                 MagicMock(
                     __name__="method_that_fires_on_commit",
                     _hooked=[
-                        HookConfig(hook="after_create", when=None, when_any=None, has_changed=None, is_now="*", is_not=NotSet,
-                             was="*", was_not=NotSet, changes_to=NotSet, on_commit=True, priority=DEFAULT_PRIORITY)
+                        HookConfig(
+                            hook="after_create",
+                            when=None,
+                            when_any=None,
+                            has_changed=None,
+                            is_now="*",
+                            is_not=NotSet,
+                            was="*",
+                            was_not=NotSet,
+                            changes_to=NotSet,
+                            on_commit=True,
+                            priority=DEFAULT_PRIORITY,
+                        )
                     ],
                 ),
                 MagicMock(
                     __name__="method_that_fires_in_transaction",
                     _hooked=[
-                        HookConfig(hook="after_create", when=None, when_any=None, has_changed=None, is_now="*", is_not=NotSet,
-                             was="*", was_not=NotSet, changes_to=NotSet, on_commit=False, priority=DEFAULT_PRIORITY)
+                        HookConfig(
+                            hook="after_create",
+                            when=None,
+                            when_any=None,
+                            has_changed=None,
+                            is_now="*",
+                            is_not=NotSet,
+                            was="*",
+                            was_not=NotSet,
+                            changes_to=NotSet,
+                            on_commit=False,
+                            priority=DEFAULT_PRIORITY,
+                        )
                     ],
                 ),
                 MagicMock(
                     __name__="method_that_fires_in_default",
                     _hooked=[
-                        HookConfig(hook="after_create", when=None, when_any=None, has_changed=None, is_now="*", is_not=NotSet,
-                             was="*", was_not=NotSet, changes_to=NotSet, on_commit=None, priority=DEFAULT_PRIORITY)
+                        HookConfig(
+                            hook="after_create",
+                            when=None,
+                            when_any=None,
+                            has_changed=None,
+                            is_now="*",
+                            is_not=NotSet,
+                            was="*",
+                            was_not=NotSet,
+                            changes_to=NotSet,
+                            on_commit=None,
+                            priority=DEFAULT_PRIORITY,
+                        )
                     ],
                 ),
                 MagicMock(
                     __name__="after_save_method_that_fires_on_commit",
                     _hooked=[
-                        HookConfig(hook="after_save", when=None, when_any=None, has_changed=None, is_now="*", is_not=NotSet,
-                             was="*", was_not=NotSet, changes_to=NotSet, on_commit=True, priority=DEFAULT_PRIORITY)
+                        HookConfig(
+                            hook="after_save",
+                            when=None,
+                            when_any=None,
+                            has_changed=None,
+                            is_now="*",
+                            is_not=NotSet,
+                            was="*",
+                            was_not=NotSet,
+                            changes_to=NotSet,
+                            on_commit=True,
+                            priority=DEFAULT_PRIORITY,
+                        )
                     ],
                 ),
             ]
         )
 
         fired_methods = instance._run_hooked_methods("after_create")
-        self.assertEqual(fired_methods, ["method_that_fires_on_commit_on_commit", "method_that_fires_in_transaction", "method_that_fires_in_default"])
+        self.assertEqual(
+            fired_methods,
+            [
+                "method_that_fires_on_commit_on_commit",
+                "method_that_fires_in_transaction",
+                "method_that_fires_in_default",
+            ],
+        )
 
         fired_methods = instance._run_hooked_methods("after_save")
         self.assertEqual(fired_methods, ["after_save_method_that_fires_on_commit_on_commit"])

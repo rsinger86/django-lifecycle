@@ -12,13 +12,11 @@ def get_metadata(package, field):
     Return package data as listed in `__{field}__` in `init.py`.
     """
     init_py = codecs.open(os.path.join(package, "__init__.py"), encoding="utf-8").read()
-    return re.search(
-        "^__{}__ = ['\"]([^'\"]+)['\"]".format(field), init_py, re.MULTILINE
-    ).group(1)
+    return re.search(f"^__{field}__ = ['\"]([^'\"]+)['\"]", init_py, re.MULTILINE).group(1)
 
 
-def readme():
-    with open("README.md", "r") as infile:
+def readme() -> str:
+    with open("README.md") as infile:
         return infile.read()
 
 

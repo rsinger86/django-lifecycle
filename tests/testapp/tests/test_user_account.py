@@ -26,8 +26,8 @@ class UserAccountTestCase(TestCase):
     def test_send_welcome_email_after_create(self):
         with capture_on_commit_callbacks(execute=True) as callbacks:
             UserAccount.objects.create(**self.stub_data)
-        
-        self.assertEquals(len(callbacks), 1, msg=f"{callbacks}")
+
+        self.assertEqual(len(callbacks), 1, msg=f"{callbacks}")
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Welcome!")
 
@@ -86,12 +86,10 @@ class UserAccountTestCase(TestCase):
             org.save()
 
             account.save()
-        
-        self.assertEquals(len(callbacks), 1)
+
+        self.assertEqual(len(callbacks), 1)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(
-            mail.outbox[0].subject, "The name of your organization has changed!"
-        )
+        self.assertEqual(mail.outbox[0].subject, "The name of your organization has changed!")
 
     def test_no_notify_sent_if_org_name_has_not_changed(self):
         org = Organization.objects.create(name="Hogwarts")
@@ -115,11 +113,9 @@ class UserAccountTestCase(TestCase):
 
             account.save()
 
-        self.assertEquals(len(callbacks), 1, msg="Only one hook should be an on_commit callback")
+        self.assertEqual(len(callbacks), 1, msg="Only one hook should be an on_commit callback")
         self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(
-            mail.outbox[1].subject, "The name of your organization has changed!"
-        )
+        self.assertEqual(mail.outbox[1].subject, "The name of your organization has changed!")
         self.assertEqual(mail.outbox[0].subject, "You were moved to our online school!")
 
     def test_email_user_about_name_change(self):
@@ -127,9 +123,7 @@ class UserAccountTestCase(TestCase):
         mail.outbox = []
         account.first_name = "Homer the Great"
         account.save()
-        self.assertEqual(
-            mail.outbox[0].body, "You changed your first name or your last name"
-        )
+        self.assertEqual(mail.outbox[0].body, "You changed your first name or your last name")
 
     def test_does_not_email_user_about_name_change_when_name_excluded_from_update_fields(self):
         account = UserAccount.objects.create(**self.stub_data)
@@ -150,9 +144,7 @@ class UserAccountTestCase(TestCase):
 
         old_password_updated_at = account.password_updated_at
         account.save(update_fields=["first_name", "password"])
-        self.assertEqual(
-            mail.outbox[0].body, "You changed your first name or your last name"
-        )
+        self.assertEqual(mail.outbox[0].body, "You changed your first name or your last name")
         self.assertNotEqual(account.password_updated_at, old_password_updated_at)  # Both hooks fired.
 
     def test_empty_update_fields_does_not_fire_any_hooks(self):

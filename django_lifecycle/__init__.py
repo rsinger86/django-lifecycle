@@ -5,7 +5,7 @@ __author__ = "Robert Singer"
 __author_email__ = "robertgsinger@gmail.com"
 
 
-class NotSet(object):
+class NotSet:
     pass
 
 
