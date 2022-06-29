@@ -1,0 +1,37 @@
+---
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+
+      - name: Lint
+        continue-on-error: true
+        run: |
+          pip install black flake8
+          flake8 django-lifecycle tests
+          black --check django-lifecyle tests
+
+      - name: Run tests
+        run: |
+          pip install tox
+          tox -e py
