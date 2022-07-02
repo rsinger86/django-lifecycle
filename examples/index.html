@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.3">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-4.6.3">
     
     
       
@@ -512,6 +512,13 @@ When a user is first created, you could process a thumbnail image in the backgro
 </code></pre></div>
 
 
+<p>Or if you want to enqueue a background job that depends on state being committed to your database</p>
+<div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span><span class="n">AFTER_CREATE</span><span class="p">,</span> <span class="n">on_commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">do_after_create_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">enqueue_job</span><span class="p">(</span><span class="n">send_item_shipped_notication</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_id</span><span class="p">)</span>
+</code></pre></div>
+
+
 <p>Read on to see how to only fire the hooked method if certain conditions about the model's current and previous state are met.</p>
 <h2 id="transitions-between-specific-values">Transitions between specific values<a class="headerlink" href="#transitions-between-specific-values" title="Permanent link">&para;</a></h2>
 <p>Maybe you only want the hooked method to run under certain circumstances related to the state of your model. If a model's <code>status</code> field change from <code>"active"</code> to <code>"banned"</code>, you may want to send an email to the user:</p>
@@ -675,7 +682,7 @@ same value. The sample above is equal to:</p>
     
       <script src="../assets/javascripts/application.c33a9706.js"></script>
       
-      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      <script>app.initialize({version:"1.2.3",url:{base:".."}})</script>
       
     
   </body>

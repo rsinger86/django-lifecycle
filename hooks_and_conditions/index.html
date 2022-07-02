@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.3">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-4.6.3">
     
     
       
@@ -390,19 +390,21 @@
                 
                 <h1 id="available-hooks-conditions">Available Hooks &amp; Conditions<a class="headerlink" href="#available-hooks-conditions" title="Permanent link">&para;</a></h1>
 <p>You can hook into one or more lifecycle moments by adding the <code>@hook</code> decorator to a model's method. The moment name
- is passed as the first positional argument, <code>@hook(BEFORE_CREATE)</code>, and optional keyword arguments can be passed to
-  set up conditions for when the method should fire.</p>
+is passed as the first positional argument, <code>@hook(BEFORE_CREATE)</code>, and optional keyword arguments can be passed to
+set up conditions for when the method should fire.</p>
 <h2 id="decorator-signature">Decorator Signature<a class="headerlink" href="#decorator-signature" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span><code>    <span class="nd">@hook</span><span class="p">(</span>
-        <span class="n">moment</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
-        <span class="n">when</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
-        <span class="n">when_any</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+        <span class="n">moment</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">when</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">when_any</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">has_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">is_now</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
         <span class="n">is_not</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">was</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> 
+        <span class="n">was</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
         <span class="n">was_not</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">changes_to</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_PRIORITY</span><span class="p">,</span>
+        <span class="n">on_commit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
 </code></pre></div>
 
@@ -461,7 +463,7 @@
 </tbody>
 </table>
 <p>All of hook constants are strings containing the specific hook name, for example <code>AFTER_UPDATE</code> is string
- <code>"after_update"</code> - preferably way is to use hook constant.  </p>
+<code>"after_update"</code> - preferably way is to use hook constant.</p>
 <h2 id="condition-keyword-arguments">Condition Keyword Arguments<a class="headerlink" href="#condition-keyword-arguments" title="Permanent link">&para;</a></h2>
 <p>If you do not use any conditional parameters, the hook will fire every time the lifecycle moment occurs. You can use the keyword arguments below to conditionally fire the method depending on the initial or current state of a model instance's fields.</p>
 <table>
@@ -512,6 +514,16 @@
 <td align="center">changes_to</td>
 <td align="center">Any</td>
 <td align="center">Only fire the hooked method if the value of the <code>when</code> field was NOT equal to this value when first initialized but is currently equal to this value.</td>
+</tr>
+<tr>
+<td align="center">priority</td>
+<td align="center">int</td>
+<td align="center">Specify the priority, useful when some hooked methods depend on other ones.</td>
+</tr>
+<tr>
+<td align="center">on_commit</td>
+<td align="center">bool</td>
+<td align="center">When <code>True</code> only fire the hooked method after the current database transaction has been commited or not at all. (Only applies to <code>AFTER_*</code> hooks)</td>
 </tr>
 </tbody>
 </table>
@@ -587,7 +599,7 @@
     
       <script src="../assets/javascripts/application.c33a9706.js"></script>
       
-      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      <script>app.initialize({version:"1.2.3",url:{base:".."}})</script>
       
     
   </body>
