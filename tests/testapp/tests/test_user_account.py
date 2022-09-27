@@ -1,12 +1,17 @@
 import datetime
+from re import A
 
 from django.core import mail
 from django.test import TestCase
 
-from django_capture_on_commit_callbacks import capture_on_commit_callbacks
-
 from tests.testapp.models import CannotDeleteActiveTrial, Organization, UserAccount
 
+
+# Note: Can't use contextlib.supress in Python 2
+try: 
+    from django_capture_on_commit_callbacks import capture_on_commit_callbacks
+except ImportError:
+    pass
 
 class UserAccountTestCase(TestCase):
     @property
@@ -24,8 +29,13 @@ class UserAccountTestCase(TestCase):
         self.assertTrue(isinstance(account.joined_at, datetime.datetime))
 
     def test_send_welcome_email_after_create(self):
-        with capture_on_commit_callbacks(execute=True) as callbacks:
-            UserAccount.objects.create(**self.stub_data)
+
+        if hasattr(self, "captureOnCommitCallbacks"):
+            with self.captureOnCommitCallbacks(execute=True) as callbacks:
+              UserAccount.objects.create(**self.stub_data)
+        else:
+            with capture_on_commit_callbacks(execute=True) as callbacks:
+              UserAccount.objects.create(**self.stub_data)
         
         self.assertEquals(len(callbacks), 1, msg=f"{callbacks}")
         self.assertEqual(len(mail.outbox), 1)
@@ -81,11 +91,19 @@ class UserAccountTestCase(TestCase):
 
         account = UserAccount.objects.get()
 
-        with capture_on_commit_callbacks(execute=True) as callbacks:
-            org.name = "Coursera Wizardry"
-            org.save()
 
-            account.save()
+        if hasattr(self, "captureOnCommitCallbacks"):
+            with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                org.name = "Coursera Wizardry"
+                org.save()
+
+                account.save()
+        else:
+            with capture_on_commit_callbacks(execute=True) as callbacks:
+                org.name = "Coursera Wizardry"
+                org.save()
+
+                account.save()
         
         self.assertEquals(len(callbacks), 1)
         self.assertEqual(len(mail.outbox), 1)
@@ -107,13 +125,18 @@ class UserAccountTestCase(TestCase):
 
         mail.outbox = []
 
-        with capture_on_commit_callbacks(execute=True) as callbacks:
-            account = UserAccount.objects.get()
-
-            org.name = "Hogwarts Online"
-            org.save()
-
-            account.save()
+        if hasattr(self, "captureOnCommitCallbacks"):
+            with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                account = UserAccount.objects.get()
+                org.name = "Hogwarts Online"
+                org.save()
+                account.save()
+        else:
+            with capture_on_commit_callbacks(execute=True) as callbacks:
+                account = UserAccount.objects.get()
+                org.name = "Hogwarts Online"
+                org.save()
+                account.save()
 
         self.assertEquals(len(callbacks), 1, msg="Only one hook should be an on_commit callback")
         self.assertEqual(len(mail.outbox), 2)
