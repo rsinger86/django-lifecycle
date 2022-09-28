@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 from re import A
 
@@ -8,10 +9,8 @@ from tests.testapp.models import CannotDeleteActiveTrial, Organization, UserAcco
 
 
 # Note: Can't use contextlib.supress in Python 2
-try: 
+with contextlib.suppress(ImportError):
     from django_capture_on_commit_callbacks import capture_on_commit_callbacks
-except ImportError:
-    pass
 
 class UserAccountTestCase(TestCase):
     @property
