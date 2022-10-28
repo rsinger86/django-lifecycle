@@ -26,8 +26,8 @@ class UserAccountTestCase(TestCase):
     def test_send_welcome_email_after_create(self):
         with capture_on_commit_callbacks(execute=True) as callbacks:
             UserAccount.objects.create(**self.stub_data)
-        
-        self.assertEquals(len(callbacks), 1, msg=f"{callbacks}")
+
+        self.assertEquals(len(callbacks), 2, msg=f"{callbacks}")
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Welcome!")
 
@@ -86,8 +86,8 @@ class UserAccountTestCase(TestCase):
             org.save()
 
             account.save()
-        
-        self.assertEquals(len(callbacks), 1)
+
+        self.assertEquals(len(callbacks), 3)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject, "The name of your organization has changed!"
@@ -115,7 +115,7 @@ class UserAccountTestCase(TestCase):
 
             account.save()
 
-        self.assertEquals(len(callbacks), 1, msg="Only one hook should be an on_commit callback")
+        self.assertEquals(len(callbacks), 3, msg="One hook and the _reset_initial_state (2) should be in the on_commit callbacks")
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             mail.outbox[1].subject, "The name of your organization has changed!"

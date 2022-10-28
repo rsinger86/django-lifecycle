@@ -148,6 +148,9 @@ class LifecycleModelMixin(object):
             if field.is_relation and field.is_cached(self):
                 field.delete_cached_value(self)
 
+    def _reset_initial_state(self):
+        self._initial_state = self._snapshot_state()
+
     @transaction.atomic
     def save(self, *args, **kwargs):
         skip_hooks = kwargs.pop("skip_hooks", False)
@@ -174,7 +177,7 @@ class LifecycleModelMixin(object):
         else:
             self._run_hooked_methods(AFTER_UPDATE, **kwargs)
 
-        self._initial_state = self._snapshot_state()
+        transaction.on_commit(self._reset_initial_state)
 
     @transaction.atomic
     def delete(self, *args, **kwargs):

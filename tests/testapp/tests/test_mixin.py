@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 from django.test import TestCase
 
+from django_capture_on_commit_callbacks import capture_on_commit_callbacks
 from django_lifecycle import NotSet
 from django_lifecycle.priority import DEFAULT_PRIORITY
 from django_lifecycle.decorators import HookConfig
@@ -338,7 +339,9 @@ class LifecycleMixinTests(TestCase):
         account = UserAccount.objects.create(**data)
         account.first_name = "Maggie"
         self.assertTrue(account.has_changed("first_name"))
-        account.save()
+        with capture_on_commit_callbacks(execute=True) as callbacks:
+            account.save()
+        self.assertEquals(len(callbacks), 1, msg="Only the _reset_initial_state should be in the on_commit callbacks")
         self.assertFalse(account.has_changed("first_name"))
 
     def test_run_hooked_methods_for_on_commit(self):
