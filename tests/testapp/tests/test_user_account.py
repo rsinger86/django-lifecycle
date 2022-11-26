@@ -31,6 +31,21 @@ class UserAccountTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Welcome!")
 
+    def test_initial_values_on_commit_hook(self):
+        initial_email = "homer.simpson@springfieldnuclear.com"
+        account = UserAccount.objects.create(**self.stub_data, email=initial_email)
+
+        new_email = "homer.thompson@springfieldnuclear.com"
+        account.email = new_email
+        with capture_on_commit_callbacks(execute=True):
+            account.save()
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].body,
+            account.build_email_changed_body(old_email=initial_email, new_email=new_email)
+        )
+
     def test_email_banned_user_after_update(self):
         account = UserAccount.objects.create(status="active", **self.stub_data)
         account.refresh_from_db()

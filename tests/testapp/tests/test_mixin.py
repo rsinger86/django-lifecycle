@@ -377,6 +377,10 @@ class LifecycleMixinTests(TestCase):
                              was="*", was_not=NotSet, changes_to=NotSet, on_commit=True, priority=DEFAULT_PRIORITY)
                     ],
                 ),
+                MagicMock(
+                    __name__="after_save_method_that_fires_if_changed_on_commit",
+                    _hooked=[HookConfig(hook="after_save", has_changed=True, on_commit=True)],
+                ),
             ]
         )
 
@@ -384,4 +388,10 @@ class LifecycleMixinTests(TestCase):
         self.assertEqual(fired_methods, ["method_that_fires_on_commit_on_commit", "method_that_fires_in_transaction", "method_that_fires_in_default"])
 
         fired_methods = instance._run_hooked_methods("after_save")
-        self.assertEqual(fired_methods, ["after_save_method_that_fires_on_commit_on_commit"])
+        self.assertEqual(
+            fired_methods,
+            [
+                "after_save_method_that_fires_on_commit_on_commit",
+                "after_save_method_that_fires_if_changed_on_commit_on_commit",
+            ]
+        )
