@@ -62,12 +62,12 @@ class UserAccount(LifecycleModel):
     def timestamp_password_change(self):
         self.password_updated_at = timezone.now()
 
-    @hook('before_update', when='first_name', has_changed=True)
-    @hook('before_update', when='last_name', has_changed=True)
+    @hook("before_update", when="first_name", has_changed=True)
+    @hook("before_update", when="last_name", has_changed=True)
     def count_name_changes(self):
         self.name_changes += 1
 
-    @hook("before_delete", when='has_trial', was='*', is_now=True)
+    @hook("before_delete", when="has_trial", was="*", is_now=True)
     def ensure_trial_not_active(self):
         raise CannotDeleteActiveTrial("Cannot delete trial user!")
 
@@ -148,3 +148,19 @@ class ModelCustomPK(LifecycleModel):
     @hook("after_create")
     def answer_to_the_ultimate_question_of_life(self):
         self.answer = 42
+
+
+# Model stored in other database
+class Post(LifecycleModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    content = models.TextField(null=True)
+
+    @hook("after_create", on_commit=True)
+    def send_notification(self):
+        mail.send_mail(
+            "New Post!", "Click link below to have your latest post", "from@example.com", ["to@example.com"]
+        )
+
+
+    class Meta:
+        app_label = "post"
