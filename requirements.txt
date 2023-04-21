@@ -21,7 +21,7 @@ pytz==2018.3
 PyYAML==5.4
 pyyaml-env-tag==0.1
 six==1.14.0
-sqlparse==0.3.0
+sqlparse==0.4.4
 tornado==6.0.3
 urlman==1.2.0
 watchdog==2.1.6
