@@ -61,6 +61,11 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
+## 1.0.1 (August 2023)
+
+- Initial state gets reset using `transaction.on_commit()`, fixing the `has_changed()` and `initial_value()` methods for on_commit hooks. Thanks @alb3rto269!
+
+
 ## 1.0.0 (May 2022)
 
 - Drops Python 3.6 support
