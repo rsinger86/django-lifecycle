@@ -7,7 +7,7 @@
 
 This project provides a `@hook` decorator as well as a base model and mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is [Signals](https://docs.djangoproject.com/en/dev/topics/signals/). However, my team often finds that Signals introduce unnecessary indirection and are at odds with Django's "fat models" approach.
 
-**Django Lifecycle Hooks** supports Python 3.7, 3.8 and 3.9, Django 2.0.x, 2.1.x, 2.2.x, 3.0.x, 3.1.x, and 3.2.x.
+**Django Lifecycle Hooks** supports Python 3.7, 3.8, 3.9, and 3.10, Django 2.0.x, 2.1.x, 2.2.x, 3.0.x, 3.1.x, 3.2.x, 4.0.x, 4.1.x, and 4.2.x.
 
 In short, you can write model code like this:
 
@@ -60,6 +60,10 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 ---
 
 # Changelog
+
+## 1.0.2 (September 2023)
+
+- Correct package info to note that Django 4.0, 4.1, and 4.2 are supported.
 
 ## 1.0.1 (August 2023)
 
