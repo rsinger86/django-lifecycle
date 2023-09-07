@@ -3,7 +3,7 @@ from inspect import isfunction
 from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
-from django.db import transaction
+from django.db import transaction, router
 from django.utils.functional import cached_property
 
 from . import NotSet
@@ -45,7 +45,10 @@ class OnCommitHookedMethod(AbstractHookedMethod):
         # to ensure it's available to execute later.
         _on_commit_func = partial(self.method, instance)
         _on_commit_func.__name__ = self.name
-        transaction.on_commit(_on_commit_func)
+        transaction.on_commit(
+            _on_commit_func, 
+            using=router.db_for_write(instance.__class__, instance=instance)
+        )
 
 
 def instantiate_hooked_method(method: Any, callback_specs: HookConfig) -> AbstractHookedMethod:
