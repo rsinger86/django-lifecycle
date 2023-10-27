@@ -11,7 +11,8 @@ def get_metadata(package, field):
     """
     Return package data as listed in `__{field}__` in `init.py`.
     """
-    init_py = codecs.open(os.path.join(package, "__init__.py"), encoding="utf-8").read()
+    with codecs.open(os.path.join(package, "__init__.py"), encoding="utf-8") as fp:
+        init_py = fp.read()
     return re.search(
         "^__{}__ = ['\"]([^'\"]+)['\"]".format(field), init_py, re.MULTILINE
     ).group(1)
@@ -27,20 +28,17 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Framework :: Django",
-    "Framework :: Django :: 2.0",
-    "Framework :: Django :: 2.1",
-    "Framework :: Django :: 2.2",
-    "Framework :: Django :: 3.0",
-    "Framework :: Django :: 3.1",
     "Framework :: Django :: 3.2",
     "Framework :: Django :: 4.0",
     "Framework :: Django :: 4.1",
     "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
 ]
 setup(
     name="django-lifecycle",
@@ -55,5 +53,8 @@ setup(
     long_description=readme(),
     classifiers=classifiers,
     long_description_content_type="text/markdown",
-    install_requires=["Django>=2.0", "urlman>=1.2.0", "packaging>=21.0"],
+    install_requires=[
+        "Django>=3.2",
+        "urlman>=1.2.0",
+    ],
 )

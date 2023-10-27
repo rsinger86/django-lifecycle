@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 
 import django
-from packaging.version import Version
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,18 +33,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "tests.testapp",
     "django.contrib.messages",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
-    "tests.testapp",
 ]
-
-# Django 1.8 requires that abstract model app is in INSTALLED_APPS
-if Version("1.8") <= Version(django.__version__) < Version("1.9"):
-    INSTALLED_APPS.append("django_lifecycle")
-
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -111,7 +105,8 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_L10N = True
+if django.VERSION < (4, 0):
+    USE_L10N = True
 
 USE_TZ = True
 
