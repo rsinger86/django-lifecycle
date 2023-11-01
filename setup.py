@@ -55,5 +55,6 @@ setup(
     long_description=readme(),
     classifiers=classifiers,
     long_description_content_type="text/markdown",
-    install_requires=["Django>=2.0", "urlman>=1.2.0", "packaging>=21.0"],
+    install_requires=["Django>=2.0", "packaging>=21.0"],
+    tests_require=["urlman>=1.2.0"]
 )
