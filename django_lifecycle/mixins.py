@@ -4,11 +4,17 @@ from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import transaction
+from django.db.models.fields.related_descriptors import (
+    ForwardManyToOneDescriptor,
+    ReverseOneToOneDescriptor,
+    ReverseManyToOneDescriptor,
+    ManyToManyDescriptor,
+    ForwardOneToOneDescriptor,
+)
 from django.utils.functional import cached_property
 
 from . import NotSet
 from .abstract import AbstractHookedMethod
-from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
 from .decorators import HookConfig
 from .hooks import (
     BEFORE_CREATE,
@@ -19,6 +25,15 @@ from .hooks import (
     AFTER_UPDATE,
     AFTER_SAVE,
     AFTER_DELETE,
+)
+
+
+DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = (
+    ForwardManyToOneDescriptor,
+    ForwardOneToOneDescriptor,
+    ManyToManyDescriptor,
+    ReverseManyToOneDescriptor,
+    ReverseOneToOneDescriptor,
 )
 
 
