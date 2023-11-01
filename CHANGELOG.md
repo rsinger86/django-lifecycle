@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.3 (November 2023)
+## 1.1.0 (November 2023)
 
 - Drop support for Django < 2.2.
 - Confirm support for Django 5.0. Thanks @adamchainz!
