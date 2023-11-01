@@ -50,6 +50,10 @@ setup(
     author_email=get_metadata("django_lifecycle", "author_email"),
     packages=["django_lifecycle"],
     url="https://github.com/rsinger86/django-lifecycle",
+    project_urls={
+        "Documentation": "https://rsinger86.github.io/django-lifecycle/",
+        "Source": "https://github.com/rsinger86/django-lifecycle",
+    },
     license="MIT",
     keywords="django model lifecycle hooks callbacks",
     long_description=readme(),
