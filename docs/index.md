@@ -87,4 +87,19 @@ class YourModel(LifecycleModelMixin, models.Model):
 
 ```
 
+## (Optional) Add `django_lifecycle` to your `INSTALLED_APPS`
+
+```python
+INSTALLED_APPS = [
+    # ...
+    "django_lifecycle_checks",
+    # ...
+]
+```
+
+This will raise an exception if you forget to add the mixin or extend the base model class.
+
+
+---
+
 [Read on](examples.md) to see more examples of how to use lifecycle hooks.
