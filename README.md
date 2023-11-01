@@ -67,7 +67,8 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 ## Pending
 
 - Drop support for Django < 2.2.
-- Confirm support for Django 5.0.
+- Confirm support for Django 5.0. Thanks @adamchainz!
+- Remove urlman from required packages. Thanks @DmytroLitvinov!
 
 ## 1.0.2 (September 2023)
 
