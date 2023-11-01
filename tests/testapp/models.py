@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from urlman import Urls
 
+from django_lifecycle import AFTER_UPDATE
 from django_lifecycle import hook
 from django_lifecycle.models import LifecycleModel
 
@@ -56,6 +57,19 @@ class UserAccount(LifecycleModel):
         # queue background job to process thumbnail image...
         mail.send_mail(
             "Welcome!", "Thank you for joining.", "from@example.com", ["to@example.com"]
+        )
+
+    @staticmethod
+    def build_email_changed_body(old_email, new_email):
+        return f"We've changed your email from {old_email} to {new_email}"
+
+    @hook(AFTER_UPDATE, when="email", has_changed=True, on_commit=True)
+    def notify_email_changed(self):
+        mail.send_mail(
+            subject="Email changed succesfully",
+            message=self.build_email_changed_body(old_email=self.initial_value('email'), new_email=self.email),
+            from_email="from@example.com",
+            recipient_list=["to@example.com"]
         )
 
     @hook("before_update", when="password", has_changed=True)

@@ -4,11 +4,17 @@ from typing import Any, List
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import transaction
+from django.db.models.fields.related_descriptors import (
+    ForwardManyToOneDescriptor,
+    ReverseOneToOneDescriptor,
+    ReverseManyToOneDescriptor,
+    ManyToManyDescriptor,
+    ForwardOneToOneDescriptor,
+)
 from django.utils.functional import cached_property
 
 from . import NotSet
 from .abstract import AbstractHookedMethod
-from .django_info import DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES
 from .decorators import HookConfig
 from .hooks import (
     BEFORE_CREATE,
@@ -19,6 +25,15 @@ from .hooks import (
     AFTER_UPDATE,
     AFTER_SAVE,
     AFTER_DELETE,
+)
+
+
+DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = (
+    ForwardManyToOneDescriptor,
+    ForwardOneToOneDescriptor,
+    ManyToManyDescriptor,
+    ReverseManyToOneDescriptor,
+    ReverseOneToOneDescriptor,
 )
 
 
@@ -148,6 +163,9 @@ class LifecycleModelMixin(object):
             if field.is_relation and field.is_cached(self):
                 field.delete_cached_value(self)
 
+    def _reset_initial_state(self):
+        self._initial_state = self._snapshot_state()
+
     @transaction.atomic
     def save(self, *args, **kwargs):
         skip_hooks = kwargs.pop("skip_hooks", False)
@@ -174,7 +192,7 @@ class LifecycleModelMixin(object):
         else:
             self._run_hooked_methods(AFTER_UPDATE, **kwargs)
 
-        self._initial_state = self._snapshot_state()
+        transaction.on_commit(self._reset_initial_state)
 
     @transaction.atomic
     def delete(self, *args, **kwargs):

@@ -1,14 +1,22 @@
 import datetime
 
+import django
 from django.core import mail
 from django.test import TestCase
 
-from django_capture_on_commit_callbacks import capture_on_commit_callbacks
+from tests.testapp.models import CannotDeleteActiveTrial
+from tests.testapp.models import Organization
+from tests.testapp.models import UserAccount
 
-from tests.testapp.models import CannotDeleteActiveTrial, Organization, UserAccount
+if django.VERSION < (3, 2):
+    from django_capture_on_commit_callbacks import TestCaseMixin
+else:
+
+    class TestCaseMixin:
+        """Dummy implementation for Django >= 4.0"""
 
 
-class UserAccountTestCase(TestCase):
+class UserAccountTestCase(TestCaseMixin, TestCase):
     @property
     def stub_data(self):
         return {
@@ -24,12 +32,27 @@ class UserAccountTestCase(TestCase):
         self.assertTrue(isinstance(account.joined_at, datetime.datetime))
 
     def test_send_welcome_email_after_create(self):
-        with capture_on_commit_callbacks(execute=True) as callbacks:
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
             UserAccount.objects.create(**self.stub_data)
-        
-        self.assertEquals(len(callbacks), 1, msg=f"{callbacks}")
+
+        self.assertEqual(len(callbacks), 2, msg=f"{callbacks}")
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Welcome!")
+
+    def test_initial_values_on_commit_hook(self):
+        initial_email = "homer.simpson@springfieldnuclear.com"
+        account = UserAccount.objects.create(**self.stub_data, email=initial_email)
+
+        new_email = "homer.thompson@springfieldnuclear.com"
+        account.email = new_email
+        with self.captureOnCommitCallbacks(execute=True):
+            account.save()
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].body,
+            account.build_email_changed_body(old_email=initial_email, new_email=new_email)
+        )
 
     def test_email_banned_user_after_update(self):
         account = UserAccount.objects.create(status="active", **self.stub_data)
@@ -81,13 +104,13 @@ class UserAccountTestCase(TestCase):
 
         account = UserAccount.objects.get()
 
-        with capture_on_commit_callbacks(execute=True) as callbacks:
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
             org.name = "Coursera Wizardry"
             org.save()
 
             account.save()
-        
-        self.assertEquals(len(callbacks), 1)
+
+        self.assertEqual(len(callbacks), 3)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject, "The name of your organization has changed!"
@@ -107,15 +130,13 @@ class UserAccountTestCase(TestCase):
 
         mail.outbox = []
 
-        with capture_on_commit_callbacks(execute=True) as callbacks:
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
             account = UserAccount.objects.get()
-
             org.name = "Hogwarts Online"
             org.save()
-
             account.save()
 
-        self.assertEquals(len(callbacks), 1, msg="Only one hook should be an on_commit callback")
+        self.assertEqual(len(callbacks), 3, msg="One hook and the _reset_initial_state (2) should be in the on_commit callbacks")
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             mail.outbox[1].subject, "The name of your organization has changed!"
@@ -182,6 +203,7 @@ class UserAccountTestCase(TestCase):
         Hooked method that auto-lowercases email should be skipped.
         """
         UserAccount.objects.create(**self.stub_data)
-        value = UserAccount.objects.all().delete()
+        deleted, rows_count = UserAccount.objects.all().delete()
 
-        self.assertEqual(value, (1, {"testapp.UserAccount": 1}))
+        self.assertEqual(deleted, 1)
+        self.assertEqual(rows_count["testapp.UserAccount"], 1)

@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
-from packaging.version import Version
 
 import django
 
@@ -34,18 +33,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "tests.testapp",
     "django.contrib.messages",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
-    "tests.testapp",
 ]
-
-# Django 1.8 requires that abstract model app is in INSTALLED_APPS
-if Version("1.8") <= Version(django.__version__) < Version("1.9"):
-    INSTALLED_APPS.append("django_lifecycle")
-
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -111,7 +105,8 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_L10N = True
+if django.VERSION < (4, 0):
+    USE_L10N = True
 
 USE_TZ = True
 
@@ -120,3 +115,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = "/static/"
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

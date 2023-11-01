@@ -1,6 +1,6 @@
 asgiref==3.4.1
 Click==7.0
-Django==3.2.8
+Django==5.0b1
 django-capture-on-commit-callbacks==1.10.0
 djangorestframework==3.11.2
 ghp-import==2.0.2
@@ -17,8 +17,8 @@ Pygments==2.7.4
 pymdown-extensions==6.3
 pyparsing==3.0.0
 python-dateutil==2.8.2
-pytz==2018.3
-PyYAML==5.4
+pytz==2023.3
+PyYAML==6.0.1
 pyyaml-env-tag==0.1
 six==1.14.0
 sqlparse==0.3.0

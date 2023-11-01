@@ -1,14 +1,24 @@
 from unittest.mock import MagicMock
 
+import django
 from django.test import TestCase
 
 from django_lifecycle import NotSet
-from django_lifecycle.priority import DEFAULT_PRIORITY
 from django_lifecycle.decorators import HookConfig
-from tests.testapp.models import CannotRename, Organization, UserAccount
+from django_lifecycle.priority import DEFAULT_PRIORITY
+from tests.testapp.models import CannotRename
+from tests.testapp.models import Organization
+from tests.testapp.models import UserAccount
+
+if django.VERSION < (4, 0):
+    from django_capture_on_commit_callbacks import TestCaseMixin
+else:
+
+    class TestCaseMixin:
+        """Dummy implementation for Django >= 4.0"""
 
 
-class LifecycleMixinTests(TestCase):
+class LifecycleMixinTests(TestCaseMixin, TestCase):
     def setUp(self):
         UserAccount.objects.all().delete()
         Organization.objects.all().delete()
@@ -338,7 +348,9 @@ class LifecycleMixinTests(TestCase):
         account = UserAccount.objects.create(**data)
         account.first_name = "Maggie"
         self.assertTrue(account.has_changed("first_name"))
-        account.save()
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            account.save()
+        self.assertEqual(len(callbacks), 1, msg="Only the _reset_initial_state should be in the on_commit callbacks")
         self.assertFalse(account.has_changed("first_name"))
 
     def test_run_hooked_methods_for_on_commit(self):
@@ -374,6 +386,10 @@ class LifecycleMixinTests(TestCase):
                              was="*", was_not=NotSet, changes_to=NotSet, on_commit=True, priority=DEFAULT_PRIORITY)
                     ],
                 ),
+                MagicMock(
+                    __name__="after_save_method_that_fires_if_changed_on_commit",
+                    _hooked=[HookConfig(hook="after_save", has_changed=True, on_commit=True)],
+                ),
             ]
         )
 
@@ -381,4 +397,10 @@ class LifecycleMixinTests(TestCase):
         self.assertEqual(fired_methods, ["method_that_fires_on_commit_on_commit", "method_that_fires_in_transaction", "method_that_fires_in_default"])
 
         fired_methods = instance._run_hooked_methods("after_save")
-        self.assertEqual(fired_methods, ["after_save_method_that_fires_on_commit_on_commit"])
+        self.assertEqual(
+            fired_methods,
+            [
+                "after_save_method_that_fires_on_commit_on_commit",
+                "after_save_method_that_fires_if_changed_on_commit_on_commit",
+            ]
+        )
