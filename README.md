@@ -64,11 +64,12 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 # Changelog
 
-## Pending
+## 1.0.3 (November 2023)
 
 - Drop support for Django < 2.2.
 - Confirm support for Django 5.0. Thanks @adamchainz!
 - Remove urlman from required packages. Thanks @DmytroLitvinov!
+- Add an optional Django check to avoid errors by not inheriting from `LifecycleModelMixin` (or `LifecycleModel`) 
 
 ## 1.0.2 (September 2023)
 
