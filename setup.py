@@ -28,12 +28,14 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Framework :: Django",
+    "Framework :: Django :: 2.2",
     "Framework :: Django :: 3.2",
     "Framework :: Django :: 4.0",
     "Framework :: Django :: 4.1",
@@ -53,9 +55,9 @@ setup(
     long_description=readme(),
     classifiers=classifiers,
     long_description_content_type="text/markdown",
-    install_requires=[
-        "Django>=3.2",
+    install_requires=["Django>=3.2"],
+    tests_require=[
         "urlman>=1.2.0",
+        "django-capture-on-commit-callbacks",
     ],
-    tests_require=["urlman>=1.2.0"]
 )

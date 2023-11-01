@@ -9,8 +9,8 @@ This project provides a `@hook` decorator as well as a base model and mixin to a
 
 **Django Lifecycle Hooks** supports:
 
-* Python 3.8, 3.9, 3.10, 3.11, and 3.12
-* Django 3.2, 4.0, 4.1, 4.2, and 5.0
+* Python 3.7, 3.8, 3.9, 3.10, 3.11, and 3.12
+* Django 2.2, 3.2, 4.0, 4.1, 4.2, and 5.0
 
 In short, you can write model code like this:
 
@@ -66,8 +66,7 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 ## Pending
 
-- Drop support for Python < 3.8.
-- Drop support for Django < 3.2.
+- Drop support for Django < 2.2.
 - Confirm support for Django 5.0.
 
 ## 1.0.2 (September 2023)

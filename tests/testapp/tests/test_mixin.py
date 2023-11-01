@@ -1,14 +1,24 @@
 from unittest.mock import MagicMock
 
+import django
 from django.test import TestCase
 
 from django_lifecycle import NotSet
-from django_lifecycle.priority import DEFAULT_PRIORITY
 from django_lifecycle.decorators import HookConfig
-from tests.testapp.models import CannotRename, Organization, UserAccount
+from django_lifecycle.priority import DEFAULT_PRIORITY
+from tests.testapp.models import CannotRename
+from tests.testapp.models import Organization
+from tests.testapp.models import UserAccount
+
+if django.VERSION < (4, 0):
+    from django_capture_on_commit_callbacks import TestCaseMixin
+else:
+
+    class TestCaseMixin:
+        """Dummy implementation for Django >= 4.0"""
 
 
-class LifecycleMixinTests(TestCase):
+class LifecycleMixinTests(TestCaseMixin, TestCase):
     def setUp(self):
         UserAccount.objects.all().delete()
         Organization.objects.all().delete()

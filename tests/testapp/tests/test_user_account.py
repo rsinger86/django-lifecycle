@@ -1,13 +1,22 @@
 import datetime
 
+import django
 from django.core import mail
 from django.test import TestCase
 
-from tests.testapp.models import (CannotDeleteActiveTrial, Organization,
-                                  UserAccount)
+from tests.testapp.models import CannotDeleteActiveTrial
+from tests.testapp.models import Organization
+from tests.testapp.models import UserAccount
+
+if django.VERSION < (3, 2):
+    from django_capture_on_commit_callbacks import TestCaseMixin
+else:
+
+    class TestCaseMixin:
+        """Dummy implementation for Django >= 4.0"""
 
 
-class UserAccountTestCase(TestCase):
+class UserAccountTestCase(TestCaseMixin, TestCase):
     @property
     def stub_data(self):
         return {
@@ -194,6 +203,7 @@ class UserAccountTestCase(TestCase):
         Hooked method that auto-lowercases email should be skipped.
         """
         UserAccount.objects.create(**self.stub_data)
-        value = UserAccount.objects.all().delete()
+        deleted, rows_count = UserAccount.objects.all().delete()
 
-        self.assertEqual(value, (1, {"testapp.UserAccount": 1}))
+        self.assertEqual(deleted, 1)
+        self.assertEqual(rows_count["testapp.UserAccount"], 1)
