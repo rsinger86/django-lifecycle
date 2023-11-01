@@ -269,6 +269,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#optional-add-django_lifecycle-to-your-installed_apps" class="md-nav__link">
+    (Optional) Add django_lifecycle to your INSTALLED_APPS
+  </a>
+  
+</li>
+      
       
       
       
@@ -369,6 +376,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#optional-add-django_lifecycle-to-your-installed_apps" class="md-nav__link">
+    (Optional) Add django_lifecycle to your INSTALLED_APPS
+  </a>
+  
+</li>
+      
       
       
       
@@ -464,6 +478,17 @@
 </code></pre></div>
 
 
+<h2 id="optional-add-django_lifecycle-to-your-installed_apps">(Optional) Add <code>django_lifecycle</code> to your <code>INSTALLED_APPS</code><a class="headerlink" href="#optional-add-django_lifecycle-to-your-installed_apps" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># ...</span>
+    <span class="s2">&quot;django_lifecycle_checks&quot;</span><span class="p">,</span>
+    <span class="c1"># ...</span>
+<span class="p">]</span>
+</code></pre></div>
+
+
+<p>This will raise an exception if you forget to add the mixin or extend the base model class.</p>
+<hr />
 <p><a href="examples/">Read on</a> to see more examples of how to use lifecycle hooks.</p>
                 
                   
