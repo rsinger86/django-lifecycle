@@ -92,7 +92,7 @@ class YourModel(LifecycleModelMixin, models.Model):
 ```python
 INSTALLED_APPS = [
     # ...
-    'django_lifecycle',
+    "django_lifecycle_checks",
     # ...
 ]
 ```

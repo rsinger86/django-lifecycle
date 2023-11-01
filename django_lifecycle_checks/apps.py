@@ -1,8 +1,13 @@
 import inspect
-from typing import Iterable, Type, Union
+from typing import Iterable
+from typing import Type
+from typing import Union
 
-from django.apps import AppConfig, apps
-from django.core.checks import Error, register, Tags
+from django.apps import AppConfig
+from django.apps import apps
+from django.core.checks import Error
+from django.core.checks import Tags
+from django.core.checks import register
 from django.db import models
 
 
@@ -23,17 +28,29 @@ def model_has_hooked_methods(model: Type[models.Model]) -> bool:
     return False
 
 
+def model_has_lifecycle_mixin(model: Type[models.Model]) -> bool:
+    from django_lifecycle.mixins import LifecycleModelMixin
+
+    return issubclass(model, LifecycleModelMixin)
+
+
 def check_models_with_hooked_methods_inherit_from_lifecycle(
     app_configs: Union[Iterable[AppConfig], None] = None, **kwargs
 ):
-    from django_lifecycle import LifecycleModelMixin
-
     for model in get_models_to_check(app_configs):
-        if model_has_hooked_methods(model) and not issubclass(
-            model, LifecycleModelMixin
-        ):
+        if model_has_hooked_methods(model) and not model_has_lifecycle_mixin(model):
             yield Error(
                 "Model has hooked methods but it doesn't inherit from LifecycleModelMixin",
                 id="django_lifecycle.E001",
                 obj=model,
             )
+
+
+class ChecksConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "django_lifecycle_checks"
+
+    def ready(self) -> None:
+        super().ready()
+
+        register(check_models_with_hooked_methods_inherit_from_lifecycle, Tags.models)
