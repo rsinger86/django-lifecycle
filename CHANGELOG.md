@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (November 2023)
+
+- Fix: Include missing `django_lifecycle_checks` into python package
+
 ## 1.1.0 (November 2023)
 
 - Drop support for Django < 2.2.
