@@ -19,8 +19,13 @@ repo_url: https://github.com/rsinger86/django-lifecycle
 # Extensions
 markdown_extensions:
   - admonition
-  - codehilite:
-      guess_lang: false
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
   - toc:
       permalink: true
 
