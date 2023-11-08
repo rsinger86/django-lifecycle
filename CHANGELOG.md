@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.1.2 (November 2023)
+
+ - Fix: Hooks were failing if some watched field (those in `when=""` or `when_any=[...]`) was a `GenericForeignKey` 
+
 ## 1.1.1 (November 2023)
 
 - Fix: Include missing `django_lifecycle_checks` into python package
