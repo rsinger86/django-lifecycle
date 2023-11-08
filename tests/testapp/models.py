@@ -1,11 +1,14 @@
 import uuid
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 from urlman import Urls
 
+from django_lifecycle import AFTER_SAVE
 from django_lifecycle import AFTER_UPDATE
 from django_lifecycle import hook
 from django_lifecycle.models import LifecycleModel
@@ -162,3 +165,19 @@ class ModelCustomPK(LifecycleModel):
     @hook("after_create")
     def answer_to_the_ultimate_question_of_life(self):
         self.answer = 42
+
+
+class ModelWithGenericForeignKey(LifecycleModel):
+    tag = models.SlugField()
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    @hook(AFTER_SAVE, when="content_object", has_changed=True, on_commit=True)
+    def do_something(self):
+        print("Hey there! I am using django-lifecycle")

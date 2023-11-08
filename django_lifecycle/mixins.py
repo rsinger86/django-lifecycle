@@ -110,7 +110,12 @@ class LifecycleModelMixin(object):
 
     def _sanitize_field_name(self, field_name: str) -> str:
         try:
-            internal_type = self._meta.get_field(field_name).get_internal_type()
+            field = self._meta.get_field(field_name)
+
+            try:
+                internal_type = field.get_internal_type()
+            except AttributeError:
+                return field
             if internal_type == "ForeignKey" or internal_type == "OneToOneField":
                 if not field_name.endswith("_id"):
                     return field_name + "_id"
@@ -415,14 +420,14 @@ class LifecycleModelMixin(object):
         for f in cls._meta.get_fields():
             names.append(f.name)
 
+            field = cls._meta.get_field(f.name)
             try:
-                internal_type = cls._meta.get_field(f.name).get_internal_type()
+                internal_type = field.get_internal_type()
             except AttributeError:
-                # Skip fields which don't provide a `get_internal_type` method, e.g. GenericForeignKey
                 continue
-            else:
-                if internal_type == "ForeignKey" or internal_type == "OneToOneField":
-                    names.append(f.name + "_id")
+
+            if internal_type == "ForeignKey" or internal_type == "OneToOneField":
+                names.append(f.name + "_id")
 
         return names
 
