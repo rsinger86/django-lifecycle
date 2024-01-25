@@ -87,7 +87,7 @@ class YourModel(LifecycleModelMixin, models.Model):
 
 ```
 
-## (Optional) Add `django_lifecycle` to your `INSTALLED_APPS`
+## (Optional) Add `django_lifecycle_checks` to your `INSTALLED_APPS`
 
 ```python
 INSTALLED_APPS = [
