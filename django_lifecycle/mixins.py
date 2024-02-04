@@ -47,7 +47,7 @@ class HookedMethod(AbstractHookedMethod):
 
 
 class OnCommitHookedMethod(AbstractHookedMethod):
-    """ Hooked method that should run on_commit """
+    """Hooked method that should run on_commit"""
 
     @property
     def name(self) -> str:
@@ -63,8 +63,12 @@ class OnCommitHookedMethod(AbstractHookedMethod):
         transaction.on_commit(_on_commit_func)
 
 
-def instantiate_hooked_method(method: Any, callback_specs: HookConfig) -> AbstractHookedMethod:
-    hooked_method_class = OnCommitHookedMethod if callback_specs.on_commit else HookedMethod
+def instantiate_hooked_method(
+    method: Any, callback_specs: HookConfig
+) -> AbstractHookedMethod:
+    hooked_method_class = (
+        OnCommitHookedMethod if callback_specs.on_commit else HookedMethod
+    )
     return hooked_method_class(
         method=method,
         priority=callback_specs.priority,
@@ -246,7 +250,6 @@ class LifecycleModelMixin(object):
     def _watched_fk_models(cls) -> List[str]:
         return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
-
     def _get_hooked_methods(self, hook: str, **kwargs) -> List[AbstractHookedMethod]:
         """
         Iterate through decorated methods to find those that should be
@@ -305,7 +308,7 @@ class LifecycleModelMixin(object):
         return sorted(hooked_methods)
 
     def _run_hooked_methods(self, hook: str, **kwargs) -> List[str]:
-        """ Run hooked methods """
+        """Run hooked methods"""
         fired = []
 
         for method in self._get_hooked_methods(hook, **kwargs):
@@ -337,7 +340,9 @@ class LifecycleModelMixin(object):
 
         return True
 
-    def _check_has_changed(self, field_name: str, specs: HookConfig, is_synced: bool) -> bool:
+    def _check_has_changed(
+        self, field_name: str, specs: HookConfig, is_synced: bool
+    ) -> bool:
         if not is_synced:
             return False
 
