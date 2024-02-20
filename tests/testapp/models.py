@@ -37,6 +37,7 @@ class UserAccount(LifecycleModel):
     has_trial = models.BooleanField(default=False)
     organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL)
     name_changes = models.IntegerField(default=0)
+    configurations = models.JSONField(default=dict)
 
     status = models.CharField(
         default="active",

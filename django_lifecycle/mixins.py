@@ -1,3 +1,4 @@
+from copy import deepcopy
 from functools import partial, reduce, lru_cache
 from inspect import isfunction
 from typing import Any, List
@@ -81,7 +82,7 @@ class LifecycleModelMixin(object):
         self._initial_state = self._snapshot_state()
 
     def _snapshot_state(self):
-        state = self.__dict__.copy()
+        state = deepcopy(self.__dict__)
 
         for watched_related_field in self._watched_fk_model_fields():
             state[watched_related_field] = self._current_value(watched_related_field)
