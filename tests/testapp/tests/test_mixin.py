@@ -78,13 +78,13 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         self.assertFalse(user_account.has_changed("username"))
         user_account.username = "Josephine"
         self.assertEqual(user_account.initial_value("username"), "Joe")
-    
+
     def test_initial_value_if_mutable_field_has_changed(self):
         data = self.stub_data
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
         self.assertFalse(user_account.has_changed("configurations"))
-        user_account.configurations['notifications'] = True
+        user_account.configurations["notifications"] = True
         self.assertTrue(user_account.has_changed("configurations"))
         self.assertEqual(user_account.initial_value("configurations"), {})
 
@@ -234,9 +234,9 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
 
-        self.assertFalse(specs.conditions[0](user_account))
+        self.assertFalse(specs.condition(user_account))
         user_account.first_name = "Ned"
-        self.assertTrue(specs.conditions[0](user_account))
+        self.assertTrue(specs.condition(user_account))
 
     def test_check_is_now_condition_wildcard_should_pass(self):
         specs = HookConfig("before_update", when="first_name", is_now="*")
@@ -245,7 +245,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
         user_account.first_name = "Ned"
-        self.assertTrue(specs.conditions[0](user_account))
+        self.assertTrue(specs.condition(user_account))
 
     def test_check_is_now_condition_matching_value_should_pass(self):
         specs = HookConfig("before_update", when="first_name", is_now="Ned")
@@ -254,7 +254,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
         user_account.first_name = "Ned"
-        self.assertTrue(specs.conditions[0](user_account))
+        self.assertTrue(specs.condition(user_account))
 
     def test_check_is_now_condition_not_matched_value_should_not_pass(self):
         specs = HookConfig("before_update", when="first_name", is_now="Bart")
@@ -262,14 +262,14 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         data["first_name"] = "Homer"
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        self.assertFalse(specs.conditions[0](user_account))
+        self.assertFalse(specs.condition(user_account))
 
     def test_check_was_not_condition_should_pass_when_not_set(self):
         specs = HookConfig("before_update", when="first_name", was_not=NotSet)
         data = self.stub_data
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        self.assertTrue(specs.conditions[0](user_account))
+        self.assertTrue(specs.condition(user_account))
 
     def test_check_was_not_condition_not_matching_value_should_pass(self):
         specs = HookConfig("before_update", when="first_name", was_not="Bart")
@@ -278,7 +278,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         data["first_name"] = "Homer"
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        self.assertTrue(specs.conditions[0](user_account))
+        self.assertTrue(specs.condition(user_account))
 
     def test_check_was_not_condition_matched_value_should_not_pass(self):
         specs = HookConfig("before_update", when="first_name", was_not="Homer")
@@ -287,7 +287,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         data["first_name"] = "Homer"
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        self.assertFalse(specs.conditions[0](user_account))
+        self.assertFalse(specs.condition(user_account))
 
     def test_check_was_condition_wildcard_should_pass(self):
         specs = HookConfig("before_update", when="first_name", was="*")
@@ -296,7 +296,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         data["first_name"] = "Homer"
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        self.assertTrue(specs.conditions[0](user_account))
+        self.assertTrue(specs.condition(user_account))
 
     def test_check_was_condition_matching_value_should_pass(self):
         specs = HookConfig("before_update", when="first_name", was="Homer")
@@ -305,7 +305,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         data["first_name"] = "Homer"
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        self.assertTrue(specs.conditions[0](user_account))
+        self.assertTrue(specs.condition(user_account))
 
     def test_check_was_condition_not_matched_value_should_not_pass(self):
         specs = HookConfig("before_update", when="first_name", was="Bart")
@@ -314,7 +314,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         data["first_name"] = "Homer"
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        self.assertFalse(specs.conditions[0](user_account))
+        self.assertFalse(specs.condition(user_account))
 
     def test_is_not_condition_should_pass(self):
         specs = HookConfig("before_update", when="first_name", is_not="Ned")
@@ -323,7 +323,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         data["first_name"] = "Homer"
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        self.assertTrue(specs.conditions[0](user_account))
+        self.assertTrue(specs.condition(user_account))
 
     def test_is_not_condition_should_not_pass(self):
         specs = HookConfig("before_update", when="first_name", is_not="Ned")
@@ -332,7 +332,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         data["first_name"] = "Ned"
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        self.assertFalse(specs.conditions[0](user_account))
+        self.assertFalse(specs.condition(user_account))
 
     def test_changes_to_condition_should_pass(self):
         data = self.stub_data

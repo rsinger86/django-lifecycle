@@ -270,10 +270,7 @@ class LifecycleModelMixin(object):
                 if callback_specs.hook != hook:
                     continue
 
-                if any(
-                    condition(self, update_fields=update_fields)
-                    for condition in callback_specs.conditions
-                ):
+                if callback_specs.condition(self, update_fields=update_fields):
                     hooked_method = instantiate_hooked_method(method, callback_specs)
                     hooked_methods.append(hooked_method)
 

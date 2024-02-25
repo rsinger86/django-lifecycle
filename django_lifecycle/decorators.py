@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import operator
 from dataclasses import dataclass
+from functools import reduce
 from functools import wraps
 from typing import Any
 from typing import Callable
 from typing import List, Optional
 
 from django_lifecycle import NotSet
-from .conditions import WhenCondition
+from .conditions import Always
+from .conditions.legacy import When
 from .dataclass_validation import Validations
 from .hooks import VALID_HOOKS
 from .priority import DEFAULT_PRIORITY
@@ -32,34 +35,36 @@ class HookConfig(Validations):
     priority: int = DEFAULT_PRIORITY
 
     @property
-    def conditions(self) -> list[Callable]:
+    def condition(self) -> Callable:
         if self.when:
-            return [
-                WhenCondition(
-                    when=self.when,
-                    was=self.was,
-                    is_now=self.is_now,
-                    has_changed=self.has_changed,
-                    is_not=self.is_not,
-                    was_not=self.was_not,
-                    changes_to=self.changes_to,
-                )
-            ]
+            return When(
+                when=self.when,
+                was=self.was,
+                is_now=self.is_now,
+                has_changed=self.has_changed,
+                is_not=self.is_not,
+                was_not=self.was_not,
+                changes_to=self.changes_to,
+            )
+
         elif self.when_any:
-            return [
-                WhenCondition(
-                    when=field,
-                    was=self.was,
-                    is_now=self.is_now,
-                    has_changed=self.has_changed,
-                    is_not=self.is_not,
-                    was_not=self.was_not,
-                    changes_to=self.changes_to,
-                )
-                for field in self.when_any
-            ]
+            return reduce(
+                operator.or_,
+                [
+                    When(
+                        when=field,
+                        was=self.was,
+                        is_now=self.is_now,
+                        has_changed=self.has_changed,
+                        is_not=self.is_not,
+                        was_not=self.was_not,
+                        changes_to=self.changes_to,
+                    )
+                    for field in self.when_any
+                ],
+            )
         else:
-            return [lambda *_, **__: True]
+            return Always()
 
     def validate_hook(self, value, **kwargs):
         if value not in VALID_HOOKS:

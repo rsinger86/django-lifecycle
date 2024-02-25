@@ -10,6 +10,31 @@ from django_lifecycle.conditions import WhenFieldWasNot
 from tests.testapp.models import UserAccount
 
 
+class ChainableConditionsTests(TestCase):
+    def test_and_condition(self):
+        is_homer = WhenFieldIsNow("first_name", is_now="Homer")
+        is_simpson = WhenFieldIsNow("last_name", is_now="Simpson")
+        is_homer_simpson = is_homer & is_simpson
+
+        homer_simpson = UserAccount(first_name="Homer", last_name="Simpson")
+        self.assertTrue(is_homer_simpson(homer_simpson))
+
+        homer_flanders = UserAccount(first_name="Homer", last_name="Flanders")
+        self.assertFalse(is_homer_simpson(homer_flanders))
+
+        ned_simpson = UserAccount(first_name="Ned", last_name="Simpson")
+        self.assertFalse(is_homer_simpson(ned_simpson))
+
+    def test_or_condition(self):
+        is_admin = WhenFieldIsNow("username", is_now="admin")
+        is_superuser = WhenFieldIsNow("username", is_now="superuser")
+        user_has_superpowers = is_admin | is_superuser
+
+        self.assertTrue(user_has_superpowers(UserAccount(username="admin")))
+        self.assertTrue(user_has_superpowers(UserAccount(username="superuser")))
+        self.assertFalse(user_has_superpowers(UserAccount(username="citizen")))
+
+
 class ConditionsTests(TestCase):
     @property
     def stub_data(self):
