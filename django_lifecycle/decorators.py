@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import operator
+from django_lifecycle import types
 from dataclasses import dataclass
 from functools import reduce
 from functools import wraps
@@ -23,6 +24,11 @@ class DjangoLifeCycleException(Exception):
 @dataclass(order=False)
 class HookConfig(Validations):
     hook: str
+    on_commit: bool = False
+    priority: int = DEFAULT_PRIORITY
+    condition: Optional[types.Condition] = None
+
+    # Legacy parameters
     when: Optional[str] = None
     when_any: Optional[List[str]] = None
     was: Any = "*"
@@ -31,11 +37,28 @@ class HookConfig(Validations):
     is_not: Any = NotSet
     was_not: Any = NotSet
     changes_to: Any = NotSet
-    on_commit: bool = False
-    priority: int = DEFAULT_PRIORITY
 
-    @property
-    def condition(self) -> Callable:
+    def __post_init__(self):
+        super().__post_init__()
+
+        if self.condition is None:
+            self.condition = self._get_condition_from_legacy_parameters()
+
+    def _legacy_parameters_have_been_passed(self) -> bool:
+        return any(
+            [
+                self.when is not None,
+                self.when_any is not None,
+                self.was != "*",
+                self.is_now != "*",
+                self.has_changed is not None,
+                self.is_not is not NotSet,
+                self.was_not is not NotSet,
+                self.changes_to is not NotSet,
+            ]
+        )
+
+    def _get_condition_from_legacy_parameters(self) -> Callable:
         if self.when:
             return When(
                 when=self.when,
@@ -140,9 +163,16 @@ class HookConfig(Validations):
                 "Can pass either 'when' or 'when_any' but not both"
             )
 
+    def validate_condition_and_legacy_parameters_are_not_combined(self):
+        if self.condition is not None and self._legacy_parameters_have_been_passed():
+            raise DjangoLifeCycleException(
+                "Legacy parameters (when, when_any, ...) can't be used together with condition"
+            )
+
     def validate(self):
         self.validate_when_and_when_any()
         self.validate_on_commit_only_for_after_hooks()
+        self.validate_condition_and_legacy_parameters_are_not_combined()
 
     def __lt__(self, other):
         if not isinstance(other, HookConfig):
