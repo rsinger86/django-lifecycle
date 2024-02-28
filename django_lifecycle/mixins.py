@@ -145,7 +145,7 @@ class LifecycleModelMixin(object):
 
     def initial_value(self, field_name: str) -> Any:
         """
-        Get initial value of field when model was instantiated.
+        Get initial value of field when model value instantiated.
         """
         field_name = self._sanitize_field_name(field_name)
 
@@ -156,7 +156,7 @@ class LifecycleModelMixin(object):
 
     def has_changed(self, field_name: str) -> bool:
         """
-        Check if a field has changed since the model was instantiated.
+        Check if a field has changed since the model value instantiated.
         """
         changed = self._diff_with_initial.keys()
         field_name = self._sanitize_field_name(field_name)

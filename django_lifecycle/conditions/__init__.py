@@ -10,36 +10,36 @@ from django_lifecycle.conditions.base import ChainableCondition
 
 
 __all__ = [
-    "WhenFieldWas",
-    "WhenFieldIsNow",
+    "WhenFieldValueWas",
+    "WhenFieldValueIs",
     "WhenFieldHasChanged",
-    "WhenFieldIsNot",
-    "WhenFieldWasNot",
-    "WhenFieldChangesTo",
+    "WhenFieldValueIsNot",
+    "WhenFieldValueWasNot",
+    "WhenFieldValueChangesTo",
     "Always",
 ]
 
 
 @dataclass
-class WhenFieldWas(ChainableCondition):
+class WhenFieldValueWas(ChainableCondition):
     field_name: str
-    was: Any = "*"
+    value: Any = "*"
 
     def __call__(
         self, instance: Any, update_fields: Union[Iterable[str], None] = None
     ) -> bool:
-        return self.was in (instance.initial_value(self.field_name), "*")
+        return self.value in (instance.initial_value(self.field_name), "*")
 
 
 @dataclass
-class WhenFieldIsNow(ChainableCondition):
+class WhenFieldValueIs(ChainableCondition):
     field_name: str
-    is_now: Any = "*"
+    value: Any = "*"
 
     def __call__(
         self, instance: Any, update_fields: Union[Iterable[str], None] = None
     ) -> bool:
-        return self.is_now in (instance._current_value(self.field_name), "*")
+        return self.value in (instance._current_value(self.field_name), "*")
 
 
 @dataclass
@@ -63,37 +63,37 @@ class WhenFieldHasChanged(ChainableCondition):
 
 
 @dataclass
-class WhenFieldIsNot(ChainableCondition):
+class WhenFieldValueIsNot(ChainableCondition):
     field_name: str
-    is_not: Any = NotSet
+    value: Any = NotSet
 
     def __call__(
         self, instance: Any, update_fields: Union[Iterable[str], None] = None
     ) -> bool:
         return (
-            self.is_not is NotSet
-            or instance._current_value(self.field_name) != self.is_not
+            self.value is NotSet
+            or instance._current_value(self.field_name) != self.value
         )
 
 
 @dataclass
-class WhenFieldWasNot(ChainableCondition):
+class WhenFieldValueWasNot(ChainableCondition):
     field_name: str
-    was_not: Any = NotSet
+    value: Any = NotSet
 
     def __call__(
         self, instance: Any, update_fields: Union[Iterable[str], None] = None
     ) -> bool:
         return (
-            self.was_not is NotSet
-            or instance.initial_value(self.field_name) != self.was_not
+            self.value is NotSet
+            or instance.initial_value(self.field_name) != self.value
         )
 
 
 @dataclass
-class WhenFieldChangesTo(ChainableCondition):
+class WhenFieldValueChangesTo(ChainableCondition):
     field_name: str
-    changes_to: Any = NotSet
+    value: Any = NotSet
 
     def __call__(
         self, instance: Any, update_fields: Union[Iterable[str], None] = None
@@ -106,12 +106,12 @@ class WhenFieldChangesTo(ChainableCondition):
             return False
 
         value_has_changed = bool(
-            instance.initial_value(self.field_name) != self.changes_to
+            instance.initial_value(self.field_name) != self.value
         )
         new_value_is_the_expected = bool(
-            instance._current_value(self.field_name) == self.changes_to
+            instance._current_value(self.field_name) == self.value
         )
-        return self.changes_to is NotSet or (
+        return self.value is NotSet or (
             value_has_changed and new_value_is_the_expected
         )
 
