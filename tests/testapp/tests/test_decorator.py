@@ -2,6 +2,8 @@ from django.db import models
 from django.test import TestCase
 
 from django_lifecycle import hook, LifecycleModelMixin, AFTER_CREATE
+from django_lifecycle.conditions import Always
+from django_lifecycle.decorators import DjangoLifeCycleException
 from django_lifecycle.priority import HIGHEST_PRIORITY, LOWER_PRIORITY
 
 
@@ -23,7 +25,6 @@ class DecoratorTests(TestCase):
 
     def test_priority_hooks(self):
         class FakeModel(LifecycleModelMixin, models.Model):
-
             @hook(AFTER_CREATE)
             def mid_priority(self):
                 pass
@@ -41,3 +42,10 @@ class DecoratorTests(TestCase):
 
         expected_method_names = ["top_priority", "mid_priority", "lowest_priority"]
         self.assertListEqual(expected_method_names, hooked_method_names)
+
+    def test_condition_cannot_be_mixed_with_legacy_parameters(self):
+        with self.assertRaises(DjangoLifeCycleException):
+            hook(AFTER_CREATE, condition=Always(), has_changed=True)
+
+    def test_no_condition_or_legacy_parameters_is_valid(self):
+        hook(AFTER_CREATE)  # no exception is raised

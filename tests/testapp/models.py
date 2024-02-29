@@ -59,9 +59,7 @@ class UserAccount(LifecycleModel):
     @hook("after_create", on_commit=True)
     def do_after_create_jobs(self):
         # queue background job to process thumbnail image...
-        mail.send_mail(
-            "Welcome!", "Thank you for joining.", "from@example.com", ["to@example.com"]
-        )
+        mail.send_mail("Welcome!", "Thank you for joining.", "from@example.com", ["to@example.com"])
 
     @staticmethod
     def build_email_changed_body(old_email, new_email):
@@ -71,21 +69,23 @@ class UserAccount(LifecycleModel):
     def notify_email_changed(self):
         mail.send_mail(
             subject="Email changed succesfully",
-            message=self.build_email_changed_body(old_email=self.initial_value('email'), new_email=self.email),
+            message=self.build_email_changed_body(
+                old_email=self.initial_value("email"), new_email=self.email
+            ),
             from_email="from@example.com",
-            recipient_list=["to@example.com"]
+            recipient_list=["to@example.com"],
         )
 
     @hook("before_update", when="password", has_changed=True)
     def timestamp_password_change(self):
         self.password_updated_at = timezone.now()
 
-    @hook('before_update', when='first_name', has_changed=True)
-    @hook('before_update', when='last_name', has_changed=True)
+    @hook("before_update", when="first_name", has_changed=True)
+    @hook("before_update", when="last_name", has_changed=True)
     def count_name_changes(self):
         self.name_changes += 1
 
-    @hook("before_delete", when='has_trial', was='*', is_now=True)
+    @hook("before_delete", when="has_trial", was="*", is_now=True)
     def ensure_trial_not_active(self):
         raise CannotDeleteActiveTrial("Cannot delete trial user!")
 
@@ -170,12 +170,7 @@ class ModelCustomPK(LifecycleModel):
 
 class ModelWithGenericForeignKey(LifecycleModel):
     tag = models.SlugField()
-    content_type = models.ForeignKey(
-        ContentType,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     content_object = GenericForeignKey("content_type", "object_id")
 

@@ -7,19 +7,22 @@ set up conditions for when the method should fire.
 ## Decorator Signature
 
 ```python
-    @hook(
-        moment: str,
-        when: str = None,
-        when_any: List[str] = None,
-        has_changed: bool = None,
-        is_now: Any = '*',
-        is_not: Any = None,
-        was: Any = '*',
-        was_not: Any = None,
-        changes_to: Any = None,
-        priority: int = DEFAULT_PRIORITY,
-        on_commit: Optional[bool] = None
-    ):
+@hook(
+    moment: str,
+    condition: Optional[types.Condition] = None,
+    priority: int = DEFAULT_PRIORITY,
+    on_commit: Optional[bool] = None,
+    
+    # Legacy parameters
+    when: str = None,
+    when_any: List[str] = None,
+    has_changed: bool = None,
+    is_now: Any = '*',
+    is_not: Any = None,
+    was: Any = '*',
+    was_not: Any = None,
+    changes_to: Any = None,
+)
 ```
 
 ## Lifecycle Moments
@@ -40,7 +43,39 @@ Below is a full list of hooks, in the same order in which they will get called d
 All of hook constants are strings containing the specific hook name, for example `AFTER_UPDATE` is string
 `"after_update"` - preferably way is to use hook constant.
 
-## Condition Keyword Arguments
+## Conditions
+
+You can add a condition to specify in which case the hook will be fired or not, depending on the initial or current 
+state of a model instance's fields.
+
+There are some conditions already implemented, but you can provide your own condition, or even chain them using `&` and `|`.
+
+ - `WhenFieldHasChanged(field_name, has_changed)`
+ - `WhenFieldValueIs(field_name, value)`
+ - `WhenFieldValueIsNot(field_name, value)`
+ - `WhenFieldValueWas(field_name, value)`
+ - `WhenFieldValueWasNot(field_name, value)`
+ - `WhenFieldValueChangesTo(field_name, value)`
+
+### Chaining conditions
+Conditions can be chained using `&` and `|` boolean operators
+
+```python
+from django_lifecycle.conditions import WhenFieldValueChangesTo
+from django_lifecycle import hook, BEFORE_UPDATE
+
+@hook(
+    BEFORE_UPDATE, 
+    condition=(
+        WhenFieldValueChangesTo("first_name", value="Ned")
+        & WhenFieldValueChangesTo("last_name", value="Flanders")
+    )
+)
+def do_something(self):
+    ...
+```
+
+## Legacy Condition Keyword Arguments
 
 If you do not use any conditional parameters, the hook will fire every time the lifecycle moment occurs. You can use the keyword arguments below to conditionally fire the method depending on the initial or current state of a model instance's fields.
 

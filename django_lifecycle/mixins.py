@@ -1,7 +1,9 @@
+from __future__ import annotations
 from copy import deepcopy
 from functools import partial, reduce, lru_cache
 from inspect import isfunction
 from typing import Any, List
+from typing import Iterable
 
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import transaction
@@ -14,7 +16,6 @@ from django.db.models.fields.related_descriptors import (
 )
 from django.utils.functional import cached_property
 
-from . import NotSet
 from .abstract import AbstractHookedMethod
 from .decorators import HookConfig
 from .hooks import (
@@ -144,7 +145,7 @@ class LifecycleModelMixin(object):
 
     def initial_value(self, field_name: str) -> Any:
         """
-        Get initial value of field when model was instantiated.
+        Get initial value of field when model value instantiated.
         """
         field_name = self._sanitize_field_name(field_name)
 
@@ -155,7 +156,7 @@ class LifecycleModelMixin(object):
 
     def has_changed(self, field_name: str) -> bool:
         """
-        Check if a field has changed since the model was instantiated.
+        Check if a field has changed since the model value instantiated.
         """
         changed = self._diff_with_initial.keys()
         field_name = self._sanitize_field_name(field_name)
@@ -251,7 +252,9 @@ class LifecycleModelMixin(object):
     def _watched_fk_models(cls) -> List[str]:
         return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
-    def _get_hooked_methods(self, hook: str, **kwargs) -> List[AbstractHookedMethod]:
+    def _get_hooked_methods(
+        self, hook: str, update_fields: Iterable[str] | None = None, **kwargs
+    ) -> List[AbstractHookedMethod]:
         """
         Iterate through decorated methods to find those that should be
         triggered by the current hook. If conditions exist, check them before
@@ -267,44 +270,12 @@ class LifecycleModelMixin(object):
                 if callback_specs.hook != hook:
                     continue
 
-                when_field = callback_specs.when
-                when_any_field = callback_specs.when_any
-                update_fields = kwargs.get("update_fields", None)
-                is_partial_fields_update = update_fields is not None
+                if callback_specs.condition(self, update_fields=update_fields):
+                    hooked_method = instantiate_hooked_method(method, callback_specs)
+                    hooked_methods.append(hooked_method)
 
-                if when_field:
-                    if not self._check_callback_conditions(
-                        when_field,
-                        callback_specs,
-                        is_synced=(
-                            is_partial_fields_update is False
-                            or when_field in update_fields
-                        ),
-                    ):
-                        continue
-                elif when_any_field:
-                    any_condition_matched = False
-
-                    for field_name in when_any_field:
-                        if self._check_callback_conditions(
-                            field_name,
-                            callback_specs,
-                            is_synced=(
-                                is_partial_fields_update is False
-                                or field_name in update_fields
-                            ),
-                        ):
-                            any_condition_matched = True
-                            break
-
-                    if not any_condition_matched:
-                        continue
-
-                hooked_method = instantiate_hooked_method(method, callback_specs)
-                hooked_methods.append(hooked_method)
-
-                # Only store the method once per hook
-                break
+                    # Only store the method once per hook
+                    break
 
         return sorted(hooked_methods)
 
@@ -317,69 +288,6 @@ class LifecycleModelMixin(object):
             fired.append(method.name)
 
         return fired
-
-    def _check_callback_conditions(
-        self, field_name: str, specs: dict, is_synced: bool
-    ) -> bool:
-        if not self._check_has_changed(field_name, specs, is_synced):
-            return False
-
-        if not self._check_changes_to_condition(field_name, specs, is_synced):
-            return False
-
-        if not self._check_is_now_condition(field_name, specs):
-            return False
-
-        if not self._check_was_condition(field_name, specs):
-            return False
-
-        if not self._check_was_not_condition(field_name, specs):
-            return False
-
-        if not self._check_is_not_condition(field_name, specs):
-            return False
-
-        return True
-
-    def _check_has_changed(
-        self, field_name: str, specs: HookConfig, is_synced: bool
-    ) -> bool:
-        if not is_synced:
-            return False
-
-        has_changed = specs.has_changed
-        return has_changed is None or has_changed == self.has_changed(field_name)
-
-    def _check_is_now_condition(self, field_name: str, specs: HookConfig) -> bool:
-        return specs.is_now in (self._current_value(field_name), "*")
-
-    def _check_is_not_condition(self, field_name: str, specs: HookConfig) -> bool:
-        is_not = specs.is_not
-        return is_not is NotSet or self._current_value(field_name) != is_not
-
-    def _check_was_condition(self, field_name: str, specs: HookConfig) -> bool:
-        return specs.was in (self.initial_value(field_name), "*")
-
-    def _check_was_not_condition(self, field_name: str, specs: HookConfig) -> bool:
-        was_not = specs.was_not
-        return was_not is NotSet or self.initial_value(field_name) != was_not
-
-    def _check_changes_to_condition(
-        self, field_name: str, specs: HookConfig, is_synced: bool
-    ) -> bool:
-        if not is_synced:
-            return False
-
-        changes_to = specs.changes_to
-        return any(
-            [
-                changes_to is NotSet,
-                (
-                    self.initial_value(field_name) != changes_to
-                    and self._current_value(field_name) == changes_to
-                ),
-            ]
-        )
 
     @classmethod
     def _get_model_property_names(cls) -> List[str]:
