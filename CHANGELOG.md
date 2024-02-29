@@ -1,5 +1,10 @@
 # Changelog
 
+# 1.2.0 (February 2024)
+
+ - Hook condition can be now built using some predefined conditions and/or with custom ones.
+ - Fix `has_changed` and `changed_to` when working with mutable data (i.e.: `dict`s). Thanks @AlaaNour94
+
 # 1.1.2 (November 2023)
 
  - Fix: Hooks were failing if some watched field (those in `when=""` or `when_any=[...]`) was a `GenericForeignKey` 
