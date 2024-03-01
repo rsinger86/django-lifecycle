@@ -1,0 +1,2 @@
+class NotSet(object):
+    pass

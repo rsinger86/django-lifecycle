@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import operator
-from django_lifecycle import types
 from dataclasses import dataclass
 from functools import reduce
 from functools import wraps
 from typing import Any
 from typing import Callable
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
-from django_lifecycle import NotSet
+from . import types
 from .conditions import Always
 from .conditions.legacy import When
+from .constants import NotSet
 from .dataclass_validation import Validations
 from .hooks import VALID_HOOKS
 from .priority import DEFAULT_PRIORITY
@@ -110,8 +111,7 @@ class HookConfig(Validations):
             return
 
         when_any_error_msg = (
-            "'when_any' hook param must be a list of strings "
-            "matching the names of model fields"
+            "'when_any' hook param must be a list of strings " "matching the names of model fields"
         )
 
         if not isinstance(value, list):
@@ -145,9 +145,7 @@ class HookConfig(Validations):
 
     def validate_priority(self, value, **kwargs):
         if self.priority < 0:
-            raise DjangoLifeCycleException(
-                "'priority' hook param must be a positive integer"
-            )
+            raise DjangoLifeCycleException("'priority' hook param must be a positive integer")
 
         return value
 
@@ -159,9 +157,7 @@ class HookConfig(Validations):
 
     def validate_when_and_when_any(self):
         if self.when is not None and self.when_any is not None:
-            raise DjangoLifeCycleException(
-                "Can pass either 'when' or 'when_any' but not both"
-            )
+            raise DjangoLifeCycleException("Can pass either 'when' or 'when_any' but not both")
 
     def validate_condition_and_legacy_parameters_are_not_combined(self):
         if self.condition is not None and self._legacy_parameters_have_been_passed():

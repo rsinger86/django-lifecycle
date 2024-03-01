@@ -2,6 +2,7 @@ __version__ = "1.2.2"
 __author__ = "Robert Singer"
 __author_email__ = "robertgsinger@gmail.com"
 
+from .constants import NotSet
 from .decorators import hook
 from .hooks import AFTER_CREATE
 from .hooks import AFTER_DELETE
@@ -13,11 +14,6 @@ from .hooks import BEFORE_SAVE
 from .hooks import BEFORE_UPDATE
 from .mixins import LifecycleModelMixin
 from .models import LifecycleModel
-
-
-class NotSet(object):
-    pass
-
 
 __all__ = [
     "hook",

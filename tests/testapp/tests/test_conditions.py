@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from django_lifecycle import NotSet
+from django_lifecycle.constants import NotSet
 from django_lifecycle.conditions import WhenFieldValueChangesTo
 from django_lifecycle.conditions import WhenFieldHasChanged
 from django_lifecycle.conditions import WhenFieldValueIsNot

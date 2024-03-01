@@ -5,14 +5,14 @@ from typing import Any
 from typing import List
 from typing import Optional
 
-from django_lifecycle import NotSet
-from django_lifecycle.conditions.base import ChainableCondition
-from django_lifecycle.conditions import WhenFieldValueChangesTo
-from django_lifecycle.conditions import WhenFieldHasChanged
-from django_lifecycle.conditions import WhenFieldValueIsNot
-from django_lifecycle.conditions import WhenFieldValueIs
-from django_lifecycle.conditions import WhenFieldValueWas
-from django_lifecycle.conditions import WhenFieldValueWasNot
+from ..constants import NotSet
+from ..conditions.base import ChainableCondition
+from ..conditions import WhenFieldValueChangesTo
+from ..conditions import WhenFieldHasChanged
+from ..conditions import WhenFieldValueIsNot
+from ..conditions import WhenFieldValueIs
+from ..conditions import WhenFieldValueWas
+from ..conditions import WhenFieldValueWasNot
 
 
 @dataclass
@@ -26,9 +26,7 @@ class When(ChainableCondition):
     changes_to: Any = NotSet
 
     def __call__(self, instance: Any, update_fields=None) -> bool:
-        has_changed_condition = WhenFieldHasChanged(
-            self.when, has_changed=self.has_changed
-        )
+        has_changed_condition = WhenFieldHasChanged(self.when, has_changed=self.has_changed)
         if not has_changed_condition(instance, update_fields=update_fields):
             return False
 
@@ -78,6 +76,4 @@ class WhenAny:
             )
             for field in self.when_any
         )
-        return any(
-            condition(instance, update_fields=update_fields) for condition in conditions
-        )
+        return any(condition(instance, update_fields=update_fields) for condition in conditions)
