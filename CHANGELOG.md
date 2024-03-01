@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.2.1 (February 2024)
+
+ - Fix import errors
+
 # 1.2.0 (February 2024)
 
  - Hook condition can be now built using some predefined conditions and/or with custom ones.
