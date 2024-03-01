@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.2.2 (February 2024)
+
+ - Fix pypi release by explicitly include `conditions` folder
+
 # 1.2.1 (February 2024)
 
  - Fix import errors
