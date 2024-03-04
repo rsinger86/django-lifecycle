@@ -20,11 +20,17 @@ class Article(LifecycleModel):
     status = models.ChoiceField(choices=['draft', 'published'])
     editor = models.ForeignKey(AuthUser)
 
-    @hook(BEFORE_UPDATE, when='contents', has_changed=True)
+    @hook(BEFORE_UPDATE, condition=WhenFieldHasChanged('contents', has_changed=True))
     def on_content_change(self):
         self.updated_at = timezone.now()
 
-    @hook(AFTER_UPDATE, when="status", was="draft", is_now="published")
+    @hook(
+        AFTER_UPDATE, 
+        condition=(
+            WhenFieldValueWas("status", value="draft")
+            & WhenFieldValueIs("status", value="published")
+        )
+    )
     def on_publish(self):
         send_email(self.editor.email, "An article has published!")
 ```
@@ -52,8 +58,8 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 ## Requirements
 
-* Python (3.5+)
-* Django (2.0+)
+* Python (3.7+)
+* Django (2.2+)
 
 ## Installation
 
