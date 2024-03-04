@@ -20,7 +20,10 @@ class Article(LifecycleModel):
     status = models.ChoiceField(choices=['draft', 'published'])
     editor = models.ForeignKey(AuthUser)
 
-    @hook(BEFORE_UPDATE, condition=WhenFieldHasChanged('contents', has_changed=True))
+    @hook(
+        BEFORE_UPDATE, 
+        condition=WhenFieldHasChanged('contents', has_changed=True),
+    )
     def on_content_change(self):
         self.updated_at = timezone.now()
 
