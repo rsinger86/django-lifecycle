@@ -212,6 +212,10 @@ class LifecycleModelMixin(object):
         self._run_hooked_methods(AFTER_DELETE, **kwargs)
         return value
 
+    def refresh_from_db(self, *args, **kwargs):
+        super().refresh_from_db(*args, **kwargs)
+        self._initial_state = self._snapshot_state()
+
     @classmethod
     @lru_cache(typed=True)
     def _potentially_hooked_methods(cls):
