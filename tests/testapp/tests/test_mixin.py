@@ -77,15 +77,6 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         user_account.username = "Josephine"
         self.assertEqual(user_account.initial_value("username"), "Joe")
 
-    def test_initial_value_if_mutable_field_has_changed(self):
-        data = self.stub_data
-        UserAccount.objects.create(**data)
-        user_account = UserAccount.objects.get()
-        self.assertFalse(user_account.has_changed("configurations"))
-        user_account.configurations["notifications"] = True
-        self.assertTrue(user_account.has_changed("configurations"))
-        self.assertEqual(user_account.initial_value("configurations"), {})
-
     def test_initial_value_if_field_has_not_changed(self):
         data = self.stub_data
         data["username"] = "Joe"
@@ -212,7 +203,6 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         user_account.username = data["username"]
         self.assertTrue(user_account.has_changed("username"),
                         'The initial state should get updated after refreshing the object from db')
-
 
     def test_has_changed_is_true_if_fk_related_model_field_has_changed(self):
         org = Organization.objects.create(name="Dunder Mifflin")

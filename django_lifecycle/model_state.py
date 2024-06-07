@@ -1,6 +1,4 @@
 from __future__ import annotations
-
-from copy import deepcopy
 from typing import Any
 from typing import Dict
 from typing import TYPE_CHECKING
@@ -18,7 +16,7 @@ class ModelState:
 
     @classmethod
     def from_instance(cls, instance: "LifecycleModelMixin") -> ModelState:
-        state = deepcopy(instance.__dict__)
+        state = instance.__dict__.copy()
 
         for watched_related_field in instance._watched_fk_model_fields():
             state[watched_related_field] = get_value(instance, watched_related_field)
