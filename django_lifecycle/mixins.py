@@ -1,11 +1,9 @@
 from __future__ import annotations
-from copy import deepcopy
-from functools import partial, reduce, lru_cache
+from functools import partial, lru_cache
 from inspect import isfunction
 from typing import Any, List
 from typing import Iterable
 
-from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import transaction
 from django.db.models.fields.related_descriptors import (
     ForwardManyToOneDescriptor,
@@ -28,7 +26,9 @@ from .hooks import (
     AFTER_SAVE,
     AFTER_DELETE,
 )
-
+from .model_state import ModelState
+from .utils import get_value
+from .utils import sanitize_field_name
 
 DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = (
     ForwardManyToOneDescriptor,
@@ -80,91 +80,32 @@ def instantiate_hooked_method(
 class LifecycleModelMixin(object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._initial_state = self._snapshot_state()
+        self._initial_state = ModelState.from_instance(self)
 
-    def _snapshot_state(self):
-        state = deepcopy(self.__dict__)
-
-        for watched_related_field in self._watched_fk_model_fields():
-            state[watched_related_field] = self._current_value(watched_related_field)
-
-        if "_state" in state:
-            del state["_state"]
-
-        if "_potentially_hooked_methods" in state:
-            del state["_potentially_hooked_methods"]
-
-        if "_initial_state" in state:
-            del state["_initial_state"]
-
-        if "_watched_fk_model_fields" in state:
-            del state["_watched_fk_model_fields"]
-
-        return state
+    def _snapshot_state(self) -> dict:
+        return ModelState.from_instance(self).initial_state
 
     @property
     def _diff_with_initial(self) -> dict:
-        initial = self._initial_state
-        current = self._snapshot_state()
-        diffs = []
-
-        for k, v in initial.items():
-            if k in current and v != current[k]:
-                diffs.append((k, (v, current[k])))
-
-        return dict(diffs)
+        return self._initial_state.get_diff(self)
 
     def _sanitize_field_name(self, field_name: str) -> str:
-        try:
-            field = self._meta.get_field(field_name)
-
-            try:
-                internal_type = field.get_internal_type()
-            except AttributeError:
-                return field
-            if internal_type == "ForeignKey" or internal_type == "OneToOneField":
-                if not field_name.endswith("_id"):
-                    return field_name + "_id"
-        except FieldDoesNotExist:
-            pass
-
-        return field_name
+        return sanitize_field_name(self, field_name)
 
     def _current_value(self, field_name: str) -> Any:
-        if "." in field_name:
-
-            def getitem(obj, field_name: str):
-                try:
-                    return getattr(obj, field_name)
-                except (AttributeError, ObjectDoesNotExist):
-                    return None
-
-            return reduce(getitem, field_name.split("."), self)
-        else:
-            return getattr(self, self._sanitize_field_name(field_name))
+        return get_value(self, field_name)
 
     def initial_value(self, field_name: str) -> Any:
         """
         Get initial value of field when model value instantiated.
         """
-        field_name = self._sanitize_field_name(field_name)
-
-        if field_name in self._initial_state:
-            return self._initial_state[field_name]
-
-        return None
+        return self._initial_state.get_value(self, field_name)
 
     def has_changed(self, field_name: str) -> bool:
         """
         Check if a field has changed since the model value instantiated.
         """
-        changed = self._diff_with_initial.keys()
-        field_name = self._sanitize_field_name(field_name)
-
-        if field_name in changed:
-            return True
-
-        return False
+        return self._initial_state.has_changed(self, field_name)
 
     def _clear_watched_fk_model_cache(self):
         """ """
@@ -175,7 +116,7 @@ class LifecycleModelMixin(object):
                 field.delete_cached_value(self)
 
     def _reset_initial_state(self):
-        self._initial_state = self._snapshot_state()
+        self._initial_state = ModelState.from_instance(self)
 
     @transaction.atomic
     def save(self, *args, **kwargs):
