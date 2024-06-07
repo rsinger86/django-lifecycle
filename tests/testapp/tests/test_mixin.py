@@ -203,6 +203,17 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         user_account.username = "Josephine"
         self.assertTrue(user_account.has_changed("username"))
 
+    def test_has_changed_when_refreshed_from_db(self):
+        data = self.stub_data
+        UserAccount.objects.create(**data)
+        user_account = UserAccount.objects.get()
+        UserAccount.objects.update(username="not " + user_account.username)
+        user_account.refresh_from_db()
+        user_account.username = data["username"]
+        self.assertTrue(user_account.has_changed("username"),
+                        'The initial state should get updated after refreshing the object from db')
+
+
     def test_has_changed_is_true_if_fk_related_model_field_has_changed(self):
         org = Organization.objects.create(name="Dunder Mifflin")
         UserAccount.objects.create(**self.stub_data, organization=org)
