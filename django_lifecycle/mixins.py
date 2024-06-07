@@ -155,7 +155,7 @@ class LifecycleModelMixin(object):
 
     def refresh_from_db(self, *args, **kwargs):
         super().refresh_from_db(*args, **kwargs)
-        self._initial_state = self._snapshot_state()
+        self._initial_state = ModelState.from_instance(self)
 
     @classmethod
     @lru_cache(typed=True)
