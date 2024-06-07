@@ -1,5 +1,10 @@
 # Changelog
 
+# 1.2.4 (June 2024)
+ - Revert deepcopying model state to copy
+ - Update the initial state after calling `refresh_from_db` on the model instance. Thanks, @partizaans!
+ - Refactor: Extract model state methods
+
 # 1.2.3 (February 2024)
 
  - Fix imports
