@@ -16,6 +16,7 @@ In short, you can write model code like this:
 
 ```python
 from django_lifecycle import LifecycleModel, hook, BEFORE_UPDATE, AFTER_UPDATE
+from django_lifecycle.conditions import WhenFieldValueIs, WhenFieldValueWas, WhenFieldHasChanged
 
 
 class Article(LifecycleModel):
