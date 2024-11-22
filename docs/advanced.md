@@ -7,7 +7,7 @@ These are available on your model instance when the mixin or extend the base mod
 |                  Method                  |                                                         Details                                                         |
 |:----------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------:|
 |  `has_changed(field_name: str) -> bool`  | Return a boolean indicating whether the field's value has changed since the model was initialized, or refreshed from db |
-| `initial_value(field_name: str) -> bool` |                Return the value of the field when the model was first initialized, or refreshed from db                 |
+| `initial_value(field_name: str) -> Any` |                Return the value of the field when the model was first initialized, or refreshed from db                 |
 
 ### Example
 You can use these methods for more advanced checks, for example:
