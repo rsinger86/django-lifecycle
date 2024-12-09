@@ -47,6 +47,7 @@ setup(
     author=get_metadata("django_lifecycle", "author"),
     author_email=get_metadata("django_lifecycle", "author_email"),
     packages=["django_lifecycle", "django_lifecycle_checks", "django_lifecycle.conditions"],
+    include_package_data=True,
     url="https://github.com/rsinger86/django-lifecycle",
     project_urls={
         "Documentation": "https://rsinger86.github.io/django-lifecycle/",
