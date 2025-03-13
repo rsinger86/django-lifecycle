@@ -1,8 +1,10 @@
 from __future__ import annotations
+from contextlib import contextmanager
 from functools import partial, lru_cache
 from inspect import isfunction
 from typing import Any, List
 from typing import Iterable
+from typing import TypeVar
 
 from django.db import transaction
 from django.db.models.fields.related_descriptors import (
@@ -37,6 +39,8 @@ DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = (
     ReverseManyToOneDescriptor,
     ReverseOneToOneDescriptor,
 )
+
+_MARKER = "_bypass_hooks"
 
 
 class HookedMethod(AbstractHookedMethod):
@@ -123,7 +127,8 @@ class LifecycleModelMixin(object):
         skip_hooks = kwargs.pop("skip_hooks", False)
         save = super().save
 
-        if skip_hooks:
+        skip_hooks_from_cm = hasattr(self.__class__, _MARKER)
+        if skip_hooks or skip_hooks_from_cm:
             save(*args, **kwargs)
             return
 
@@ -298,3 +303,17 @@ class LifecycleModelMixin(object):
             + cls._get_model_property_names()
             + ["_run_hooked_methods"]
         )
+
+
+T = TypeVar("T", bound=LifecycleModelMixin)
+
+
+@contextmanager
+def bypass_hooks_for(models: Iterable[T]):
+    try:
+        for model in models:
+            setattr(model, _MARKER, True)
+        yield
+    finally:
+        for model in models:
+            delattr(model, _MARKER)

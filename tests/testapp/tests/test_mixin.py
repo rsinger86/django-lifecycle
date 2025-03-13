@@ -3,10 +3,12 @@ from unittest.mock import MagicMock
 import django
 from django.test import TestCase
 
+from django_lifecycle import bypass_hooks_for
 from django_lifecycle.constants import NotSet
 from django_lifecycle.decorators import HookConfig
 from django_lifecycle.priority import DEFAULT_PRIORITY
 from tests.testapp.models import CannotRename
+from tests.testapp.models import ModelThatFailsIfTriggered
 from tests.testapp.models import Organization
 from tests.testapp.models import UserAccount
 
@@ -498,3 +500,7 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
                 "after_save_method_that_fires_if_changed_on_commit_on_commit",
             ],
         )
+
+    def test_bypass_hook_for(self):
+        with bypass_hooks_for((ModelThatFailsIfTriggered,)):
+            ModelThatFailsIfTriggered.objects.create()
