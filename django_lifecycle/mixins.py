@@ -267,7 +267,7 @@ class LifecycleModelMixin(object):
         for name in dir(cls):
             attr = getattr(cls, name, None)
 
-            if attr and isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
+            if isinstance(attr, DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES):
                 descriptor_names.append(name)
 
         return descriptor_names
