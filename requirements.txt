@@ -1,6 +1,6 @@
-asgiref==3.4.1
+asgiref>=3.8.1
 Click==7.0
-Django==5.0b1
+Django==5.2
 django-capture-on-commit-callbacks==1.10.0
 djangorestframework==3.11.2
 ghp-import==2.0.2
@@ -21,7 +21,7 @@ pytz==2023.3
 PyYAML==6.0.1
 pyyaml-env-tag==0.1
 six==1.14.0
-sqlparse==0.3.0
+sqlparse>=0.3.1
 tornado==6.0.3
 urlman==1.2.0
 watchdog==2.1.6
