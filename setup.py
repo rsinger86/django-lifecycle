@@ -39,6 +39,7 @@ classifiers = [
     "Framework :: Django :: 4.1",
     "Framework :: Django :: 4.2",
     "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
 ]
 setup(
     name="django-lifecycle",
