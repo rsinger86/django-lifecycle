@@ -177,3 +177,9 @@ class ModelWithGenericForeignKey(LifecycleModel):
     @hook(AFTER_SAVE, when="content_object", has_changed=True, on_commit=True)
     def do_something(self):
         print("Hey there! I am using django-lifecycle")
+
+
+class ModelThatFailsIfTriggered(LifecycleModel):
+    @hook("after_create")
+    def one_hook(self):
+        raise RuntimeError
