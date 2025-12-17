@@ -42,7 +42,29 @@ DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = (
     ReverseOneToOneDescriptor,
 )
 
-_bypass_state = threading.local()
+
+class LifecycleHookBypass:
+    _bypass_state = threading.local()
+
+    @classmethod
+    def get_model_full_name(cls) -> str:
+        return f"{cls.__module__}:{cls.__qualname__}"
+
+    @classmethod
+    def set_bypass_lifecycle(cls):
+        setattr(
+            cls._bypass_state,
+            cls.get_model_full_name(),
+            True,
+        )
+
+    @classmethod
+    def remove_bypass_lifecycle(cls):
+        delattr(cls._bypass_state, cls.get_model_full_name())
+
+    @classmethod
+    def is_lifecycle_bypassed(cls) -> bool:
+        return getattr(cls._bypass_state, cls.get_model_full_name(), False)
 
 
 class HookedMethod(AbstractHookedMethod):
@@ -83,7 +105,7 @@ def instantiate_hooked_method(
     )
 
 
-class LifecycleModelMixin(object):
+class LifecycleModelMixin(LifecycleHookBypass, object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._initial_state = ModelState.from_instance(self)
@@ -129,11 +151,7 @@ class LifecycleModelMixin(object):
         skip_hooks = kwargs.pop("skip_hooks", False)
         save = super().save
 
-        skip_hooks_from_cm = getattr(
-            _bypass_state,
-            f"{self.__class__.__module__}:{self.__class__.__qualname__}",
-            None,
-        )
+        skip_hooks_from_cm = self.__class__.is_lifecycle_bypassed()
         if skip_hooks or skip_hooks_from_cm:
             save(*args, **kwargs)
             return
@@ -311,19 +329,15 @@ class LifecycleModelMixin(object):
         )
 
 
-T = TypeVar("T", bound=LifecycleModelMixin)
+T = TypeVar("T", bound=LifecycleHookBypass)
 
 
 @contextmanager
 def bypass_hooks_for(models: Iterable[T]):
     try:
         for model in models:
-            setattr(
-                _bypass_state,
-                f"{model.__module__}:{model.__qualname__}",
-                True,
-            )
+            model.set_bypass_lifecycle()
         yield
     finally:
         for model in models:
-            delattr(_bypass_state, f"{model.__module__}:{model.__qualname__}")
+            model.remove_bypass_lifecycle()
