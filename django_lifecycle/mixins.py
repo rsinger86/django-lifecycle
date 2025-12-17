@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import threading
 from contextlib import contextmanager
 from functools import partial, lru_cache
 from inspect import isfunction
@@ -40,7 +42,7 @@ DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = (
     ReverseOneToOneDescriptor,
 )
 
-_MARKER = "_bypass_hooks"
+_bypass_state = threading.local()
 
 
 class HookedMethod(AbstractHookedMethod):
@@ -127,7 +129,11 @@ class LifecycleModelMixin(object):
         skip_hooks = kwargs.pop("skip_hooks", False)
         save = super().save
 
-        skip_hooks_from_cm = hasattr(self.__class__, _MARKER)
+        skip_hooks_from_cm = getattr(
+            _bypass_state,
+            f"{self.__class__.__module__}:{self.__class__.__qualname__}",
+            None,
+        )
         if skip_hooks or skip_hooks_from_cm:
             save(*args, **kwargs)
             return
@@ -312,8 +318,12 @@ T = TypeVar("T", bound=LifecycleModelMixin)
 def bypass_hooks_for(models: Iterable[T]):
     try:
         for model in models:
-            setattr(model, _MARKER, True)
+            setattr(
+                _bypass_state,
+                f"{model.__module__}:{model.__qualname__}",
+                True,
+            )
         yield
     finally:
         for model in models:
-            delattr(model, _MARKER)
+            delattr(_bypass_state, f"{model.__module__}:{model.__qualname__}")
