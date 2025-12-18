@@ -44,27 +44,28 @@ DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = (
 
 
 class LifecycleHookBypass:
-    _bypass_state = threading.local()
+    def __init__(self):
+        self._state = threading.local()
 
-    @classmethod
-    def get_model_full_name(cls) -> str:
-        return f"{cls.__module__}:{cls.__qualname__}"
+    @staticmethod
+    def get_model_full_name(model) -> str:
+        return f"{model.__module__}:{model.__qualname__}"
 
-    @classmethod
-    def set_bypass_lifecycle(cls):
+    def set_bypass_for(self, model):
         setattr(
-            cls._bypass_state,
-            cls.get_model_full_name(),
+            self._state,
+            self.get_model_full_name(model),
             True,
         )
 
-    @classmethod
-    def remove_bypass_lifecycle(cls):
-        delattr(cls._bypass_state, cls.get_model_full_name())
+    def remove_bypass_for(self, model):
+        delattr(self._state, self.get_model_full_name(model))
 
-    @classmethod
-    def is_lifecycle_bypassed(cls) -> bool:
-        return getattr(cls._bypass_state, cls.get_model_full_name(), False)
+    def is_bypassed_for(self, model) -> bool:
+        return getattr(self._state, self.get_model_full_name(model), False)
+
+
+_bypass_state = LifecycleHookBypass()
 
 
 class HookedMethod(AbstractHookedMethod):
@@ -105,7 +106,7 @@ def instantiate_hooked_method(
     )
 
 
-class LifecycleModelMixin(LifecycleHookBypass, object):
+class LifecycleModelMixin(object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._initial_state = ModelState.from_instance(self)
@@ -151,7 +152,7 @@ class LifecycleModelMixin(LifecycleHookBypass, object):
         skip_hooks = kwargs.pop("skip_hooks", False)
         save = super().save
 
-        skip_hooks_from_cm = self.__class__.is_lifecycle_bypassed()
+        skip_hooks_from_cm = _bypass_state.is_bypassed_for(self.__class__)
         if skip_hooks or skip_hooks_from_cm:
             save(*args, **kwargs)
             return
@@ -336,8 +337,8 @@ T = TypeVar("T", bound=LifecycleHookBypass)
 def bypass_hooks_for(models: Iterable[T]):
     try:
         for model in models:
-            model.set_bypass_lifecycle()
+            _bypass_state.set_bypass_for(model)
         yield
     finally:
         for model in models:
-            model.remove_bypass_lifecycle()
+            _bypass_state.remove_bypass_for(model)
