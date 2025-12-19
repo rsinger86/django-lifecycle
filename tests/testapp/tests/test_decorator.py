@@ -5,6 +5,7 @@ from django_lifecycle import hook, LifecycleModelMixin, AFTER_CREATE
 from django_lifecycle.conditions import Always
 from django_lifecycle.decorators import DjangoLifeCycleException
 from django_lifecycle.priority import HIGHEST_PRIORITY, LOWER_PRIORITY
+from tests.testapp.models import ModelThatFailsIfTriggered
 
 
 class DecoratorTests(TestCase):

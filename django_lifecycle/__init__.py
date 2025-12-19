@@ -13,6 +13,7 @@ from .hooks import BEFORE_DELETE
 from .hooks import BEFORE_SAVE
 from .hooks import BEFORE_UPDATE
 from .mixins import LifecycleModelMixin
+from .mixins import bypass_hooks_for
 from .models import LifecycleModel
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "BEFORE_DELETE",
     "AFTER_DELETE",
     "NotSet",
+    "bypass_hooks_for",
 ]

@@ -1,8 +1,12 @@
 from __future__ import annotations
+
+import threading
+from contextlib import contextmanager
 from functools import partial, lru_cache
 from inspect import isfunction
 from typing import Any, List
 from typing import Iterable
+from typing import TypeVar
 
 from django.db import transaction
 from django.db.models.fields.related_descriptors import (
@@ -37,6 +41,31 @@ DJANGO_RELATED_FIELD_DESCRIPTOR_CLASSES = (
     ReverseManyToOneDescriptor,
     ReverseOneToOneDescriptor,
 )
+
+
+class LifecycleHookBypass:
+    def __init__(self):
+        self._state = threading.local()
+
+    @staticmethod
+    def get_model_full_name(model) -> str:
+        return f"{model.__module__}:{model.__qualname__}"
+
+    def set_bypass_for(self, model):
+        setattr(
+            self._state,
+            self.get_model_full_name(model),
+            True,
+        )
+
+    def remove_bypass_for(self, model):
+        delattr(self._state, self.get_model_full_name(model))
+
+    def is_bypassed_for(self, model) -> bool:
+        return getattr(self._state, self.get_model_full_name(model), False)
+
+
+_bypass_state = LifecycleHookBypass()
 
 
 class HookedMethod(AbstractHookedMethod):
@@ -123,7 +152,8 @@ class LifecycleModelMixin(object):
         skip_hooks = kwargs.pop("skip_hooks", False)
         save = super().save
 
-        if skip_hooks:
+        skip_hooks_from_cm = _bypass_state.is_bypassed_for(self.__class__)
+        if skip_hooks or skip_hooks_from_cm:
             save(*args, **kwargs)
             return
 
@@ -298,3 +328,17 @@ class LifecycleModelMixin(object):
             + cls._get_model_property_names()
             + ["_run_hooked_methods"]
         )
+
+
+T = TypeVar("T", bound=LifecycleHookBypass)
+
+
+@contextmanager
+def bypass_hooks_for(models: Iterable[T]):
+    try:
+        for model in models:
+            _bypass_state.set_bypass_for(model)
+        yield
+    finally:
+        for model in models:
+            _bypass_state.remove_bypass_for(model)

@@ -81,3 +81,20 @@ To prevent the hooked methods from being called, pass `skip_hooks=True` when cal
 ```python
    account.save(skip_hooks=True)
 ```
+
+Or, you can rely on the `bypass_hooks_for` context manager:
+
+```python
+from django_lifecycle import bypass_hooks_for
+
+
+class MyModel(LifecycleModel):
+    @hook(AFTER_CREATE)
+    def trigger(self):
+        pass
+
+with bypass_hooks_for((MyModel,)):
+    model = MyModel()
+    model.save()  # will not invoke model.trigger() method
+
+```
