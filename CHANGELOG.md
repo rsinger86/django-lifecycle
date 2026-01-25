@@ -1,6 +1,9 @@
 # Changelog
 
 # 1.2.5 (January 2026)
+ - Fix Python and Django supported versions in docs and Pypi
+
+# 1.2.5 (January 2026)
  - Add a context manager to bypass hooks. Thanks, @ticosax!
  - Add support for django 6.0. Thanks @scpaes and @kimihito!
  - Remove support for unsupported versions of Django and Python.

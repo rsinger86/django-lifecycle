@@ -1,4 +1,4 @@
-__version__ = "1.2.5-fix-supported-versions"
+__version__ = "1.2.6"
 __author__ = "Robert Singer"
 __author_email__ = "robertgsinger@gmail.com"
 
