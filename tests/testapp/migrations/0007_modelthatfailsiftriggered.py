@@ -5,19 +5,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('testapp', '0006_useraccount_configurations'),
+        ("testapp", "0006_useraccount_configurations"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ModelThatFailsIfTriggered',
+            name="ModelThatFailsIfTriggered",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
             bases=(django_lifecycle.mixins.LifecycleModelMixin, models.Model),
         ),

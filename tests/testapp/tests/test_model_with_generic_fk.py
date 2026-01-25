@@ -12,11 +12,13 @@ else:
 
 
 class ModelWithGenericForeignKeyTestCase(TestCaseMixin, TestCase):
-
     def test_saving_model_with_generic_fk_doesnt_break(self):
         evil_corp = Organization.objects.create(name="Evil corp.")
         good_corp = Organization.objects.create(name="Good corp.")
-        model = ModelWithGenericForeignKey.objects.create(tag="evil-corp", content_object=evil_corp)
+        model = ModelWithGenericForeignKey.objects.create(
+            tag="evil-corp",
+            content_object=evil_corp,
+        )
 
         # One hook should be executed
         with self.captureOnCommitCallbacks(execute=True) as callbacks:

@@ -59,7 +59,12 @@ class UserAccount(LifecycleModel):
     @hook("after_create", on_commit=True)
     def do_after_create_jobs(self):
         # queue background job to process thumbnail image...
-        mail.send_mail("Welcome!", "Thank you for joining.", "from@example.com", ["to@example.com"])
+        mail.send_mail(
+            "Welcome!",
+            "Thank you for joining.",
+            "from@example.com",
+            ["to@example.com"],
+        )
 
     @staticmethod
     def build_email_changed_body(old_email, new_email):
@@ -170,7 +175,12 @@ class ModelCustomPK(LifecycleModel):
 
 class ModelWithGenericForeignKey(LifecycleModel):
     tag = models.SlugField()
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True, null=True)
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     object_id = models.PositiveIntegerField(blank=True, null=True)
     content_object = GenericForeignKey("content_type", "object_id")
 

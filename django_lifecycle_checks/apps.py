@@ -12,7 +12,7 @@ from django.db import models
 
 
 def get_models_to_check(
-    app_configs: Union[Iterable[AppConfig], None]
+    app_configs: Union[Iterable[AppConfig], None],
 ) -> Iterable[Type[models.Model]]:
     app_configs = app_configs or apps.get_app_configs()
     for app_config in app_configs:

@@ -13,7 +13,9 @@ def get_metadata(package, field):
     """
     with codecs.open(os.path.join(package, "__init__.py"), encoding="utf-8") as fp:
         init_py = fp.read()
-    return re.search("^__{}__ = ['\"]([^'\"]+)['\"]".format(field), init_py, re.MULTILINE).group(1)
+    return re.search(
+        "^__{}__ = ['\"]([^'\"]+)['\"]".format(field), init_py, re.MULTILINE
+    ).group(1)
 
 
 def readme():
@@ -47,7 +49,11 @@ setup(
     description="Declarative model lifecycle hooks.",
     author=get_metadata("django_lifecycle", "author"),
     author_email=get_metadata("django_lifecycle", "author_email"),
-    packages=["django_lifecycle", "django_lifecycle_checks", "django_lifecycle.conditions"],
+    packages=[
+        "django_lifecycle",
+        "django_lifecycle_checks",
+        "django_lifecycle.conditions",
+    ],
     include_package_data=True,
     url="https://github.com/rsinger86/django-lifecycle",
     project_urls={

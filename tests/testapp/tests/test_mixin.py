@@ -68,7 +68,10 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         )
 
         user_account = UserAccount.objects.get()
-        self.assertEqual(user_account.initial_value("organization.name"), "Dunder Mifflin")
+        self.assertEqual(
+            user_account.initial_value("organization.name"),
+            "Dunder Mifflin",
+        )
 
     def test_initial_value_if_field_has_changed(self):
         data = self.stub_data
@@ -91,13 +94,19 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         UserAccount.objects.create(**self.stub_data, organization=org)
         user_account = UserAccount.objects.get()
 
-        self.assertEqual(user_account._current_value("organization.name"), "Dunder Mifflin")
+        self.assertEqual(
+            user_account._current_value("organization.name"),
+            "Dunder Mifflin",
+        )
 
         org.name = "Dwight's Paper Empire"
         org.save()
         user_account._clear_watched_fk_model_cache()
 
-        self.assertEqual(user_account._current_value("organization.name"), "Dwight's Paper Empire")
+        self.assertEqual(
+            user_account._current_value("organization.name"),
+            "Dwight's Paper Empire",
+        )
 
     def test_run_hooked_methods_for_when(self):
         instance = UserAccount(first_name="Bob")
@@ -203,8 +212,10 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         UserAccount.objects.update(username="not " + user_account.username)
         user_account.refresh_from_db()
         user_account.username = data["username"]
-        self.assertTrue(user_account.has_changed("username"),
-                        'The initial state should get updated after refreshing the object from db')
+        self.assertTrue(
+            user_account.has_changed("username"),
+            "The initial state should get updated after refreshing the object from db",
+        )
 
     def test_has_changed_is_true_if_fk_related_model_field_has_changed(self):
         org = Organization.objects.create(name="Dunder Mifflin")
@@ -335,7 +346,9 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         data = self.stub_data
         UserAccount.objects.create(**data)
         user_account = UserAccount.objects.get()
-        with self.assertRaises(CannotRename, msg="Oh, not Flanders. Anybody but Flanders."):
+        with self.assertRaises(
+            CannotRename, msg="Oh, not Flanders. Anybody but Flanders."
+        ):
             user_account.last_name = "Flanders"
             user_account.save()
 
@@ -343,7 +356,10 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         user_account = UserAccount.objects.create(**self.stub_data)
         user_account.first_name = "Flanders"
         user_account.last_name = "Flanders"
-        with self.assertRaises(CannotRename, msg="Oh, not Flanders. Anybody but Flanders."):
+        with self.assertRaises(
+            CannotRename,
+            msg="Oh, not Flanders. Anybody but Flanders.",
+        ):
             user_account.last_name = "Flanders"
             user_account.save(update_fields=["last_name"])
 
@@ -353,7 +369,8 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
         user_account = UserAccount.objects.create(**self.stub_data)
         user_account.first_name = "Flanders"
         user_account.last_name = "Flanders"
-        user_account.save(update_fields=["first_name"])  # `CannotRename` exception is not raised
+        # `CannotRename` exception is not raised
+        user_account.save(update_fields=["first_name"])
 
         user_account.refresh_from_db()
         self.assertEqual(user_account.first_name, "Flanders")
@@ -477,7 +494,9 @@ class LifecycleMixinTests(TestCaseMixin, TestCase):
                 ),
                 MagicMock(
                     __name__="after_save_method_that_fires_if_changed_on_commit",
-                    _hooked=[HookConfig(hook="after_save", has_changed=True, on_commit=True)],
+                    _hooked=[
+                        HookConfig(hook="after_save", has_changed=True, on_commit=True)
+                    ],
                 ),
             ]
         )

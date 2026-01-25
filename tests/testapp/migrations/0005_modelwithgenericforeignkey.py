@@ -6,7 +6,6 @@ import django_lifecycle.mixins
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
         ("testapp", "0004_alter_locale_id_alter_locale_users_and_more"),

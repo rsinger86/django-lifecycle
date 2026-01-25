@@ -28,7 +28,9 @@ class ChainedCondition:
     def __or__(self, other):
         return ChainedCondition(self, other, operator=operator.or_)
 
-    def __call__(self, instance: Any, update_fields: Union[Iterable[str], None] = None) -> bool:
+    def __call__(
+        self, instance: Any, update_fields: Union[Iterable[str], None] = None
+    ) -> bool:
         left_result = self.left(instance, update_fields)
         right_result = self.right(instance, update_fields)
         return self.operator(left_result, right_result)
@@ -43,5 +45,6 @@ class ChainableCondition:
     def __or__(self, other) -> ChainedCondition:
         return ChainedCondition(self, other, operator=operator.or_)
 
-    def __call__(self, instance: Any, update_fields: Union[Iterable[str], None] = None) -> bool:
-        ...
+    def __call__(
+        self, instance: Any, update_fields: Union[Iterable[str], None] = None
+    ) -> bool: ...

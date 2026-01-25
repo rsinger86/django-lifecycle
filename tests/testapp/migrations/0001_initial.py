@@ -6,54 +6,78 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='UserAccount',
+            name="UserAccount",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('username', models.CharField(max_length=100)),
-                ('first_name', models.CharField(max_length=100)),
-                ('last_name', models.CharField(max_length=100)),
-                ('password', models.CharField(max_length=200)),
-                ('email', models.EmailField(max_length=254, null=True)),
-                ('password_updated_at', models.DateTimeField(null=True)),
-                ('joined_at', models.DateTimeField(null=True)),
-                ('has_trial', models.BooleanField(default=False)),
-                ('status', models.CharField(
-                    choices=[('active', 'Active'), ('banned', 'Banned'), ('inactive', 'Inactive')],
-                    default='active', max_length=30
-                )),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("username", models.CharField(max_length=100)),
+                ("first_name", models.CharField(max_length=100)),
+                ("last_name", models.CharField(max_length=100)),
+                ("password", models.CharField(max_length=200)),
+                ("email", models.EmailField(max_length=254, null=True)),
+                ("password_updated_at", models.DateTimeField(null=True)),
+                ("joined_at", models.DateTimeField(null=True)),
+                ("has_trial", models.BooleanField(default=False)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("active", "Active"),
+                            ("banned", "Banned"),
+                            ("inactive", "Inactive"),
+                        ],
+                        default="active",
+                        max_length=30,
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
-
         migrations.CreateModel(
-            name='Locale',
+            name="Locale",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(max_length=20)),
-                ('users', models.ManyToManyField(to='UserAccount')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("code", models.CharField(max_length=20)),
+                ("users", models.ManyToManyField(to="UserAccount")),
             ],
         ),
-
         migrations.CreateModel(
-            name='ModelCustomPK',
+            name="ModelCustomPK",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(null=True)),
-                ('answer', models.IntegerField(default=None, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created_at", models.DateTimeField(null=True)),
+                ("answer", models.IntegerField(default=None, null=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
-
     ]

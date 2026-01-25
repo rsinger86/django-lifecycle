@@ -10,12 +10,10 @@ class AbstractHookedMethod(ABC):
 
     @property
     @abstractmethod
-    def name(self) -> str:
-        ...
+    def name(self) -> str: ...
 
     @abstractmethod
-    def run(self, instance: Any) -> None:
-        ...
+    def run(self, instance: Any) -> None: ...
 
     def __lt__(self, other):
         if not isinstance(other, AbstractHookedMethod):

@@ -6,26 +6,37 @@ import django_lifecycle
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('testapp', '0001_initial'),
+        ("testapp", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Organization',
+            name="Organization",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
             bases=(django_lifecycle.LifecycleModelMixin, models.Model),
         ),
         migrations.AddField(
-            model_name='useraccount',
-            name='organization',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='testapp.Organization'),
+            model_name="useraccount",
+            name="organization",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="testapp.Organization",
+            ),
         ),
     ]

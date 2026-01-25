@@ -26,7 +26,10 @@ class When(ChainableCondition):
     changes_to: Any = NotSet
 
     def __call__(self, instance: Any, update_fields=None) -> bool:
-        has_changed_condition = WhenFieldHasChanged(self.when, has_changed=self.has_changed)
+        has_changed_condition = WhenFieldHasChanged(
+            self.when,
+            has_changed=self.has_changed,
+        )
         if not has_changed_condition(instance, update_fields=update_fields):
             return False
 
@@ -76,4 +79,6 @@ class WhenAny:
             )
             for field in self.when_any
         )
-        return any(condition(instance, update_fields=update_fields) for condition in conditions)
+        return any(
+            condition(instance, update_fields=update_fields) for condition in conditions
+        )
