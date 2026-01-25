@@ -9,8 +9,8 @@ This project provides a `@hook` decorator as well as a base model and mixin to a
 
 **Django Lifecycle Hooks** supports:
 
-* Python 3.7, 3.8, 3.9, 3.10, 3.11, and 3.12
-* Django 2.2, 3.2, 4.0, 4.1, 4.2, 5.0 and 5.2
+* Python 3.8, 3.9, 3.10, 3.11, 3.12, 3.13 and 3.14
+* Django 4.2, 5.0, 5.2 and 6.0
 
 In short, you can write model code like this:
 
