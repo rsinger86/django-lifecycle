@@ -1,5 +1,12 @@
 # Changelog
 
+# 1.2.5 (January 2026)
+ - Add a context manager to bypass hooks. Thanks, @ticosax!
+ - Add support for django 6.0. Thanks @scpaes and @kimihito!
+ - Remove support for unsupported versions of Django and Python.
+ - Avoid evaluating attributes. Thanks, @TonisPiip!
+ - Format code with ruff (and automate it with ruff)
+
 # 1.2.4 (June 2024)
  - Revert deepcopying model state to copy
  - Update the initial state after calling `refresh_from_db` on the model instance. Thanks, @partizaans!
