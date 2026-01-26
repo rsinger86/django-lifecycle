@@ -1,6 +1,6 @@
 # Changelog
 
-# 1.2.5 (January 2026)
+# 1.2.6 (January 2026)
  - Fix Python and Django supported versions in docs and Pypi
 
 # 1.2.5 (January 2026)
