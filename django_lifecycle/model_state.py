@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class ModelState:
-    def __init__(self, initial_state: Dict[str, Any]):
+    def __init__(self, initial_state: dict[str, Any]):
         self.initial_state = initial_state
 
     @classmethod

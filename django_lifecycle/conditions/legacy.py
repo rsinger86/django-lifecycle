@@ -17,10 +17,10 @@ from ..conditions import WhenFieldValueWasNot
 
 @dataclass
 class When(ChainableCondition):
-    when: Optional[str] = None
+    when: str | None = None
     was: Any = "*"
     is_now: Any = "*"
-    has_changed: Optional[bool] = None
+    has_changed: bool | None = None
     is_not: Any = NotSet
     was_not: Any = NotSet
     changes_to: Any = NotSet
@@ -58,10 +58,10 @@ class When(ChainableCondition):
 
 @dataclass
 class WhenAny:
-    when_any: Optional[List[str]] = None
+    when_any: list[str] | None = None
     was: Any = "*"
     is_now: Any = "*"
-    has_changed: Optional[bool] = None
+    has_changed: bool | None = None
     is_not: Any = NotSet
     was_not: Any = NotSet
     changes_to: Any = NotSet

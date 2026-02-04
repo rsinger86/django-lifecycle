@@ -27,14 +27,14 @@ class HookConfig(Validations):
     hook: str
     on_commit: bool = False
     priority: int = DEFAULT_PRIORITY
-    condition: Optional[types.Condition] = None
+    condition: types.Condition | None = None
 
     # Legacy parameters
-    when: Optional[str] = None
-    when_any: Optional[List[str]] = None
+    when: str | None = None
+    when_any: list[str] | None = None
     was: Any = "*"
     is_now: Any = "*"
-    has_changed: Optional[bool] = None
+    has_changed: bool | None = None
     is_not: Any = NotSet
     was_not: Any = NotSet
     changes_to: Any = NotSet
@@ -93,7 +93,7 @@ class HookConfig(Validations):
     def validate_hook(self, value, **kwargs):
         if value not in VALID_HOOKS:
             raise DjangoLifeCycleException(
-                "%s is not a valid hook; must be one of %s" % (hook, VALID_HOOKS)
+                f"{hook} is not a valid hook; must be one of {VALID_HOOKS}"
             )
 
         return value
