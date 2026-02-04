@@ -106,7 +106,7 @@ def instantiate_hooked_method(
     )
 
 
-class LifecycleModelMixin(object):
+class LifecycleModelMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._initial_state = ModelState.from_instance(self)
