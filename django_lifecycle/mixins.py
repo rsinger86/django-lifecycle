@@ -106,7 +106,7 @@ def instantiate_hooked_method(
     )
 
 
-class LifecycleModelMixin(object):
+class LifecycleModelMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._initial_state = ModelState.from_instance(self)
@@ -207,7 +207,7 @@ class LifecycleModelMixin(object):
 
     @classmethod
     @lru_cache(typed=True)
-    def _watched_fk_model_fields(cls) -> List[str]:
+    def _watched_fk_model_fields(cls) -> list[str]:
         """
         Gather up all field names (values in 'when' key) that correspond to
         field names on FK-related models. These will be strings that contain
@@ -224,12 +224,12 @@ class LifecycleModelMixin(object):
 
     @classmethod
     @lru_cache(typed=True)
-    def _watched_fk_models(cls) -> List[str]:
+    def _watched_fk_models(cls) -> list[str]:
         return [_.split(".")[0] for _ in cls._watched_fk_model_fields()]
 
     def _get_hooked_methods(
         self, hook: str, update_fields: Iterable[str] | None = None, **kwargs
-    ) -> List[AbstractHookedMethod]:
+    ) -> list[AbstractHookedMethod]:
         """
         Iterate through decorated methods to find those that should be
         triggered by the current hook. If conditions exist, check them before
@@ -254,7 +254,7 @@ class LifecycleModelMixin(object):
 
         return sorted(hooked_methods)
 
-    def _run_hooked_methods(self, hook: str, **kwargs) -> List[str]:
+    def _run_hooked_methods(self, hook: str, **kwargs) -> list[str]:
         """Run hooked methods"""
         fired = []
 
@@ -265,7 +265,7 @@ class LifecycleModelMixin(object):
         return fired
 
     @classmethod
-    def _get_model_property_names(cls) -> List[str]:
+    def _get_model_property_names(cls) -> list[str]:
         """
         Gather up properties and cached_properties which may be methods
         that were decorated. Need to inspect class versions b/c doing
@@ -284,7 +284,7 @@ class LifecycleModelMixin(object):
         return property_names
 
     @classmethod
-    def _get_model_descriptor_names(cls) -> List[str]:
+    def _get_model_descriptor_names(cls) -> list[str]:
         """
         Attributes which are Django descriptors. These represent a field
         which is a one-to-many or many-to-many relationship that is
@@ -303,7 +303,7 @@ class LifecycleModelMixin(object):
         return descriptor_names
 
     @classmethod
-    def _get_field_names(cls) -> List[str]:
+    def _get_field_names(cls) -> list[str]:
         names = []
 
         for f in cls._meta.get_fields():
@@ -321,7 +321,7 @@ class LifecycleModelMixin(object):
         return names
 
     @classmethod
-    def _get_unhookable_attribute_names(cls) -> List[str]:
+    def _get_unhookable_attribute_names(cls) -> list[str]:
         return (
             cls._get_field_names()
             + cls._get_model_descriptor_names()

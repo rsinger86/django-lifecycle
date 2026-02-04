@@ -11,11 +11,11 @@ if TYPE_CHECKING:
 
 
 class ModelState:
-    def __init__(self, initial_state: Dict[str, Any]):
+    def __init__(self, initial_state: dict[str, Any]):
         self.initial_state = initial_state
 
     @classmethod
-    def from_instance(cls, instance: "LifecycleModelMixin") -> ModelState:
+    def from_instance(cls, instance: LifecycleModelMixin) -> ModelState:
         state = instance.__dict__.copy()
 
         for watched_related_field in instance._watched_fk_model_fields():
@@ -32,7 +32,7 @@ class ModelState:
 
         return ModelState(state)
 
-    def get_diff(self, instance: "LifecycleModelMixin") -> dict:
+    def get_diff(self, instance: LifecycleModelMixin) -> dict:
         current = ModelState.from_instance(instance).initial_state
         diffs = {}
 
@@ -47,14 +47,14 @@ class ModelState:
 
         return diffs
 
-    def get_value(self, instance: "LifecycleModelMixin", field_name: str) -> Any:
+    def get_value(self, instance: LifecycleModelMixin, field_name: str) -> Any:
         """
         Get initial value of field when model was instantiated.
         """
         field_name = sanitize_field_name(instance, field_name)
         return self.initial_state.get(field_name)
 
-    def has_changed(self, instance: "LifecycleModelMixin", field_name: str) -> bool:
+    def has_changed(self, instance: LifecycleModelMixin, field_name: str) -> bool:
         """
         Check if a field has changed since the model was instantiated.
         """

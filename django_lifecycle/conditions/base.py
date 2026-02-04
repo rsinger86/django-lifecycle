@@ -29,7 +29,7 @@ class ChainedCondition:
         return ChainedCondition(self, other, operator=operator.or_)
 
     def __call__(
-        self, instance: Any, update_fields: Union[Iterable[str], None] = None
+        self, instance: Any, update_fields: Iterable[str] | None = None
     ) -> bool:
         left_result = self.left(instance, update_fields)
         right_result = self.right(instance, update_fields)
@@ -46,5 +46,5 @@ class ChainableCondition:
         return ChainedCondition(self, other, operator=operator.or_)
 
     def __call__(
-        self, instance: Any, update_fields: Union[Iterable[str], None] = None
+        self, instance: Any, update_fields: Iterable[str] | None = None
     ) -> bool: ...

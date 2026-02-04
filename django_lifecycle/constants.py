@@ -1,2 +1,2 @@
-class NotSet(object):
+class NotSet:
     pass

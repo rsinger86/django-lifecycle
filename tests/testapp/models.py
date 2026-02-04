@@ -102,7 +102,7 @@ class UserAccount(LifecycleModel):
     def notify_org_name_change(self):
         mail.send_mail(
             "The name of your organization has changed!",
-            "You organization is now named %s" % self.organization.name,
+            f"You organization is now named {self.organization.name}",
             "from@example.com",
             ["to@example.com"],
         )
@@ -116,7 +116,7 @@ class UserAccount(LifecycleModel):
     def notify_user_they_were_moved_to_online_school(self):
         mail.send_mail(
             "You were moved to our online school!",
-            "You organization is now named %s" % self.organization.name,
+            f"You organization is now named {self.organization.name}",
             "from@example.com",
             ["to@example.com"],
         )
