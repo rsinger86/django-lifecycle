@@ -1,2 +1,7 @@
 # Reformat files with ruff
 667ea4dee0f214a951c4c9c8b51fed36afb838bf
+
+# Apply ruff UP fixes
+f27f2c62d2f22b88d322586496284af3a1e541c5
+# Apply ruff UP unsafe fixes
+73f803599575f2fce3d0e7a2f23e51d3e842167b
