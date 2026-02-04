@@ -1,6 +1,5 @@
 import datetime
 
-import django
 from django.core import mail
 from django.test import TestCase
 
@@ -8,15 +7,8 @@ from tests.testapp.models import CannotDeleteActiveTrial
 from tests.testapp.models import Organization
 from tests.testapp.models import UserAccount
 
-if django.VERSION < (3, 2):
-    from django_capture_on_commit_callbacks import TestCaseMixin
-else:
 
-    class TestCaseMixin:
-        """Dummy implementation for Django >= 4.0"""
-
-
-class UserAccountTestCase(TestCaseMixin, TestCase):
+class UserAccountTestCase(TestCase):
     @property
     def stub_data(self):
         return {

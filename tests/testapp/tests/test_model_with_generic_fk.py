@@ -1,17 +1,9 @@
-import django
 from django.test import TestCase
 from tests.testapp.models import ModelWithGenericForeignKey
 from tests.testapp.models import Organization
 
-if django.VERSION < (3, 2):
-    from django_capture_on_commit_callbacks import TestCaseMixin
-else:
 
-    class TestCaseMixin:
-        """Dummy implementation for Django >= 4.0"""
-
-
-class ModelWithGenericForeignKeyTestCase(TestCaseMixin, TestCase):
+class ModelWithGenericForeignKeyTestCase(TestCase):
     def test_saving_model_with_generic_fk_doesnt_break(self):
         evil_corp = Organization.objects.create(name="Evil corp.")
         good_corp = Organization.objects.create(name="Good corp.")

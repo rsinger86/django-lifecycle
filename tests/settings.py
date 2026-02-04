@@ -106,8 +106,6 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-if django.VERSION < (4, 0):
-    USE_L10N = True
 
 USE_TZ = True
 
