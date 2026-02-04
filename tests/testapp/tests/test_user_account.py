@@ -8,12 +8,9 @@ from tests.testapp.models import CannotDeleteActiveTrial
 from tests.testapp.models import Organization
 from tests.testapp.models import UserAccount
 
-if django.VERSION < (3, 2):
-    from django_capture_on_commit_callbacks import TestCaseMixin
-else:
 
-    class TestCaseMixin:
-        """Dummy implementation for Django >= 4.0"""
+class TestCaseMixin:
+    """Dummy implementation for Django >= 4.0"""
 
 
 class UserAccountTestCase(TestCaseMixin, TestCase):

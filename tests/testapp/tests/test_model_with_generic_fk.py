@@ -3,12 +3,9 @@ from django.test import TestCase
 from tests.testapp.models import ModelWithGenericForeignKey
 from tests.testapp.models import Organization
 
-if django.VERSION < (3, 2):
-    from django_capture_on_commit_callbacks import TestCaseMixin
-else:
 
-    class TestCaseMixin:
-        """Dummy implementation for Django >= 4.0"""
+class TestCaseMixin:
+    """Dummy implementation for Django >= 4.0"""
 
 
 class ModelWithGenericForeignKeyTestCase(TestCaseMixin, TestCase):

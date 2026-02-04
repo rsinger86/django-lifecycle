@@ -12,12 +12,9 @@ from tests.testapp.models import ModelThatFailsIfTriggered
 from tests.testapp.models import Organization
 from tests.testapp.models import UserAccount
 
-if django.VERSION < (4, 0):
-    from django_capture_on_commit_callbacks import TestCaseMixin
-else:
 
-    class TestCaseMixin:
-        """Dummy implementation for Django >= 4.0"""
+class TestCaseMixin:
+    """Dummy implementation for Django >= 4.0"""
 
 
 class LifecycleMixinTests(TestCaseMixin, TestCase):
