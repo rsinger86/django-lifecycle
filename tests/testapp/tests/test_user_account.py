@@ -1,6 +1,5 @@
 import datetime
 
-import django
 from django.core import mail
 from django.test import TestCase
 
@@ -9,11 +8,7 @@ from tests.testapp.models import Organization
 from tests.testapp.models import UserAccount
 
 
-class TestCaseMixin:
-    """Dummy implementation for Django >= 4.0"""
-
-
-class UserAccountTestCase(TestCaseMixin, TestCase):
+class UserAccountTestCase(TestCase):
     @property
     def stub_data(self):
         return {

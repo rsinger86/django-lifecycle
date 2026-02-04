@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 
-import django
 from django.test import TestCase
 
 from django_lifecycle import bypass_hooks_for
@@ -13,11 +12,7 @@ from tests.testapp.models import Organization
 from tests.testapp.models import UserAccount
 
 
-class TestCaseMixin:
-    """Dummy implementation for Django >= 4.0"""
-
-
-class LifecycleMixinTests(TestCaseMixin, TestCase):
+class LifecycleMixinTests(TestCase):
     def setUp(self):
         UserAccount.objects.all().delete()
         Organization.objects.all().delete()
