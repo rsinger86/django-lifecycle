@@ -2,34 +2,31 @@ from __future__ import annotations
 
 import threading
 from contextlib import contextmanager
-from functools import partial, lru_cache
+from functools import lru_cache
+from functools import partial
 from inspect import isfunction
-from typing import Any, List
+from typing import Any
 from typing import Iterable
 from typing import TypeVar
 
 from django.db import transaction
-from django.db.models.fields.related_descriptors import (
-    ForwardManyToOneDescriptor,
-    ReverseOneToOneDescriptor,
-    ReverseManyToOneDescriptor,
-    ManyToManyDescriptor,
-    ForwardOneToOneDescriptor,
-)
+from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
+from django.db.models.fields.related_descriptors import ForwardOneToOneDescriptor
+from django.db.models.fields.related_descriptors import ManyToManyDescriptor
+from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
+from django.db.models.fields.related_descriptors import ReverseOneToOneDescriptor
 from django.utils.functional import cached_property
 
 from .abstract import AbstractHookedMethod
 from .decorators import HookConfig
-from .hooks import (
-    BEFORE_CREATE,
-    BEFORE_UPDATE,
-    BEFORE_SAVE,
-    BEFORE_DELETE,
-    AFTER_CREATE,
-    AFTER_UPDATE,
-    AFTER_SAVE,
-    AFTER_DELETE,
-)
+from .hooks import AFTER_CREATE
+from .hooks import AFTER_DELETE
+from .hooks import AFTER_SAVE
+from .hooks import AFTER_UPDATE
+from .hooks import BEFORE_CREATE
+from .hooks import BEFORE_DELETE
+from .hooks import BEFORE_SAVE
+from .hooks import BEFORE_UPDATE
 from .model_state import ModelState
 from .utils import get_value
 from .utils import sanitize_field_name

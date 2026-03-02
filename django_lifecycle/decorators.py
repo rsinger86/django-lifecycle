@@ -6,8 +6,6 @@ from functools import reduce
 from functools import wraps
 from typing import Any
 from typing import Callable
-from typing import List
-from typing import Optional
 
 from . import types
 from .conditions import Always
