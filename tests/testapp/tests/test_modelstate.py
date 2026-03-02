@@ -1,5 +1,5 @@
 from django.test import TestCase
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 from django_lifecycle.model_state import ModelState
 from tests.testapp.models import UserAccount, Organization
@@ -15,7 +15,7 @@ class ModelStateTests(TestCase):
             password="donuts",
             email="homer@simpsons.net",
             password_updated_at=None,
-            joined_at=datetime(1987, 4, 19, 19, tzinfo=UTC),
+            joined_at=datetime(1987, 4, 19, 19, tzinfo=timezone.utc),
             has_trial=False,
             organization=simpsons,
             name_changes=0,
@@ -29,8 +29,8 @@ class ModelStateTests(TestCase):
             last_name="Flanders",
             password="jesus",
             email="ned@flanders.org",
-            password_updated_at=datetime(2026, 3, 1, tzinfo=UTC),
-            joined_at=datetime(1987, 4, 19, 20, tzinfo=UTC),
+            password_updated_at=datetime(2026, 3, 1, tzinfo=timezone.utc),
+            joined_at=datetime(1987, 4, 19, 20, tzinfo=timezone.utc),
             has_trial=True,
             organization=flanders,
             name_changes=1,
@@ -47,10 +47,13 @@ class ModelStateTests(TestCase):
                 "last_name": ("Simpson", "Flanders"),
                 "password": ("donuts", "jesus"),
                 "email": ("homer@simpsons.net", "ned@flanders.org"),
-                "password_updated_at": (None, datetime(2026, 3, 1, tzinfo=UTC)),
+                "password_updated_at": (
+                    None,
+                    datetime(2026, 3, 1, tzinfo=timezone.utc),
+                ),
                 "joined_at": (
-                    datetime(1987, 4, 19, 19, 0, tzinfo=UTC),
-                    datetime(1987, 4, 19, 20, 0, tzinfo=UTC),
+                    datetime(1987, 4, 19, 19, 0, tzinfo=timezone.utc),
+                    datetime(1987, 4, 19, 20, 0, tzinfo=timezone.utc),
                 ),
                 "has_trial": (False, True),
                 "organization_id": (1, 2),
