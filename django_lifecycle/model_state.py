@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Any
-from typing import Dict
 from typing import TYPE_CHECKING
 
 from django_lifecycle.utils import get_value
@@ -43,7 +42,7 @@ class ModelState:
                 continue
 
             if initial_value != current_value:
-                diffs[key] = (key, current_value)
+                diffs[key] = (initial_value, current_value)
 
         return diffs
 
