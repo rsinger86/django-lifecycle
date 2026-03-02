@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from typing import Any
 from typing import Callable
 from typing import Iterable
-from typing import Union
 
 from .. import types
 

@@ -2,17 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
-from typing import List
-from typing import Optional
 
-from ..constants import NotSet
-from ..conditions.base import ChainableCondition
-from ..conditions import WhenFieldValueChangesTo
 from ..conditions import WhenFieldHasChanged
-from ..conditions import WhenFieldValueIsNot
+from ..conditions import WhenFieldValueChangesTo
 from ..conditions import WhenFieldValueIs
+from ..conditions import WhenFieldValueIsNot
 from ..conditions import WhenFieldValueWas
 from ..conditions import WhenFieldValueWasNot
+from ..conditions.base import ChainableCondition
+from ..constants import NotSet
 
 
 @dataclass

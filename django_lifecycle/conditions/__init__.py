@@ -3,10 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 from typing import Iterable
-from typing import Union
 
-from ..constants import NotSet
 from ..conditions.base import ChainableCondition
+from ..constants import NotSet
 
 __all__ = [
     "WhenFieldValueWas",
