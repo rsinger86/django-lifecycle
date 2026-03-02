@@ -1,5 +1,11 @@
 # Changelog
 
+# 1.2.7 (March 2026)
+ - Fix get_diff utility. Thanks, @ahumeau!
+ - Upgrade python syntax to Python 3.8
+ - Remove pre-django 4.2 code
+ - Remove unused imports
+
 # 1.2.6 (January 2026)
  - Fix Python and Django supported versions in docs and Pypi
 
