@@ -1,10 +1,8 @@
 # Django Lifecycle Hooks
-
 [![Package version](https://badge.fury.io/py/django-lifecycle.svg)](https://pypi.python.org/pypi/django-lifecycle)
-[![Python versions](https://img.shields.io/pypi/status/django-lifecycle.svg)](https://img.shields.io/pypi/status/django-lifecycle.svg/)
+[![PyPI status](https://img.shields.io/pypi/status/django-lifecycle.svg)](https://pypi.org/project/django-lifecycle/)
 [![Python versions](https://img.shields.io/pypi/pyversions/django-lifecycle.svg)](https://pypi.org/project/django-lifecycle/)
-![PyPI - Django Version](https://img.shields.io/pypi/djversions/django-lifecycle)
-
+[![Django versions](https://img.shields.io/pypi/djversions/django-lifecycle)](https://pypi.org/project/django-lifecycle/)
 
 This project provides a `@hook` decorator as well as a base model and mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is [Signals](https://docs.djangoproject.com/en/dev/topics/signals/). However, my team often finds that Signals introduce unnecessary indirection and are at odds with Django's "fat models" approach.
 
@@ -50,7 +48,7 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 
     def save(self, *args, **kwargs):
-        if self.pk is not None and self.contents != self._orig_contents):
+        if self.pk is not None and self.contents != self._orig_contents:
             self.updated_at = timezone.now()
 
         super().save(*args, **kwargs)
@@ -61,8 +59,8 @@ Instead of overriding `save` and `__init__` in a clunky way that hurts readabili
 
 ## Requirements
 
-* Python (3.7+)
-* Django (2.2+)
+* Python (3.8+)
+* Django (4.2+)
 
 ## Installation
 
