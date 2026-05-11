@@ -22,7 +22,7 @@ PyYAML==6.0.1
 pyyaml-env-tag==0.1
 six==1.14.0
 sqlparse>=0.3.1
-tornado==6.0.3
+tornado==6.5.5
 urlman==1.2.0
 watchdog==2.1.6
 zipp==3.6.0
