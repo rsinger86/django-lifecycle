@@ -17,7 +17,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -573,9 +573,9 @@
 
 <h1 id="django-lifecycle-hooks">Django Lifecycle Hooks<a class="headerlink" href="#django-lifecycle-hooks" title="Permanent link">&para;</a></h1>
 <p><a href="https://pypi.python.org/pypi/django-lifecycle"><img alt="Package version" src="https://badge.fury.io/py/django-lifecycle.svg" /></a>
-<a href="https://img.shields.io/pypi/status/django-lifecycle.svg/"><img alt="Python versions" src="https://img.shields.io/pypi/status/django-lifecycle.svg" /></a>
+<a href="https://pypi.org/project/django-lifecycle/"><img alt="PyPI status" src="https://img.shields.io/pypi/status/django-lifecycle.svg" /></a>
 <a href="https://pypi.org/project/django-lifecycle/"><img alt="Python versions" src="https://img.shields.io/pypi/pyversions/django-lifecycle.svg" /></a>
-<img alt="PyPI - Django Version" src="https://img.shields.io/pypi/djversions/django-lifecycle" /></p>
+<a href="https://pypi.org/project/django-lifecycle/"><img alt="Django versions" src="https://img.shields.io/pypi/djversions/django-lifecycle" /></a></p>
 <p>This project provides a <code>@hook</code> decorator as well as a base model and mixin to add lifecycle hooks to your Django models. Django's built-in approach to offering lifecycle hooks is <a href="https://docs.djangoproject.com/en/dev/topics/signals/">Signals</a>. However, my team often finds that Signals introduce unnecessary indirection and are at odds with Django's "fat models" approach.</p>
 <p>In short, you can write model code like this:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">django_lifecycle</span><span class="w"> </span><span class="kn">import</span> <span class="n">LifecycleModel</span><span class="p">,</span> <span class="n">hook</span><span class="p">,</span> <span class="n">BEFORE_UPDATE</span><span class="p">,</span> <span class="n">AFTER_UPDATE</span>
@@ -614,7 +614,7 @@
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orig_contents</span><span class="p">):</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orig_contents</span><span class="p">:</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 </span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -624,8 +624,8 @@
 </span></code></pre></div>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Python (3.7+)</li>
-<li>Django (2.2+)</li>
+<li>Python (3.8+)</li>
+<li>Django (4.2+)</li>
 </ul>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip install django-lifecycle
