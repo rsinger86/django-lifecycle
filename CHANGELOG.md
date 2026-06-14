@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.3.0
+ - Confirm support for Python 3.13, 3.14 and Django 6.0. Thanks, @marciomazza!
+
 # 1.2.7 (March 2026)
  - Fix get_diff utility. Thanks, @ahumeau!
  - Upgrade python syntax to Python 3.8
