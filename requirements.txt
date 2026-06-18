@@ -13,7 +13,7 @@ mergedeep==1.3.4
 mkdocs==1.2.3
 mkdocs-material==4.6.3
 packaging==21.0
-Pygments==2.7.4
+Pygments==2.20.0
 pymdown-extensions==6.3
 pyparsing==3.0.0
 python-dateutil==2.8.2
